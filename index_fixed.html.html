@@ -1108,7 +1108,7 @@ body.viewer-mode .viewer-hide{display:none!important}
           <div class="card-title"><i data-lucide="calendar-days" class="lucide"></i> البلان الأسبوعي</div>
           <span id="wp-del-week-range" style="font-size:12px;color:var(--text2)"></span>
         </div>
-        <p style="font-size:12px;color:var(--text2);margin:0 0 12px">خطط زياراتك لكل يوم من السبت إلى الخميس: اكتب اسم الطبيب والمنطقة والايتم والغرض في جدول كل يوم، وفي الأسفل ستجد الجدول التجميعي لكل الأسبوع. الموعد الرسمي للتقديم: يوم الجمعة أو السبت.</p>
+        <p style="font-size:12px;color:var(--text2);margin:0 0 12px">خطط زياراتك لكل يوم من السبت إلى الخميس: اختر نوع الزيارة (طبيب أو صيدلية) واكتب الاسم والمنطقة والايتم والغرض في جدول كل يوم، وفي الأسفل ستجد الجدول التجميعي لكل الأسبوع. الموعد الرسمي للتقديم: يوم الجمعة أو السبت.</p>
         <div class="filter-row" style="margin-bottom:12px">
           <div class="form-group"><label><i data-lucide="calendar" class="lucide"></i> الأسبوع</label><select id="wp-del-week" onchange="loadDelWeeklyPlan()"></select></div>
           <div class="form-group" style="align-self:flex-end"><button class="btn btn-outline btn-sm" onclick="wpCopyLastWeek()"><i data-lucide="clipboard-list" class="lucide"></i> نسخ بلان الأسبوع الماضي</button></div>
@@ -1125,6 +1125,7 @@ body.viewer-mode .viewer-hide{display:none!important}
       </div>
 
       <datalist id="wp-dl-doctors"></datalist>
+      <datalist id="wp-dl-pharmacies"></datalist>
       <datalist id="wp-dl-areas"></datalist>
       <datalist id="wp-dl-purposes"></datalist>
     </div>
@@ -1176,7 +1177,8 @@ body.viewer-mode .viewer-hide{display:none!important}
     <div class="modal-body">
       <div class="alert alert-info" style="font-size:12px">التعديل يعتمد الزيارة مباشرة وتظهر للمندوب بعلامة «معدّلة من المشرف».</div>
       <div class="form-grid">
-        <div class="form-group full"><label><i data-lucide="stethoscope" class="lucide"></i> الطبيب</label><input type="text" id="wpe-doctor"></div>
+        <div class="form-group"><label><i data-lucide="repeat" class="lucide"></i> نوع الزيارة</label><select id="wpe-vtype"><option value="doctor">طبيب</option><option value="pharmacy">صيدلية</option></select></div>
+        <div class="form-group"><label><i data-lucide="stethoscope" class="lucide"></i> الطبيب / الصيدلية</label><input type="text" id="wpe-doctor"></div>
         <div class="form-group"><label><i data-lucide="map-pin" class="lucide"></i> المنطقة</label><input type="text" id="wpe-area"></div>
         <div class="form-group"><label><i data-lucide="calendar" class="lucide"></i> اليوم</label><select id="wpe-day"></select></div>
         <div class="form-group full"><label><i data-lucide="target" class="lucide"></i> الغرض من الزيارة</label><input type="text" id="wpe-purpose"></div>
@@ -4858,6 +4860,8 @@ function wpStatusBadge(st){const m={pending:['بانتظار المراجعة','
 function wpVisitBadge(v){if(v.status==='approved')return '<span class="badge badge-green">'+(v.edited?'معتمدة (معدّلة <i data-lucide="pencil" class="lucide"></i>)':'معتمدة <i data-lucide="check" class="lucide"></i>')+'</span>';if(v.status==='rejected')return '<span class="badge badge-red">مرفوضة <i data-lucide="x" class="lucide"></i></span>';return '<span class="badge badge-orange">بانتظار</span>';}
 function wpFlash(boxId,html,ms){const b=document.getElementById(boxId);if(!b)return;b.innerHTML=html;if(ms)setTimeout(()=>{b.innerHTML='';},ms);}
 function wpNewVid(){return Date.now()+''+Math.floor(Math.random()*1e5);}
+function wpVType(v){return v&&v.vtype==='pharmacy'?'pharmacy':'doctor';}
+function wpTypeBadge(v){return wpVType(v)==='pharmacy'?'<span class="badge badge-green"><i data-lucide="pill" class="lucide"></i> صيدلية</span>':'<span class="badge badge-blue"><i data-lucide="stethoscope" class="lucide"></i> طبيب</span>';}
 
 /* ---------- DELEGATE SIDE ---------- */
 async function initDelWeeklyPlan(){
@@ -4867,7 +4871,9 @@ async function initDelWeeklyPlan(){
   sel.innerHTML=opts.map(o=>`<option value="${wpWeekStart(o[0])}">${o[1]} (${wpWeekLabel(wpWeekStart(o[0]))})</option>`).join('');
   sel.value=(cur&&[...sel.options].some(o=>o.value===cur))?cur:wpWeekStart(1);
   if(!allDoctors.length){try{allDoctors=await sb('doctors','GET',null,'?order=name');}catch(e){}}
+  if(!allPharmacies.length){try{allPharmacies=await sb('pharmacies','GET',null,'?order=name');}catch(e){}}
   document.getElementById('wp-dl-doctors').innerHTML=allDoctors.map(d=>`<option value="${wpEsc(d.name)}"></option>`).join('');
+  document.getElementById('wp-dl-pharmacies').innerHTML=(allPharmacies||[]).map(p=>`<option value="${wpEsc(p.name)}"></option>`).join('');
   document.getElementById('wp-dl-areas').innerHTML=(sysSettings.areas||[]).map(a=>`<option value="${wpEsc(a)}"></option>`).join('');
   document.getElementById('wp-dl-purposes').innerHTML=WP_PURPOSES.map(p=>`<option value="${wpEsc(p)}"></option>`).join('');
   loadDelWeeklyPlan();
@@ -4906,7 +4912,8 @@ function renderDelPlan(){
     const dayVisits=wpDraft.filter(v=>v.day===day);
     const rows=dayVisits.map((v,ri)=>`<tr>
       <td style="color:var(--text2);font-size:11px">${ri+1}</td>
-      <td>${editable?`<input class="wp-cell-input" data-vid="${v.vid}" list="wp-dl-doctors" value="${wpEsc(v.doctor_name||'')}" placeholder="اسم الطبيب..." oninput="wpCellEdit('${v.vid}','doctor_name',this.value)">`:wpEsc(v.doctor_name||'—')}</td>
+      <td>${editable?`<select class="wp-cell-input" style="min-width:86px" onchange="wpCellEdit('${v.vid}','vtype',this.value)"><option value="doctor"${wpVType(v)==='doctor'?' selected':''}>طبيب</option><option value="pharmacy"${wpVType(v)==='pharmacy'?' selected':''}>صيدلية</option></select>`:wpTypeBadge(v)}</td>
+      <td>${editable?`<input class="wp-cell-input" data-vid="${v.vid}" list="${wpVType(v)==='pharmacy'?'wp-dl-pharmacies':'wp-dl-doctors'}" value="${wpEsc(v.doctor_name||'')}" placeholder="${wpVType(v)==='pharmacy'?'اسم الصيدلية...':'اسم الطبيب...'}" oninput="wpCellEdit('${v.vid}','doctor_name',this.value)">`:wpEsc(v.doctor_name||'—')}</td>
       <td>${editable?`<input class="wp-cell-input" list="wp-dl-areas" value="${wpEsc(v.area||'')}" placeholder="المنطقة..." oninput="wpCellEdit('${v.vid}','area',this.value)">`:wpEsc(v.area||'—')}</td>
       <td>${editable?`<input class="wp-cell-input" value="${wpEsc((v.items||[]).join('، '))}" placeholder="ايتم أو أكثر (افصل بـ ،)" oninput="wpCellEdit('${v.vid}','items',this.value)">`:((v.items||[]).map(x=>`<span class="badge badge-blue" style="margin:1px">${wpEsc(x)}</span>`).join(' ')||'—')}</td>
       <td>${editable?`<input class="wp-cell-input" list="wp-dl-purposes" value="${wpEsc(v.purpose||'')}" placeholder="الغرض من الزيارة..." oninput="wpCellEdit('${v.vid}','purpose',this.value)">`:wpEsc(v.purpose||'—')}</td>
@@ -4916,7 +4923,7 @@ function renderDelPlan(){
     return `<div class="wp-day-card">
       <div class="wp-day-head"><span><i data-lucide="calendar" class="lucide"></i> ${day} <span style="font-size:11px;color:var(--text2);font-weight:600">(${wpDayDate(ws,i)})</span></span><span style="font-size:11.5px;color:var(--text2)">${dayVisits.length?dayVisits.length+' زيارة':'لا زيارات'}</span></div>
       <div class="wp-day-body">
-        ${dayVisits.length?`<div class="table-wrap"><table><thead><tr><th>#</th><th><i data-lucide="stethoscope" class="lucide"></i> اسم الطبيب</th><th><i data-lucide="map-pin" class="lucide"></i> المنطقة</th><th><i data-lucide="pill" class="lucide"></i> الايتم</th><th><i data-lucide="target" class="lucide"></i> الغرض من الزيارة</th><th>الحالة</th>${editable?'<th>حذف</th>':''}</tr></thead><tbody>${rows}</tbody></table></div>`:'<p style="font-size:12px;color:var(--text2);margin:0">لا توجد زيارات مخططة لهذا اليوم</p>'}
+        ${dayVisits.length?`<div class="table-wrap"><table><thead><tr><th>#</th><th><i data-lucide="repeat" class="lucide"></i> النوع</th><th><i data-lucide="stethoscope" class="lucide"></i> اسم الطبيب / الصيدلية</th><th><i data-lucide="map-pin" class="lucide"></i> المنطقة</th><th><i data-lucide="pill" class="lucide"></i> الايتم</th><th><i data-lucide="target" class="lucide"></i> الغرض من الزيارة</th><th>الحالة</th>${editable?'<th>حذف</th>':''}</tr></thead><tbody>${rows}</tbody></table></div>`:'<p style="font-size:12px;color:var(--text2);margin:0">لا توجد زيارات مخططة لهذا اليوم</p>'}
         ${editable?`<button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="wpAddRow('${day}')"><i data-lucide="plus" class="lucide"></i> إضافة زيارة ليوم ${day}</button>`:''}
       </div>
     </div>`;
@@ -4925,7 +4932,8 @@ function renderDelPlan(){
 }
 function wpAddRow(day){
   const vid=wpNewVid();
-  wpDraft.push({vid:vid,doctor_id:null,doctor_name:'',area:'',items:[],purpose:'',day:day,note:null,status:'pending',sup_note:null,edited:false});
+  const last=wpDraft[wpDraft.length-1];
+  wpDraft.push({vid:vid,doctor_id:null,doctor_name:'',vtype:last?wpVType(last):'doctor',area:'',items:[],purpose:'',day:day,note:null,status:'pending',sup_note:null,edited:false});
   wpDirty=true;
   renderDelPlan();
   const el=document.querySelector('input[data-vid="'+vid+'"]');
@@ -4936,6 +4944,7 @@ function wpCellEdit(vid,field,val){
   if(field==='items')v.items=val.split(/[،,]/).map(s=>s.trim()).filter(Boolean);
   else v[field]=val;
   wpDirty=true;
+  if(field==='vtype'){renderDelPlan();return;}
   wpUpdateSummary();
 }
 function wpRemoveVisit(vid){wpDraft=wpDraft.filter(v=>String(v.vid)!==String(vid));wpDirty=true;renderDelPlan();}
@@ -4947,6 +4956,7 @@ function wpUpdateSummary(){
   const dash='<span style="color:var(--text2)">—</span>';
   const rows=visits.map(v=>`<tr>
     <td style="font-weight:700;white-space:nowrap">${wpEsc(v.day)}</td>
+    <td>${wpTypeBadge(v)}</td>
     <td>${(v.doctor_name||'').trim()?wpEsc(v.doctor_name):dash}</td>
     <td>${(v.area||'').trim()?wpEsc(v.area):dash}</td>
     <td>${(v.items||[]).map(x=>`<span class="badge badge-blue" style="margin:1px">${wpEsc(x)}</span>`).join(' ')||dash}</td>
@@ -4954,7 +4964,7 @@ function wpUpdateSummary(){
     <td>${wpCurrentPlan?wpVisitBadge(v):dash}${v.sup_note?`<br><span style="font-size:10.5px;color:#fbbf24"><i data-lucide="message-circle" class="lucide"></i> المشرف: ${wpEsc(v.sup_note)}</span>`:''}</td>
   </tr>`).join('');
   document.getElementById('wp-del-table').innerHTML=visits.length
-    ?`<div class="table-wrap"><table><thead><tr><th>اليوم</th><th>الطبيب</th><th>المنطقة</th><th>الايتمات</th><th>الغرض</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table></div>`
+    ?`<div class="table-wrap"><table><thead><tr><th>اليوم</th><th>النوع</th><th>الطبيب / الصيدلية</th><th>المنطقة</th><th>الايتمات</th><th>الغرض</th><th>الحالة</th></tr></thead><tbody>${rows}</tbody></table></div>`
     :'<div class="empty"><div class="icon"><i data-lucide="calendar-days" class="lucide"></i></div><p>لا توجد زيارات في البلان بعد — أضف الزيارات من جداول الأيام أعلاه</p></div>';
   document.getElementById('wp-del-actions').innerHTML=editable&&visits.length
     ?`<button class="btn btn-accent" onclick="wpSubmitPlan()">${wpCurrentPlan?'<i data-lucide="upload" class="lucide"></i> إعادة تقديم البلان للمشرف':'<i data-lucide="upload" class="lucide"></i> تقديم البلان للمشرف'}</button>${wpDirty?'<span style="font-size:11.5px;color:#fbbf24;margin-right:10px"><i data-lucide="alert-triangle" class="lucide"></i> لديك تعديلات غير مُرسلة</span>':''}`
@@ -4979,9 +4989,9 @@ async function wpSubmitPlan(){
   wpDraft=wpDraft.filter(v=>(v.doctor_name||'').trim()||(v.area||'').trim()||(v.items||[]).length||(v.purpose||'').trim());
   if(!wpDraft.length){wpFlash('wp-del-alert','<div class="alert alert-error">أضف زيارة واحدة على الأقل في أحد الأيام قبل التقديم</div>',3500);renderDelPlan();return;}
   const bad=wpDraft.filter(v=>!(v.doctor_name||'').trim()||!(v.area||'').trim()||!(v.items||[]).length||!(v.purpose||'').trim());
-  if(bad.length){wpFlash('wp-del-alert',`<div class="alert alert-error"><i data-lucide="alert-triangle" class="lucide"></i> يوجد ${bad.length} صف ناقص — أكمل (الطبيب، المنطقة، الايتم، الغرض) في كل صف أو احذفه</div>`,4500);renderDelPlan();return;}
+  if(bad.length){wpFlash('wp-del-alert',`<div class="alert alert-error"><i data-lucide="alert-triangle" class="lucide"></i> يوجد ${bad.length} صف ناقص — أكمل (اسم الطبيب أو الصيدلية، المنطقة، الايتم، الغرض) في كل صف أو احذفه</div>`,4500);renderDelPlan();return;}
   const isLate=wpFmtDate(new Date())>ws;
-  const visits=wpDraft.map(v=>({...v,doctor_name:v.doctor_name.trim(),area:v.area.trim(),purpose:v.purpose.trim(),status:'pending',sup_note:null,edited:false}));
+  const visits=wpDraft.map(v=>({...v,vtype:wpVType(v),doctor_name:v.doctor_name.trim(),area:v.area.trim(),purpose:v.purpose.trim(),status:'pending',sup_note:null,edited:false}));
   const payload={delegate_id:currentUser.id,delegate_name:currentUser.full_name,week_start:ws,visits:visits,status:'pending',supervisor_note:null,is_late:isLate,submitted_at:new Date().toISOString(),reviewed_at:null};
   try{
     if(wpCurrentPlan){await sb(`weekly_plans?id=eq.${wpCurrentPlan.id}`,'PATCH',payload);}
@@ -5071,6 +5081,7 @@ function wpSupPlanDetail(p){
   const gEl=document.getElementById('wp-gnote-'+p.id);
   const gVal=gEl?gEl.value:(p.supervisor_note||'');
   const visitRow=v=>`<tr>
+    <td>${wpTypeBadge(v)}</td>
     <td>${wpEsc(v.doctor_name)}</td>
     <td>${wpEsc(v.area)}</td>
     <td>${(v.items||[]).map(x=>`<span class="badge badge-blue" style="margin:1px">${wpEsc(x)}</span>`).join(' ')}</td>
@@ -5088,7 +5099,7 @@ function wpSupPlanDetail(p){
     if(!dv.length)return '';
     return `<div style="margin-bottom:14px">
       <div style="font-weight:800;font-size:13px;margin-bottom:6px;color:var(--gold)"><i data-lucide="calendar" class="lucide"></i> ${day} <span style="font-weight:600;color:var(--text2);font-size:11px">(${dv.length} زيارة)</span></div>
-      <div class="table-wrap"><table><thead><tr><th>الطبيب</th><th>المنطقة</th><th>الايتمات</th><th>الغرض</th><th>ملاحظات</th><th>الحالة</th><th class="viewer-hide">إجراءات</th></tr></thead><tbody>${dv.map(visitRow).join('')}</tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>النوع</th><th>الطبيب / الصيدلية</th><th>المنطقة</th><th>الايتمات</th><th>الغرض</th><th>ملاحظات</th><th>الحالة</th><th class="viewer-hide">إجراءات</th></tr></thead><tbody>${dv.map(visitRow).join('')}</tbody></table></div>
     </div>`;
   }).join('');
   const sub=p.submitted_at?new Date(p.submitted_at).toLocaleString('ar',{dateStyle:'short',timeStyle:'short'}):'—';
@@ -5145,6 +5156,7 @@ function wpOpenEdit(pid,vid){
   const p=wpSupPlans.find(x=>String(x.id)===String(pid));if(!p)return;
   const v=(p.visits||[]).find(x=>String(x.vid)===String(vid));if(!v)return;
   wpEditCtx={pid:pid,vid:vid};
+  document.getElementById('wpe-vtype').value=wpVType(v);
   document.getElementById('wpe-doctor').value=v.doctor_name||'';
   document.getElementById('wpe-area').value=v.area||'';
   const daySel=document.getElementById('wpe-day');
@@ -5159,6 +5171,7 @@ async function wpSaveEdit(){
   if(!wpEditCtx)return;
   const p=wpSupPlans.find(x=>String(x.id)===String(wpEditCtx.pid));if(!p)return;
   const v=(p.visits||[]).find(x=>String(x.vid)===String(wpEditCtx.vid));if(!v)return;
+  v.vtype=document.getElementById('wpe-vtype').value==='pharmacy'?'pharmacy':'doctor';
   v.doctor_name=document.getElementById('wpe-doctor').value.trim()||v.doctor_name;
   v.area=document.getElementById('wpe-area').value.trim()||v.area;
   v.day=document.getElementById('wpe-day').value;
