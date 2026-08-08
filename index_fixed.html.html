@@ -17,14 +17,16 @@
 :root{--primary:#c9a227;--primary-light:#e8c547;--accent:#10b981;--accent2:#e8c547;--bg:#0f0f13;--surface:#1a1a22;--surface2:#22222e;--border:#2e2e3e;--text:#e8e8f2;--text2:#8888a8;--text3:#55556a;--danger:#ef4444;--warning:#f59e0b;--success:#10b981;--shadow:0 4px 24px rgba(0,0,0,.6);--radius:14px;--gold:#c9a227;--gold-light:#e8c547}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;color-scheme:dark}
-#loader{position:fixed;inset:0;background:#0f0f13;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s}
+#loader{position:fixed;inset:0;background:#0f0f13;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100000;transition:opacity .5s}
 #loader .logo{font-size:48px;margin-bottom:12px}
 #loader h1{color:#e8e8f2;font-size:24px;font-weight:700}
 #loader p{color:rgba(232,232,242,.5);margin-top:8px}
 #loader .bar{width:200px;height:3px;background:rgba(201,162,39,.2);border-radius:10px;margin-top:24px;overflow:hidden}
 #loader .bar-fill{height:100%;background:var(--gold);border-radius:10px;animation:load 1.5s ease forwards}
 @keyframes load{from{width:0}to{width:100%}}
-#login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#080810,#0f0f13,#0a0a10);padding:20px}
+#login-page{position:fixed;inset:0;z-index:99999;min-height:100vh;overflow-y:auto;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#080810,#0f0f13,#0a0a10);padding:20px}
+body.login-open{overflow:hidden}
+body.login-open #app,body.login-open #toast-stack,body.login-open .modal-overlay{display:none!important}
 .login-card{background:#1a1a22;border:1px solid #2e2e3e;border-radius:24px;padding:48px 40px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
 .login-logo{text-align:center;margin-bottom:32px}
 .login-logo .icon{font-size:52px;display:block}
@@ -397,7 +399,7 @@ body.viewer-mode .viewer-hide{display:none!important}
 </head>
 <body>
 
-<div id="loader" style="opacity: 0; display: none;">
+<div id="loader">
   <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pill" aria-hidden="true" class="lucide lucide-pill"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path><path d="m8.5 8.5 7 7"></path></svg></div>
   <h1>نظام تقارير المندوبين</h1>
   <p>Pharma Field Reports System</p>
@@ -418,122 +420,32 @@ body.viewer-mode .viewer-hide{display:none!important}
   </div>
 </div>
 
-<div id="app" style="display: block;">
+<div id="app" style="display: none;">
   <div class="topbar">
     <div class="topbar-brand"><span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pill" aria-hidden="true" class="lucide lucide-pill"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path><path d="m8.5 8.5 7 7"></path></svg></span><h2 id="topbar-system-name">نظام تقارير المندوبين</h2></div>
-    <div class="global-search-wrap" id="global-search-wrap" style="display: block;">
+    <div class="global-search-wrap" id="global-search-wrap" style="display: none;">
       <input type="text" id="global-search-input" placeholder="بحث شامل: مندوب، طبيب، صيدلية، دواء..." oninput="runGlobalSearch(this.value)" onfocus="if(this.value)runGlobalSearch(this.value)">
       <div class="global-search-results" id="global-search-results"></div>
     </div>
     <div class="topbar-user">
       <div style="position:relative" id="notif-bell-wrap">
-        <button class="btn-logout" onclick="toggleNotifDropdown()" style="position:relative" id="notif-bell-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bell" aria-hidden="true" class="lucide lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg><span id="notif-badge" style="position: absolute; top: -4px; left: -4px; background: var(--danger); color: rgb(255, 255, 255); border-radius: 50%; width: 16px; height: 16px; font-size: 10px; font-weight: 800; align-items: center; justify-content: center; display: flex;">9+</span></button>
+        <button class="btn-logout" onclick="toggleNotifDropdown()" style="position:relative" id="notif-bell-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bell" aria-hidden="true" class="lucide lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg><span id="notif-badge" style="position: absolute; top: -4px; left: -4px; background: var(--danger); color: rgb(255, 255, 255); border-radius: 50%; width: 16px; height: 16px; font-size: 10px; font-weight: 800; align-items: center; justify-content: center; display: none;"></span></button>
         <div id="notif-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);left:0;width:320px;max-height:400px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);z-index:400">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border)">
             <strong style="font-size:13px"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bell" aria-hidden="true" class="lucide lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg> الإشعارات</strong>
             <button class="btn btn-sm btn-outline" onclick="markAllNotifsRead()">تحديد الكل كمقروء</button>
           </div>
-          <div id="notif-list" style="padding:6px"><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة طبيب: منيرة احمد النائب | جودة: 60%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:٣٧:١٣ م</div>
-      </div>
-    </div>
-  </div><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة صيدلية: الحدث | جودة: 60%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:١٧:١٤ م</div>
-      </div>
-    </div>
-  </div><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة صيدلية: البيت الطبي | جودة: 60%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:١٦:١٠ م</div>
-      </div>
-    </div>
-  </div><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة طبيب: علي الصواف | جودة: 40%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:١٥:٣٥ م</div>
-      </div>
-    </div>
-  </div><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة صيدلية: النبض | جودة: 40%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:١٤:٥١ م</div>
-      </div>
-    </div>
-  </div><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة طبيب: زيد صبحي قصاب باشي | جودة: 40%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:١٤:١٤ م</div>
-      </div>
-    </div>
-  </div><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة طبيب: ارقم غازي العبادي | جودة: 60%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:١٢:٤٠ م</div>
-      </div>
-    </div>
-  </div><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة طبيب: اوس القطان | جودة: 40%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:١١:٠٥ م</div>
-      </div>
-    </div>
-  </div><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة صيدلية: سارة عامر الداؤود | جودة: 60%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:١٠:٠٧ م</div>
-      </div>
-    </div>
-  </div><div style="padding:10px 12px;border-radius:8px;margin-bottom:4px;background:rgba(201,162,39,.08);border:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:flex-start">
-      <span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" aria-hidden="true" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg></span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">تقرير جديد — محمود</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">زيارة صيدلية: الابراهيمي | جودة: 60%</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:4px">٧‏/٨‏/٢٠٢٦ ١٠:٠٩:٢٦ م</div>
-      </div>
-    </div>
-  </div></div>
+          <div id="notif-list" style="padding:6px"></div>
         </div>
       </div>
-      <button class="btn-share" onclick="openShareModal()" id="share-btn" style="display: flex;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="link" aria-hidden="true" class="lucide lucide-link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> مشاركة</button>
-      <span class="user-name" id="topbar-name">المشرف العام</span>
-      <span class="role-badge" id="topbar-role">مشرف</span>
+      <button class="btn-share" onclick="openShareModal()" id="share-btn" style="display: none;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="link" aria-hidden="true" class="lucide lucide-link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> مشاركة</button>
+      <span class="user-name" id="topbar-name"></span>
+      <span class="role-badge" id="topbar-role"></span>
       <button class="btn-logout" onclick="doLogout()">خروج <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="log-out" aria-hidden="true" class="lucide lucide-log-out"><path d="m16 17 5-5-5-5"></path><path d="M21 12H9"></path><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path></svg></button>
     </div>
   </div>
 
-  <div class="nav-tabs" id="nav-supervisor" style="display: flex;">
+  <div class="nav-tabs" id="nav-supervisor" style="display: none;">
     <div class="nav-tab active" onclick="showPage(&#39;sup-dashboard&#39;,this)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bar-chart-3" aria-hidden="true" class="lucide lucide-bar-chart-3"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg> لوحة التحكم</div>
     <div class="nav-tab" onclick="showPage(&#39;sup-analytics&#39;,this)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trending-up" aria-hidden="true" class="lucide lucide-trending-up"><path d="M16 7h6v6"></path><path d="m22 7-8.5 8.5-5-5L2 17"></path></svg> التحليلات</div>
     <div class="nav-tab" onclick="showPage(&#39;sup-reports&#39;,this)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="clipboard-list" aria-hidden="true" class="lucide lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg> التقارير</div>
@@ -566,67 +478,13 @@ body.viewer-mode .viewer-hide{display:none!important}
 
     <!-- SUPERVISOR PAGES -->
     <div class="page active" id="sup-dashboard">
-      <div class="stats-grid" id="dash-stats">
-      <div class="stat-card"><div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="clipboard-list" aria-hidden="true" class="lucide lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg></div><div><div class="stat-value">0</div><div class="stat-label">تقارير اليوم</div></div></div>
-      <div class="stat-card green"><div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="stethoscope" aria-hidden="true" class="lucide lucide-stethoscope"><path d="M11 2v2"></path><path d="M5 2v2"></path><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"></path><path d="M8 15a6 6 0 0 0 12 0v-3"></path><circle cx="20" cy="10" r="2"></circle></svg></div><div><div class="stat-value">0</div><div class="stat-label">زيارات أطباء</div></div></div>
-      <div class="stat-card orange"><div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pill" aria-hidden="true" class="lucide lucide-pill"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path><path d="m8.5 8.5 7 7"></path></svg></div><div><div class="stat-value">0</div><div class="stat-label">زيارات صيدليات</div></div></div>
-      <div class="stat-card purple"><div class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="users" aria-hidden="true" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg></div><div><div class="stat-value">0/10</div><div class="stat-label">مندوبين نشطين</div></div></div></div>
+      <div class="stats-grid" id="dash-stats"></div>
       <div class="card">
         <div class="card-header">
           <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="users" aria-hidden="true" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg> المندوبون — نظرة عامة</div>
           <div class="filter-row" style="margin:0"><div class="form-group"><label>تاريخ</label><input type="date" id="dash-date" onchange="loadDashboard()"></div></div>
         </div>
-        <div id="dash-delegates-grid" class="delegate-grid"><div class="delegate-card" onclick="filterByDelegate(&#39;4691237a-5f34-4321-ba60-69f7f771a7ed&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">test</div>
-        <div class="company">—</div>
-        <span class="count">0/8</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div><div class="delegate-card" onclick="filterByDelegate(&#39;5b09bafb-c9e2-4916-a29b-af9be663cef7&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">عمر سعد</div>
-        <div class="company">—</div>
-        <span class="count">0/15</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div><div class="delegate-card" onclick="filterByDelegate(&#39;1fe2e77b-0fb1-4b3a-98c7-407ff50730ec&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">عبد الرحمن حسن</div>
-        <div class="company">fidia</div>
-        <span class="count">0/5</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div><div class="delegate-card" onclick="filterByDelegate(&#39;5ee3cefa-d12a-46d6-9eb1-20dc616ca90c&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">خلود</div>
-        <div class="company">MEDCEL</div>
-        <span class="count">0/5</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div><div class="delegate-card" onclick="filterByDelegate(&#39;7070fcbd-c92b-4817-9ea3-294681588803&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">حسن</div>
-        <div class="company">drogsan</div>
-        <span class="count">0/5</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div><div class="delegate-card" onclick="filterByDelegate(&#39;08f218ee-af12-457e-85bd-7c3a159ca982&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">محمود</div>
-        <div class="company">drogsan</div>
-        <span class="count">0/5</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div><div class="delegate-card" onclick="filterByDelegate(&#39;9e2daef5-39ff-405e-9e96-d30cfc62888d&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">احسان</div>
-        <div class="company">drogsan</div>
-        <span class="count">0/5</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div><div class="delegate-card" onclick="filterByDelegate(&#39;d96a67ae-3ee7-44a8-9798-90060a38463c&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">حكم اسماعيل</div>
-        <div class="company">scilife</div>
-        <span class="count">0/5</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div><div class="delegate-card" onclick="filterByDelegate(&#39;5740b2f9-21c5-47c4-9136-e369cc2d0f7d&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">عمار اللويزي</div>
-        <div class="company">Zim</div>
-        <span class="count">0/5</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div><div class="delegate-card" onclick="filterByDelegate(&#39;94be7a98-f84c-4d66-a243-1a3055e82927&#39;)">
-        <div class="avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="user" aria-hidden="true" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="name">ملاك</div>
-        <div class="company">fidia</div>
-        <span class="count">0/5</span>
-        <div style="height:6px;background:#2e2e3e;border-radius:10px;margin-top:8px;overflow:hidden"><div style="height:100%;width:0%;background:#c9a227;border-radius:10px"></div></div>
-      </div></div>
+        <div id="dash-delegates-grid" class="delegate-grid"></div>
       </div>
       <div class="card"><div class="card-header"><div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="clipboard-list" aria-hidden="true" class="lucide lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg> آخر التقارير</div></div><div id="dash-recent-table"><div class="empty"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="clipboard-list" aria-hidden="true" class="lucide lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M12 11h4"></path><path d="M12 16h4"></path><path d="M8 11h.01"></path><path d="M8 16h.01"></path></svg></div><p>لا توجد تقارير</p></div></div></div>
     </div>
@@ -1894,7 +1752,7 @@ window.onload=async()=>{
     document.getElementById('loader').style.display='none';
     const saved=localStorage.getItem('pharma_user');
     if(saved){currentUser=JSON.parse(saved);initApp();}
-    else document.getElementById('login-page').classList.remove('hidden');
+    else showLoginPage();
   },500);
   const today=dstr(new Date());
   document.getElementById('r-date').value=today;
@@ -1917,6 +1775,19 @@ function applySettings(){
 }
 function saveSysSettings(){localStorage.setItem('pharma_settings',JSON.stringify(sysSettings));}
 
+// إظهار شاشة تسجيل الدخول وإخفاء التطبيق بالكامل (منع ظهور البيانات قبل الدخول)
+function showLoginPage(){
+  document.getElementById('app').style.display='none';
+  document.body.classList.add('login-open');
+  document.getElementById('login-page').classList.remove('hidden');
+  document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+  window.scrollTo(0,0);
+}
+function hideLoginPage(){
+  document.getElementById('login-page').classList.add('hidden');
+  document.body.classList.remove('login-open');
+}
+
 async function doLogin(){
   const u=document.getElementById('login-username').value.trim();
   const p=document.getElementById('login-password').value.trim();
@@ -1925,7 +1796,7 @@ async function doLogin(){
   try{
     const res=await sb('rpc/verify_login','POST',{p_username:u,p_password:p});
     if(!res)showLoginError('اسم المستخدم أو كلمة المرور غير صحيحة');
-    else{currentUser=res;localStorage.setItem('pharma_user',JSON.stringify(currentUser));document.getElementById('login-page').classList.add('hidden');initApp();}
+    else{currentUser=res;localStorage.setItem('pharma_user',JSON.stringify(currentUser));hideLoginPage();initApp();}
   }catch(e){showLoginError('خطأ في الاتصال');}
   document.getElementById('login-btn-text').textContent='تسجيل الدخول';
 }
@@ -1934,6 +1805,7 @@ function showLoginError(m){const el=document.getElementById('login-error');el.te
 function doLogout(){localStorage.removeItem('pharma_user');location.reload();}
 
 async function initApp(){
+  hideLoginPage();
   document.getElementById('app').style.display='block';
   document.getElementById('topbar-name').textContent=currentUser.full_name;
   if(currentUser.role==='supervisor'){
