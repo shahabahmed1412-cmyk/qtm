@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style></head><body>
+<title>دفتر الحديد</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Lalezar&display=swap">
+<style>
+/* Layout: single-column mobile log, sticky header, bottom tab bar, rest timer docked above it */
+:root{
+  --bg:#eceff3; --surface:#ffffff; --surface-2:#f4f6f9; --line:#d5dbe3;
+  --fg:#142130; --muted:#5b6878; --accent:#1d4fc4; --accent-ink:#ffffff;
+  --pr:#b98200; --pr-soft:#fbefd0; --good:#1f7a4d; --good-soft:#dcf1e5; --warn:#b4471f; --warn-soft:#fbe3d9;
+  --f-display:"Lalezar","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e141b; --surface:#17202a; --surface-2:#1e2935; --line:#2c3a49;
+  --fg:#e6ebf1; --muted:#97a4b4; --accent:#7ea3ff; --accent-ink:#0b1320;
+  --pr:#f0c04a; --pr-soft:#3a2f12; --good:#5fcf95; --good-soft:#163527; --warn:#ff9a72; --warn-soft:#3d2219;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e141b; --surface:#17202a; --surface-2:#1e2935; --line:#2c3a49;
+  --fg:#e6ebf1; --muted:#97a4b4; --accent:#7ea3ff; --accent-ink:#0b1320;
+  --pr:#f0c04a; --pr-soft:#3a2f12; --good:#5fcf95; --good-soft:#163527; --warn:#ff9a72; --warn-soft:#3d2219;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.app{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 170px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--f-display);font-size:28px;line-height:1;letter-spacing:.5px}
+.brand small{display:block;font-family:var(--f-body);font-size:12px;color:var(--muted);letter-spacing:0;margin-top:4px}
+.plates{display:flex;gap:3px;align-items:center}
+.plates i{display:block;width:7px;border-radius:2px}
+h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:22px 0 8px;text-wrap:balance}
+h3{font-size:16px;margin:0;font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.card.flat{background:var(--surface-2);border-color:transparent}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:380px){.grid3{grid-template-columns:1fr 1fr}}
+.stat b{display:block;font-family:var(--f-num);font-size:22px;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
+.stat span{font-size:12px;color:var(--muted)}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 14px;min-height:40px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+button.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+button.danger{color:var(--warn);border-color:var(--warn)}
+button.block{width:100%}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input,select,textarea{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:40px;width:100%;min-width:0}
+textarea{min-height:110px;font-family:var(--f-num);font-size:12px;direction:ltr}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chip{flex:0 0 auto;border-radius:999px;padding:6px 14px;min-height:36px;font-size:14px}
+.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-inline-start:6px;vertical-align:middle}
+.tag{display:inline-block;font-size:12px;border-radius:6px;padding:1px 8px;background:var(--surface-2);color:var(--muted)}
+.tag.pr{background:var(--pr-soft);color:var(--pr);font-weight:700}
+.tag.up{background:var(--good-soft);color:var(--good);font-weight:600}
+.tag.hold{background:var(--surface-2);color:var(--muted)}
+.ex-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.ex-head .en{font-size:12px;color:var(--muted);direction:ltr;text-align:right}
+.target{font-size:13px;color:var(--muted);white-space:nowrap}
+.hint{font-size:13px;margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--surface-2)}
+.hint.up{background:var(--good-soft);color:var(--good)}
+.sets{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:6px 8px;align-items:center;margin-top:10px}
+.sets .h{font-size:12px;color:var(--muted)}
+.sets input{text-align:center;font-family:var(--f-num);direction:ltr}
+.sets .idx{font-family:var(--f-num);color:var(--muted);text-align:center}
+.tick{width:44px;height:40px;padding:0;border-radius:8px;font-size:18px;line-height:1}
+.tick.done{background:var(--good);border-color:var(--good);color:var(--surface)}
+.set-done input{border-color:var(--good)}
+details.card summary{cursor:pointer;font-weight:700}
+details.card[open] summary{margin-bottom:8px}
+ul.clean{list-style:none;margin:0;padding:0}
+ul.list li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+ul.list li:last-child{border-bottom:0}
+.bar{height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.bar.over i{background:var(--good)}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:600}
+.chart svg{width:100%;height:auto;display:block}
+.empty{padding:18px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r);font-size:14px}
+.banner{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:13px;margin-top:12px}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs button{border:0;border-radius:0;background:transparent;padding:8px 2px 10px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:56px}
+nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button.on{color:var(--accent);font-weight:700}
+.timer{position:fixed;left:0;right:0;bottom:calc(57px + env(safe-area-inset-bottom,0px));z-index:9;padding-inline:16px}
+.timer .in{max-width:640px;margin:0 auto 8px;background:var(--fg);color:var(--bg);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 24px rgb(0 0 0 / .25)}
+.timer .clock{font-family:var(--f-num);font-size:28px;font-weight:600;direction:ltr;min-width:84px}
+.timer .lbl{flex:1;font-size:13px;min-width:0}
+.timer button{background:transparent;color:var(--bg);border-color:color-mix(in srgb,var(--bg) 40%,transparent);min-height:36px;padding:4px 10px}
+.timer.ding .in{background:var(--good);color:var(--surface)}
+.toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 70px);left:50%;transform:translateX(-50%);z-index:20;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;max-width:calc(100% - 32px)}
+.confirm-on{background:var(--warn)!important;color:var(--surface)!important;border-color:var(--warn)!important}
+@media (prefers-reduced-motion:no-preference){.tick,.chip,button{transition:background .15s,color .15s}}
+</style>
+
+<div class="app" dir="rtl" lang="ar">
+  <header class="top">
+    <div class="brand">دفتر الحديد<small id="subtitle">برنامجك الشخصي للتضخيم</small></div>
+    <div class="plates" aria-hidden="true">
+      <i style="height:34px;background:#c8312b"></i><i style="height:30px;background:#2453c9"></i><i style="height:26px;background:#e2b014"></i><i style="height:22px;background:#2b8a4b"></i>
+    </div>
+  </header>
+  <div id="storeWarn" class="banner" hidden>التخزين في هذا المتصفح غير متاح الآن، فلن تُحفظ بياناتك بعد إغلاق الصفحة. افتح الصفحة في متصفح عادي (ليس وضع التصفح الخاص)، أو انسخ نسخة احتياطية من الإعدادات.</div>
+  <main id="view"></main>
+</div>
+
+<div class="timer" id="timer" hidden>
+  <div class="in">
+    <div class="clock" id="tClock">2:00</div>
+    <div class="lbl" id="tLabel">راحة</div>
+    <button type="button" id="tPlus">+30ث</button>
+    <button type="button" id="tStop">إيقاف</button>
+  </div>
+</div>
+
+<nav class="tabs" dir="rtl" id="tabs">
+  <button type="button" data-tab="today"><svg viewBox="0 0 24 24"><path d="M2 12h3M19 12h3M5 8v8M19 8v8M8 6v12M16 6v12M8 12h8"/></svg>التمرين</button>
+  <button type="button" data-tab="progress"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>التقدّم</button>
+  <button type="button" data-tab="body"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9l3 4 3-4"/></svg>الجسم</button>
+  <button type="button" data-tab="food"><svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8M7 7h4M17 3c-2 2-2 6 0 9v9"/></svg>التغذية</button>
+  <button type="button" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>ملفي</button>
+</nav>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- program ---------- */
+const DEFAULT_DAYS=[
+ {id:"UA",ar:"علوي A",en:"Upper A",wd:6,wdName:"السبت",focus:"صدر · ظهر · أكتاف · ذراعين",ex:[
+  {id:"bench",ar:"ضغط صدر بالبار",en:"Barbell Bench Press",s:3,lo:6,hi:10,rest:150,k:"u"},
+  {id:"latpd",ar:"سحب عالي (Lat Pulldown)",en:"Lat Pulldown",s:3,lo:8,hi:12,rest:120,k:"u"},
+  {id:"dbohp",ar:"ضغط أكتاف بالدمبل جالس",en:"Seated DB Shoulder Press",s:3,lo:8,hi:12,rest:120,k:"u"},
+  {id:"cablerow",ar:"سحب أرضي بالكيبل جالس",en:"Seated Cable Row",s:3,lo:8,hi:12,rest:90,k:"u"},
+  {id:"pushdown",ar:"تراي بالكيبل (Pushdown)",en:"Cable Triceps Pushdown",s:2,lo:10,hi:15,rest:75,k:"u"},
+  {id:"dbcurl",ar:"باي بالدمبل",en:"Dumbbell Biceps Curl",s:2,lo:10,hi:15,rest:75,k:"u"}]},
+ {id:"LA",ar:"سفلي A",en:"Lower A",wd:0,wdName:"الأحد",focus:"أمامي الفخذ · الخلفي · السمانة",ex:[
+  {id:"squat",ar:"سكوات بالبار",en:"Barbell Back Squat",s:3,lo:6,hi:10,rest:180,k:"l"},
+  {id:"rdl",ar:"ديدلفت روماني",en:"Romanian Deadlift",s:3,lo:8,hi:12,rest:150,k:"l"},
+  {id:"legpress",ar:"دفع أرجل (Leg Press)",en:"Leg Press",s:3,lo:10,hi:12,rest:120,k:"l"},
+  {id:"lyingcurl",ar:"رفرفة خلفي نائم",en:"Lying Leg Curl",s:3,lo:10,hi:15,rest:90,k:"l"},
+  {id:"calfstand",ar:"سمانة واقف",en:"Standing Calf Raise",s:3,lo:10,hi:15,rest:60,k:"l"},
+  {id:"crunch",ar:"بطن بالكيبل",en:"Cable Crunch",s:3,lo:10,hi:15,rest:60,k:"u"}]},
+ {id:"UB",ar:"علوي B",en:"Upper B",wd:2,wdName:"الثلاثاء",focus:"صدر علوي · ظهر · جانبي كتف",ex:[
+  {id:"incdb",ar:"ضغط صدر مائل بالدمبل",en:"Incline DB Press",s:3,lo:8,hi:12,rest:120,k:"u"},
+  {id:"bbrow",ar:"تجديف بالبار منحني",en:"Barbell Bent-Over Row",s:3,lo:6,hi:10,rest:150,k:"u"},
+  {id:"latpdn",ar:"سحب عالي قبضة ضيقة",en:"Close-Grip Lat Pulldown",s:3,lo:8,hi:12,rest:120,k:"u"},
+  {id:"lateral",ar:"رفرفة جانبي بالدمبل",en:"DB Lateral Raise",s:3,lo:12,hi:15,rest:60,k:"u"},
+  {id:"ohtri",ar:"تراي خلف الرأس بالكيبل",en:"Overhead Cable Triceps Ext.",s:2,lo:10,hi:15,rest:75,k:"u"},
+  {id:"hammer",ar:"باي مطرقة (Hammer)",en:"Hammer Curl",s:2,lo:10,hi:15,rest:75,k:"u"}]},
+ {id:"LB",ar:"سفلي B",en:"Lower B",wd:3,wdName:"الأربعاء",focus:"المؤخرة · الفخذ · السمانة",ex:[
+  {id:"legpress2",ar:"دفع أرجل (Leg Press)",en:"Leg Press",s:3,lo:8,hi:12,rest:150,k:"l"},
+  {id:"hipthrust",ar:"هيب ثرست بالبار",en:"Barbell Hip Thrust",s:3,lo:8,hi:12,rest:120,k:"l"},
+  {id:"bulgarian",ar:"سكوات بلغاري بالدمبل (لكل رجل)",en:"DB Bulgarian Split Squat",s:3,lo:8,hi:12,rest:90,k:"l"},
+  {id:"legext",ar:"رفرفة أمامي (Leg Extension)",en:"Leg Extension",s:3,lo:10,hi:15,rest:75,k:"l"},
+  {id:"seatcurl",ar:"رفرفة خلفي جالس",en:"Seated Leg Curl",s:3,lo:10,hi:15,rest:75,k:"l"},
+  {id:"calfseat",ar:"سمانة جالس",en:"Seated Calf Raise",s:3,lo:12,hi:15,rest:60,k:"l"}]}
+];
+let DAYS=DEFAULT_DAYS,EX={};
+// Leg Press appears on both lower days; track them as one lift for PRs & charts.
+const LIFT=id=>id==="legpress2"?"legpress":id;
+const MEAS=[["chest","الصدر"],["shoulders","الأكتاف"],["arm","الذراع"],["waist","الخصر"],["hips","الورك"],["thigh","الفخذ"]];
+const WDN=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+
+/* ---------- storage ---------- */
+const KEY="ironlog.v1";
+const DEF=()=>({profile:{sex:"male",age:"",height:"",weight:"",activity:1.375,surplus:300,protPerKg:2,kcalOverride:"",protOverride:""},
+  settings:{incU:2.5,incL:5},program:null,retired:[],sessions:[],draft:null,bodyw:[],meas:[],food:[]});
+let S=DEF(),storeOK=true;
+try{const raw=localStorage.getItem(KEY);if(raw)S=merge(DEF(),JSON.parse(raw));}catch(e){storeOK=false}
+const clone=o=>JSON.parse(JSON.stringify(o));
+const wdLabel=d=>d.wd>=0?WDN[d.wd]:"يوم مرن";
+// Rebuild the lookup tables from the user's program (or the default one).
+function loadProgram(){DAYS=Array.isArray(S.program)&&S.program.length?S.program:DEFAULT_DAYS;EX={};
+  for(const e of S.retired||[])EX[e.id]=Object.assign({retired:true},e);
+  DAYS.forEach(d=>{d.wdName=wdLabel(d);d.ex.forEach(e=>{EX[e.id]=Object.assign({day:d.id},e)})})}
+function editable(){if(!Array.isArray(S.program)||!S.program.length)S.program=clone(DEFAULT_DAYS);loadProgram();return S.program}
+function merge(d,o){for(const k in o){if(o[k]&&typeof o[k]==="object"&&!Array.isArray(o[k])&&d[k]&&typeof d[k]==="object")d[k]=merge(d[k],o[k]);else d[k]=o[k]}return d}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){storeOK=false;$("#storeWarn").hidden=false}}
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
+const parseD=s=>{const[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c)};
+const fmtD=s=>{const d=parseD(s);return WDN[d.getDay()]+" "+d.getDate()+"/"+(d.getMonth()+1)};
+const shortD=s=>{const d=parseD(s);return d.getDate()+"/"+(d.getMonth()+1)};
+const num=v=>{const n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:null};
+const r1=n=>Math.round(n*10)/10;
+const e1rm=(w,r)=>w*(1+r/30); // Epley estimate
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const mmss=s=>Math.floor(s/60)+":"+pad(Math.max(0,s%60));
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2600)}
+// Two-tap confirmation (the viewer blocks confirm()).
+function armed(btn,label){if(btn.dataset.armed){return true}btn.dataset.armed="1";const old=btn.textContent;btn.textContent=label||"اضغط مرة أخرى للتأكيد";btn.classList.add("confirm-on");setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=old;btn.classList.remove("confirm-on")}},3500);return false}
+
+/* ---------- training logic ---------- */
+function history(exId){const L=LIFT(exId),out=[];for(const s of S.sessions){for(const e of s.ex){if(LIFT(e.id)===L&&e.sets.length)out.push({date:s.date,sets:e.sets,sid:s.id})}}return out.sort((a,b)=>a.date<b.date?-1:1)}
+function bestOf(sets){let b=null;for(const st of sets){const v=e1rm(st.w,st.r);if(!b||v>b.e)b={e:v,w:st.w,r:st.r}}return b}
+function prs(exId){const h=history(exId);let maxW=null,maxE=null;for(const x of h)for(const st of x.sets){if(!maxW||st.w>maxW.w||(st.w===maxW.w&&st.r>maxW.r))maxW={w:st.w,r:st.r,date:x.date};const v=e1rm(st.w,st.r);if(!maxE||v>maxE.e)maxE={e:v,w:st.w,r:st.r,date:x.date}}return{maxW,maxE}}
+function suggest(ex){
+  const h=history(ex.id);const inc=ex.k==="l"?S.settings.incL:S.settings.incU;
+  if(!h.length)return{kind:"new",w:null,text:`أول مرة: اختر وزنًا تؤدي به ${ex.hi} تكرار بأداء نظيف وتبقى قادرًا على ١–٢ تكرار إضافي. سجّل الوزن والتكرارات بعد كل جولة.`};
+  const last=h[h.length-1];const work=last.sets;const topW=Math.max(...work.map(s=>s.w));
+  const atTop=work.filter(s=>s.w===topW);
+  const allHit=work.length>=ex.s&&atTop.length>=ex.s&&atTop.every(s=>s.r>=ex.hi);
+  if(allHit)return{kind:"up",w:r1(topW+inc),text:`أكملت ${ex.hi} تكرار في كل الجولات آخر مرة. زِد الوزن إلى ${r1(topW+inc)} كجم وابدأ من ${ex.lo} تكرارات.`};
+  const fails=atTop.filter(s=>s.r<ex.lo).length;
+  if(fails>=2&&h.length>=2){const prev=h[h.length-2];const prevTop=Math.max(...prev.sets.map(s=>s.w));const prevFails=prev.sets.filter(s=>s.w===prevTop&&s.r<ex.lo).length;
+    if(prevTop===topW&&prevFails>=2){const dw=r1(topW*0.9);return{kind:"down",w:dw,text:`لم تصل إلى ${ex.lo} تكرارات بهذا الوزن مرتين متتاليتين. خفّف إلى ${dw} كجم تقريبًا وابنِ التكرارات من جديد.`}}}
+  return{kind:"hold",w:topW,text:`ثبّت ${topW} كجم وحاول إضافة تكرار في كل جولة حتى تصل إلى ${ex.hi}.`};
+}
+function nextDayId(){
+  const wd=new Date().getDay();const sched=DAYS.find(d=>d.wd===wd);
+  if(sched)return{id:sched.id,why:"sched"};
+  if(!DAYS.length)return{id:null,why:"rest"};
+  const last=[...S.sessions].sort((a,b)=>a.date<b.date?1:-1)[0];
+  if(!last)return{id:"UA",why:"rest"};
+  const i=DAYS.findIndex(d=>d.id===last.day);return{id:DAYS[(i+1)%DAYS.length].id,why:"rest"};
+}
+
+/* ---------- nutrition ---------- */
+function targets(){
+  const p=S.profile;const w=num(p.weight),h=num(p.height),a=num(p.age);
+  let kcal=null,prot=null,bmr=null,tdee=null;
+  if(w&&h&&a){bmr=10*w+6.25*h-5*a+(p.sex==="female"?-161:5);tdee=bmr*Number(p.activity||1.375);kcal=Math.round((tdee+Number(p.surplus||0))/10)*10}
+  if(w)prot=Math.round(w*Number(p.protPerKg||2));
+  if(num(p.kcalOverride))kcal=num(p.kcalOverride);
+  if(num(p.protOverride))prot=num(p.protOverride);
+  return{kcal,prot,bmr,tdee};
+}
+function latestWeight(){const b=[...S.bodyw].sort((a,b)=>a.date<b.date?-1:1);return b.length?b[b.length-1].kg:num(S.profile.weight)}
+
+/* ---------- chart ---------- */
+function lineChart(pts,unit){
+  if(pts.length<2)return`<div class="empty">يظهر الرسم بعد تسجيل قيمتين على الأقل.</div>`;
+  const W=600,H=220,L=48,R=14,T=16,B=30;
+  const xs=pts.map(p=>parseD(p.x).getTime()),ys=pts.map(p=>p.y);
+  let x0=Math.min(...xs),x1=Math.max(...xs);if(x0===x1){x0-=864e5;x1+=864e5}
+  let y0=Math.min(...ys),y1=Math.max(...ys);const padY=(y1-y0)*0.15||Math.max(1,y1*0.05);y0-=padY;y1+=padY;
+  const X=t=>L+(t-x0)/(x1-x0)*(W-L-R); // time runs left→right so "up and to the right" reads as progress
+  const Y=v=>T+(1-(v-y0)/(y1-y0))*(H-T-B);
+  const ticks=[0,1,2,3].map(i=>y0+(y1-y0)*i/3);
+  const line=pts.map((p,i)=>(i?"L":"M")+X(xs[i]).toFixed(1)+" "+Y(p.y).toFixed(1)).join(" ");
+  const area=line+` L${X(xs[xs.length-1]).toFixed(1)} ${H-B} L${X(xs[0]).toFixed(1)} ${H-B} Z`;
+  const lastI=pts.length-1;
+  return`<svg viewBox="0 0 ${W} ${H}" style="direction:ltr" role="img" aria-label="رسم بياني">
+   ${ticks.map(t=>`<line x1="${L}" x2="${W-R}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)" stroke-width="1"/>
+     <text x="${L-6}" y="${Y(t)+4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${r1(t)}</text>`).join("")}
+   <path d="${area}" fill="var(--accent)" fill-opacity=".10"/>
+   <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+   ${pts.map((p,i)=>`<circle cx="${X(xs[i])}" cy="${Y(p.y)}" r="${i===lastI?5.5:3}" fill="${i===lastI?"var(--accent)":"var(--surface)"}" stroke="var(--accent)" stroke-width="2"/>`).join("")}
+   <text x="${X(xs[0])}" y="${H-8}" text-anchor="start" font-size="12" fill="var(--muted)">${shortD(pts[0].x)}</text>
+   <text x="${X(xs[lastI])}" y="${H-8}" text-anchor="end" font-size="12" fill="var(--fg)" font-weight="700">${r1(pts[lastI].y)} ${unit} · ${shortD(pts[lastI].x)}</text>
+  </svg>`;
+}
+
+/* ---------- views ---------- */
+loadProgram();
+let tab="today",selDay=null,progEx="bench",editDay=null,progMetric="top",sessEdit=null;
+function render(){
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(tab==="sess"?"progress":tab)));
+  const v=$("#view");
+  v.innerHTML=({today:vToday,progress:vProgress,body:vBody,food:vFood,settings:vSettings,edit:vEdit,sess:vSess})[tab]();
+  bind[tab]&&bind[tab]();
+}
+const bind={};
+
+/* Today */
+function vToday(){
+  if(S.draft&&!DAYS.some(d=>d.id===S.draft.day)){S.draft=null;save()}
+  if(selDay&&!DAYS.some(d=>d.id===selDay))selDay=null;
+  if(!DAYS.length)return`<h2>برنامجك فارغ</h2><div class="empty">لا توجد أيام تمرين. <button type="button" id="goEdit">إضافة أيام وتمارين</button></div>`;
+  const nd=nextDayId();
+  const day=DAYS.find(d=>d.id===(S.draft?S.draft.day:(selDay||nd.id)));
+  const wdToday=WDN[new Date().getDay()];
+  const lead=S.draft?`تمرين جارٍ منذ ${new Date(S.draft.startedAt).toLocaleTimeString("ar",{hour:"numeric",minute:"2-digit"})}`
+    :nd.why==="sched"?`اليوم ${wdToday}: موعد تمرين ${DAYS.find(d=>d.id===nd.id).ar}`
+    :`اليوم ${wdToday} يوم راحة في جدولك. إن أردت التمرين فالتالي هو ${DAYS.find(d=>d.id===nd.id).ar}.`;
+  const dr=S.draft&&S.draft.day===day.id?S.draft:null;
+  let h=`<h2>${esc(day.ar)} <span class="muted small" style="font-family:var(--f-body)">${esc(day.en)} · ${esc(day.wdName)}</span></h2>
+  <p class="muted small" style="margin:0 0 10px">${lead}<br>${esc(day.focus)}</p>`;
+  if(!S.draft)h+=`<div class="chips" role="tablist">${DAYS.map(d=>`<button type="button" class="chip ${d.id===day.id?"on":""}" data-day="${d.id}">${d.ar} · ${d.wdName}${d.id===nd.id?'<span class="dot" title="المقترح"></span>':""}</button>`).join("")}</div>`;
+  h+=`<div class="row" style="margin-top:8px"><button type="button" id="goEdit">تعديل تمارين البرنامج</button></div>`;
+  h+=`<details class="card" style="margin-top:12px"><summary>كيف يعمل البرنامج؟</summary>
+   <div class="small stack" style="gap:6px">
+   <div><b>الجدول:</b> ${DAYS.map(d=>esc(d.wdName)+" "+esc(d.ar)).join(" · ")}. باقي الأيام راحة. يمكنك تغيير الأيام والتمارين من زر «تعديل تمارين البرنامج».</div>
+   <div><b>التدرّج المزدوج:</b> لكل تمرين نطاق تكرارات (مثل ٦–١٠). ثبّت الوزن وزد التكرارات، وعندما تكمل الحد الأعلى في كل الجولات يقترح التطبيق زيادة الوزن (٢٫٥ كجم للعلوي و٥ كجم للسفلي، ويمكنك تغييرها من «ملفي»).</div>
+   <div><b>الجهد:</b> أنهِ كل جولة وأنت قادر تقريبًا على ١–٣ تكرارات إضافية بأداء نظيف. الأداء الصحيح أهم من الوزن.</div>
+   <div><b>الإحماء:</b> ٥ دقائق خفيفة ثم ١–٢ جولة إحماء بوزن أخف قبل أول تمرين مركّب. لا تسجّل جولات الإحماء.</div>
+   <div class="muted">هذه إرشادات عامة شائعة للمبتدئين وليست استشارة طبية. توقف إذا شعرت بألم حاد واستشر مختصًا.</div>
+   </div></details>`;
+  h+=`<div class="stack" style="margin-top:12px">`;
+  day.ex.forEach((ex,ei)=>{
+    const sg=suggest(ex);const h0=history(ex.id);const last=h0[h0.length-1];
+    const rows=dr?(dr.ex[ex.id]||[]):[];
+    const n=Math.max(ex.s,rows.length);
+    h+=`<section class="card"><div class="ex-head"><div style="min-width:0"><h3>${ei+1}. ${esc(ex.ar)}</h3><div class="en">${esc(ex.en)}</div></div>
+      <div class="target"><span class="num">${ex.s} × ${ex.lo}–${ex.hi}</span><br>راحة <span class="num">${mmss(ex.rest)}</span></div></div>
+      ${last?`<div class="small muted" style="margin-top:6px">آخر مرة (${shortD(last.date)}): <span class="num">${last.sets.map(s=>s.w+"×"+s.r).join("  ")}</span></div>`:""}
+      <div class="hint ${sg.kind==="up"?"up":""}">${sg.kind==="up"?'<span class="tag up">زِد الوزن</span> ':sg.kind==="down"?'<span class="tag">خفّف</span> ':""}${esc(sg.text)}</div>
+      <div class="sets"><span class="h">#</span><span class="h">الوزن (كجم)</span><span class="h">التكرارات</span><span class="h"></span>`;
+    for(let i=0;i<n;i++){const r=rows[i]||{};const ph=last&&last.sets[i]?last.sets[i]:null;
+      h+=`<span class="idx">${i+1}</span>
+      <input id="w-${ex.id}-${i}" class="${r.done?"set-done":""}" inputmode="decimal" type="number" step="0.5" min="0" data-ex="${ex.id}" data-i="${i}" data-f="w" value="${r.w!==undefined?(r.w??""):(sg.w??"")}" placeholder="${ph?ph.w:"كجم"}" aria-label="الوزن للجولة ${i+1}">
+      <input id="r-${ex.id}-${i}" class="${r.done?"set-done":""}" inputmode="numeric" type="number" step="1" min="0" data-ex="${ex.id}" data-i="${i}" data-f="r" value="${r.r??""}" placeholder="${ph?ph.r:ex.lo+"–"+ex.hi}" aria-label="التكرارات للجولة ${i+1}">
+      <button type="button" class="tick ${r.done?"done":""}" data-tick="${ex.id}" data-i="${i}" aria-label="أنهيت الجولة ${i+1}">✓</button>`}
+    h+=`</div><div class="row" style="margin-top:8px"><button type="button" class="ghost small" data-addset="${ex.id}">+ جولة</button></div></section>`;
+  });
+  h+=`</div><div class="stack" style="margin-top:16px">
+   <button type="button" class="primary block" id="finish">إنهاء التمرين وحفظه</button>
+   ${S.draft?`<button type="button" class="ghost block" id="discard">إلغاء التمرين الجاري</button>`:""}
+   <p class="muted small" style="margin:0">التمرين يُحفظ كمسودة أثناء الكتابة، فلا مشكلة إذا أغلقت الصفحة. تُحفظ فقط الجولات التي فيها وزن وتكرارات.</p></div>`;
+  return h;
+}
+function ensureDraft(dayId){if(!S.draft){S.draft={day:dayId,date:today(),startedAt:Date.now(),ex:{}}}return S.draft}
+function day0(){return S.draft?S.draft.day:(selDay||nextDayId().id)}
+function curDay(){return S.draft?S.draft.day:(selDay||nextDayId().id)}
+bind.today=function(){
+  const v=$("#view");
+  v.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{if(S.draft){toast("أنهِ التمرين الجاري أو ألغِه أولًا");render();return}selDay=b.dataset.day;render()});
+  v.querySelectorAll("input[data-ex]").forEach(inp=>inp.addEventListener("input",()=>{
+    const d=ensureDraft(curDay());const a=(d.ex[inp.dataset.ex]=d.ex[inp.dataset.ex]||[]);const i=+inp.dataset.i;
+    a[i]=a[i]||{};a[i][inp.dataset.f]=inp.value===""?null:num(inp.value);save();
+  }));
+  v.querySelectorAll("[data-tick]").forEach(b=>b.onclick=()=>{
+    const exId=b.dataset.tick,i=+b.dataset.i;const d=ensureDraft(curDay());
+    const a=(d.ex[exId]=d.ex[exId]||[]);a[i]=a[i]||{};
+    const wv=num($(`#w-${exId}-${i}`).value),rv=num($(`#r-${exId}-${i}`).value);
+    if(!a[i].done&&(wv==null||rv==null)){toast("اكتب الوزن والتكرارات أولًا");return}
+    a[i].w=wv;a[i].r=rv;a[i].done=!a[i].done;save();
+    if(a[i].done&&EX[exId])startTimer(EX[exId].rest,EX[exId].ar);
+    const y=window.scrollY;render();window.scrollTo(0,y);
+  });
+  v.querySelectorAll("[data-addset]").forEach(b=>b.onclick=()=>{
+    const exId=b.dataset.addset;const d=ensureDraft(curDay());const a=(d.ex[exId]=d.ex[exId]||[]);
+    const n=Math.max(EX[exId].s,a.length);while(a.length<n)a.push({});a.push({});save();const y=window.scrollY;render();window.scrollTo(0,y);
+  });
+  $("#goEdit").onclick=()=>{editDay=DAYS.length?day0():null;tab="edit";render();window.scrollTo(0,0)};
+  if(!DAYS.length)return;
+  $("#finish").onclick=finish;
+  const ds=$("#discard");if(ds)ds.onclick=()=>{if(!armed(ds))return;S.draft=null;save();stopTimer();render();toast("تم إلغاء التمرين")};
+};
+function finish(){
+  const dayId=curDay();const day=DAYS.find(d=>d.id===dayId);
+  // read straight from inputs so prefilled values count
+  const ex=[];let newPR=[];
+  for(const e of day.ex){const sets=[];const n=document.querySelectorAll(`input[data-ex="${e.id}"][data-f="w"]`).length;
+    for(let i=0;i<n;i++){const w=num($(`#w-${e.id}-${i}`).value),r=num($(`#r-${e.id}-${i}`).value);if(w!=null&&r!=null&&r>0)sets.push({w,r})}
+    if(sets.length){const before=prs(e.id);const b=bestOf(sets);const topW=Math.max(...sets.map(s=>s.w));
+      if(before.maxE&&(b.e>before.maxE.e+1e-9||topW>before.maxW.w))newPR.push(e.ar);
+      ex.push({id:e.id,sets})}}
+  if(!ex.length){toast("لا توجد جولات مكتملة للحفظ");return}
+  const dur=S.draft?Math.round((Date.now()-S.draft.startedAt)/60000):null;
+  S.sessions.push({id:uid(),date:S.draft?S.draft.date:today(),day:dayId,ex,min:dur});
+  S.draft=null;selDay=null;save();stopTimer();
+  tab="progress";render();window.scrollTo(0,0);
+  toast(newPR.length?`رقم قياسي جديد في: ${newPR.join("، ")}`:"تم حفظ التمرين");
+}
+
+/* Progress */
+function vProgress(){
+  const now=new Date();const sow=new Date(now);sow.setDate(now.getDate()-((now.getDay()+1)%7));sow.setHours(0,0,0,0); // week starts Saturday
+  const thisWeek=S.sessions.filter(s=>parseD(s.date)>=sow).length;
+  const sorted=[...S.sessions].sort((a,b)=>a.date<b.date?1:-1);
+  const vol=s=>s.ex.reduce((t,e)=>t+e.sets.reduce((u,x)=>u+x.w*x.r,0),0);
+  let h=`<h2>التقدّم</h2><div class="grid3">
+   <div class="card stat"><b>${thisWeek}<span class="muted" style="font-size:14px"> / ${DAYS.length}</span></b><span>تمارين هذا الأسبوع</span></div>
+   <div class="card stat"><b>${S.sessions.length}</b><span>إجمالي التمارين</span></div>
+   <div class="card stat"><b>${sorted[0]?Math.round(vol(sorted[0])).toLocaleString("en"):"—"}</b><span>حجم آخر تمرين (كجم)</span></div></div>`;
+  if(!EX[progEx]){const f=Object.values(EX)[0];progEx=f?f.id:""}
+  const opt=e=>`<option value="${e.id}" ${e.id===progEx?"selected":""}>${esc(e.ar)}</option>`;
+  const ret=Object.values(EX).filter(e=>e.retired);
+  const opts=DAYS.map(d=>`<optgroup label="${esc(d.ar)}">${d.ex.filter(e=>!(e.id==="legpress2"&&EX.legpress)).map(opt).join("")}</optgroup>`).join("")+(ret.length?`<optgroup label="تمارين حذفتها">${ret.map(opt).join("")}</optgroup>`:"");
+  const hx=history(progEx);
+  const M={top:["أثقل وزن",x=>Math.max(...x.sets.map(s=>s.w)),"أثقل وزن رفعته في التمرين بكل مرة."],
+    vol:["حجم التمرين",x=>x.sets.reduce((t,s)=>t+s.w*s.r,0),"مجموع (الوزن × التكرارات) لكل الجولات. ارتفاعه يعني أنك تشتغل أكثر."],
+    e1rm:["1RM تقديري",x=>bestOf(x.sets).e,"القوة القصوى التقديرية لتكرار واحد (معادلة Epley) من أفضل جولة. رقم تقريبي للمقارنة فقط."]};
+  const m=M[progMetric]||M.top;const pts=hx.map(x=>({x:x.date,y:r1(m[1](x))}));
+  const p=prs(progEx);
+  h+=`<h2>منحنى التمرين</h2><div class="card stack">
+   <label class="f">اختر التمرين<select id="progEx">${opts}</select></label>
+   <div class="chips">${Object.entries(M).map(([k,v])=>`<button type="button" class="chip ${k===progMetric?"on":""}" data-metric="${k}">${v[0]}</button>`).join("")}</div>
+   <div class="small muted">${m[2]}</div>
+   <div class="chart">${lineChart(pts,"كجم")}</div>
+   ${p.maxW?`<div class="row small"><span class="tag pr">أثقل وزن</span><span class="num">${p.maxW.w} كجم × ${p.maxW.r}</span><span class="muted">${shortD(p.maxW.date)}</span>
+     <span class="tag pr">أفضل تقدير</span><span class="num">${r1(p.maxE.e)} كجم</span></div>`:""}
+  </div>`;
+  const maxSets=Math.max(0,...hx.map(x=>x.sets.length));
+  h+=`<h2>كل الجولات</h2>`+(hx.length?`<div class="card tbl-wrap"><table><thead><tr><th>التاريخ</th>${Array.from({length:maxSets},(_,i)=>`<th>جولة ${i+1}</th>`).join("")}<th>الحجم</th></tr></thead><tbody>
+   ${[...hx].reverse().map((x,ri,arr)=>{const prev=arr[ri+1];const top=Math.max(...x.sets.map(s=>s.w));const ptop=prev?Math.max(...prev.sets.map(s=>s.w)):null;
+     return`<tr><td><button type="button" class="ghost small" style="padding:4px 6px;min-height:32px;color:var(--accent)" data-editsess="${x.sid}" aria-label="تعديل جولات ${shortD(x.date)}">${shortD(x.date)} ✎</button>${ptop!=null&&top>ptop?'<span class="tag up">↑</span>':""}</td>${Array.from({length:maxSets},(_,i)=>{const st=x.sets[i];return`<td class="num">${st?st.w+"×"+st.r:'<span class="muted">—</span>'}</td>`}).join("")}
+     <td class="num">${Math.round(x.sets.reduce((t,s)=>t+s.w*s.r,0)).toLocaleString("en")}</td></tr>`}).join("")}
+   </tbody></table></div><p class="small muted" style="margin:6px 0 0">اضغط على التاريخ ✎ لتعديل جولات ذلك اليوم. كل خانة = الوزن (كجم) × التكرارات. السهم ↑ يعني أن أثقل وزن زاد عن المرة السابقة.</p>`
+   :`<div class="empty">لم تسجّل هذا التمرين بعد.</div>`);
+  const rowsPR=Object.values(EX).filter(e=>!(e.id==="legpress2"&&EX.legpress)).map(e=>({e,p:prs(e.id)})).filter(x=>x.p.maxW);
+  h+=`<h2>الأرقام القياسية</h2>`+(rowsPR.length?`<div class="card tbl-wrap"><table><thead><tr><th>التمرين</th><th>أثقل جولة</th><th>1RM تقديري</th><th>التاريخ</th></tr></thead><tbody>
+   ${rowsPR.map(x=>`<tr><td>${esc(x.e.ar)}</td><td class="num">${x.p.maxW.w}×${x.p.maxW.r}</td><td class="num">${r1(x.p.maxE.e)}</td><td class="num">${shortD(x.p.maxE.date)}</td></tr>`).join("")}
+   </tbody></table></div>`:`<div class="empty">بعد أول تمرين تحفظه تظهر هنا أفضل أرقامك لكل تمرين.</div>`);
+  h+=`<h2>سجل التمارين</h2>`+(sorted.length?`<div class="card"><ul class="clean list">${sorted.map(s=>{const d=DAYS.find(x=>x.id===s.day)||{ar:"يوم محذوف"};const n=s.ex.reduce((t,e)=>t+e.sets.length,0);
+     return`<li><div style="min-width:0"><b>${d?esc(d.ar):""}</b> <span class="muted small">${fmtD(s.date)}</span><div class="small muted">${n} جولة · حجم <span class="num">${Math.round(vol(s)).toLocaleString("en")}</span> كجم${s.min?` · ${s.min} د`:""}</div></div>
+     <div class="row" style="gap:2px;flex-wrap:nowrap"><button type="button" class="ghost small" data-editsess="${s.id}">تعديل</button><button type="button" class="ghost small" data-delsess="${s.id}">حذف</button></div></li>`}).join("")}</ul></div>`
+     :`<div class="empty">لم تحفظ أي تمرين بعد. ابدأ من تبويب «التمرين».</div>`);
+  return h;
+}
+bind.progress=function(){
+  $("#progEx").onchange=e=>{progEx=e.target.value;render()};
+  document.querySelectorAll("[data-metric]").forEach(b=>b.onclick=()=>{progMetric=b.dataset.metric;const y=window.scrollY;render();window.scrollTo(0,y)});
+  document.querySelectorAll("[data-editsess]").forEach(b=>b.onclick=()=>{const s0=S.sessions.find(x=>x.id===b.dataset.editsess);if(!s0)return;
+    sessEdit=clone(s0);tab="sess";render();window.scrollTo(0,0)});
+  document.querySelectorAll("[data-delsess]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد الحذف"))return;S.sessions=S.sessions.filter(s=>s.id!==b.dataset.delsess);save();render()});
+};
+
+/* Body */
+function vBody(){
+  const bw=[...S.bodyw].sort((a,b)=>a.date<b.date?-1:1);
+  let trend="";
+  if(bw.length>=2){const a=bw[0],b=bw[bw.length-1];const days=(parseD(b.date)-parseD(a.date))/864e5;
+    if(days>=7){const perWk=(b.kg-a.kg)/days*7;const pct=perWk/a.kg*100;
+      trend=`<div class="hint ${pct>=0.2&&pct<=0.6?"up":""}">المعدّل منذ أول تسجيل: <span class="num">${perWk>=0?"+":""}${r1(perWk)}</span> كجم أسبوعيًا (<span class="num">${r1(pct)}%</span>).
+      ${pct<0.2?"أبطأ من المعتاد للتضخيم. جرّب زيادة ١٠٠–٢٠٠ سعرة يوميًا.":pct>0.6?"أسرع من المعتاد، وقد يزيد الدهون. جرّب إنقاص ١٠٠–٢٠٠ سعرة.":"ضمن النطاق الشائع للتضخيم (حوالي ٠٫٢٥–٠٫٥٪ أسبوعيًا)."}</div>`}}
+  let h=`<h2>وزن الجسم</h2><div class="card stack">
+   <div class="grid2"><label class="f">التاريخ<input id="bwDate" type="date" value="${today()}"></label>
+   <label class="f">الوزن (كجم)<input id="bwKg" type="number" inputmode="decimal" step="0.1" placeholder="مثلًا 72.4"></label></div>
+   <button type="button" class="primary" id="bwAdd">تسجيل الوزن</button>
+   <div class="small muted">للمقارنة العادلة: وزّن نفسك صباحًا بعد دورة المياه وقبل الأكل، ٢–٣ مرات أسبوعيًا.</div>
+   <div class="chart">${lineChart(bw.map(x=>({x:x.date,y:x.kg})),"كجم")}</div>${trend}
+   ${bw.length?`<ul class="clean list small">${[...bw].reverse().slice(0,8).map(x=>`<li><span>${fmtD(x.date)}</span><span class="num">${x.kg} كجم</span><button type="button" class="ghost small" data-delbw="${x.date}">حذف</button></li>`).join("")}</ul>`:""}
+  </div>`;
+  const ms=[...S.meas].sort((a,b)=>a.date<b.date?-1:1);const first=ms[0],last=ms[ms.length-1];
+  h+=`<h2>قياسات الجسم</h2><div class="card stack">
+   <div class="grid3">${MEAS.map(([k,l])=>`<label class="f">${l} (سم)<input id="m-${k}" type="number" inputmode="decimal" step="0.1"></label>`).join("")}</div>
+   <label class="f">التاريخ<input id="mDate" type="date" value="${today()}"></label>
+   <button type="button" class="primary" id="mAdd">حفظ القياسات</button>
+   <div class="small muted">قِس بشريط القياس على نفس النقطة كل مرة، مرة كل ٢–٤ أسابيع. يكفي أن تملأ ما تريده من الخانات.</div>
+   ${ms.length?`<div class="tbl-wrap"><table><thead><tr><th>القياس</th><th>البداية ${shortD(first.date)}</th><th>الأحدث ${shortD(last.date)}</th><th>التغيّر</th></tr></thead><tbody>
+    ${MEAS.map(([k,l])=>{const a=ms.find(m=>m[k]!=null),b=[...ms].reverse().find(m=>m[k]!=null);if(!a)return"";const d=r1(b[k]-a[k]);
+     return`<tr><td>${l}</td><td class="num">${a[k]}</td><td class="num">${b[k]}</td><td class="num" style="color:${d>0?"var(--good)":d<0?"var(--warn)":"var(--muted)"}">${d>0?"+":""}${d}</td></tr>`}).join("")}
+   </tbody></table></div>
+   <ul class="clean list small">${[...ms].reverse().map(m=>`<li><span>${fmtD(m.date)}</span><span class="muted">${MEAS.filter(([k])=>m[k]!=null).length} قياسات</span><button type="button" class="ghost small" data-delm="${m.date}">حذف</button></li>`).join("")}</ul>`
+   :`<div class="empty">سجّل قياساتك الأولى اليوم لتقارن بها لاحقًا.</div>`}
+  </div>`;
+  return h;
+}
+bind.body=function(){
+  $("#bwAdd").onclick=()=>{const kg=num($("#bwKg").value),d=$("#bwDate").value||today();if(!kg){toast("اكتب الوزن");return}
+    S.bodyw=S.bodyw.filter(x=>x.date!==d);S.bodyw.push({date:d,kg});S.profile.weight=String(latestWeight());save();render();toast("تم تسجيل الوزن")};
+  $("#mAdd").onclick=()=>{const d=$("#mDate").value||today();const m={date:d};let any=false;
+    MEAS.forEach(([k])=>{const v=num($("#m-"+k).value);if(v!=null){m[k]=v;any=true}});
+    if(!any){toast("املأ قياسًا واحدًا على الأقل");return}
+    const old=S.meas.find(x=>x.date===d);S.meas=S.meas.filter(x=>x.date!==d);S.meas.push(Object.assign(old||{},m));save();render();toast("تم حفظ القياسات")};
+  document.querySelectorAll("[data-delbw]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد"))return;S.bodyw=S.bodyw.filter(x=>x.date!==b.dataset.delbw);save();render()});
+  document.querySelectorAll("[data-delm]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد"))return;S.meas=S.meas.filter(x=>x.date!==b.dataset.delm);save();render()});
+};
+
+/* Food */
+let foodDate=null;
+function vFood(){
+  const d=foodDate||today();const T=targets();
+  const items=S.food.filter(f=>f.date===d);
+  const kc=items.reduce((t,f)=>t+(f.kcal||0),0),pr=items.reduce((t,f)=>t+(f.protein||0),0);
+  const pct=(v,t)=>t?Math.min(100,v/t*100):0;
+  let h=`<h2>التغذية</h2>`;
+  if(!T.kcal)h+=`<div class="banner" style="margin-top:0">أكمل العمر والطول والوزن في تبويب «ملفي» لحساب هدف السعرات والبروتين تلقائيًا.</div>`;
+  h+=`<div class="row" style="margin-top:10px"><label class="f" style="flex:1">اليوم<input id="fDate" type="date" value="${d}"></label></div>
+  <div class="grid2" style="margin-top:10px">
+   <div class="card"><div class="small muted">السعرات</div><div class="num" style="font-size:22px;font-weight:600;text-align:right">${Math.round(kc)}<span class="muted" style="font-size:14px"> / ${T.kcal??"—"}</span></div>
+     <div class="bar ${T.kcal&&kc>=T.kcal?"over":""}"><i style="width:${pct(kc,T.kcal)}%"></i></div>
+     <div class="small muted" style="margin-top:4px">${T.kcal?(kc<T.kcal?`باقي ${Math.round(T.kcal-kc)}`:"وصلت للهدف"):""}</div></div>
+   <div class="card"><div class="small muted">البروتين (جم)</div><div class="num" style="font-size:22px;font-weight:600;text-align:right">${Math.round(pr)}<span class="muted" style="font-size:14px"> / ${T.prot??"—"}</span></div>
+     <div class="bar ${T.prot&&pr>=T.prot?"over":""}"><i style="width:${pct(pr,T.prot)}%"></i></div>
+     <div class="small muted" style="margin-top:4px">${T.prot?(pr<T.prot?`باقي ${Math.round(T.prot-pr)}`:"وصلت للهدف"):""}</div></div></div>`;
+  const recent=[];const seen=new Set();for(const f of [...S.food].reverse()){const k=f.name.trim();if(k&&!seen.has(k)){seen.add(k);recent.push(f)}if(recent.length>=8)break}
+  h+=`<div class="card stack" style="margin-top:12px"><h3>إضافة وجبة</h3>
+   <label class="f">الاسم<input id="fName" type="text" placeholder="مثلًا: صدر دجاج ٢٠٠ جم + أرز"></label>
+   <div class="grid2"><label class="f">السعرات<input id="fKcal" type="number" inputmode="numeric" min="0"></label>
+   <label class="f">البروتين (جم)<input id="fProt" type="number" inputmode="decimal" min="0" step="0.5"></label></div>
+   <button type="button" class="primary" id="fAdd">إضافة</button>
+   ${recent.length?`<div class="small muted">إضافة سريعة من وجباتك السابقة:</div><div class="chips" style="flex-wrap:wrap">${recent.map((f,i)=>`<button type="button" class="chip" data-quick="${i}">${esc(f.name)} · <span class="num">${f.kcal||0}</span></button>`).join("")}</div>`:""}
+   <div class="small muted">القيم الغذائية تقريبية؛ خذها من ملصق المنتج أو من تطبيق قاعدة بيانات أطعمة موثوق.</div></div>`;
+  h+=`<h2>وجبات ${fmtD(d)}</h2>`+(items.length?`<div class="card"><ul class="clean list">${items.map(f=>`<li><div style="min-width:0">${esc(f.name)||"بدون اسم"}<div class="small muted"><span class="num">${f.kcal||0}</span> سعرة · <span class="num">${f.protein||0}</span> جم بروتين</div></div><button type="button" class="ghost small" data-delf="${f.id}">حذف</button></li>`).join("")}</ul></div>`
+    :`<div class="empty">لم تسجّل أكلًا لهذا اليوم بعد.</div>`);
+  const days=[];for(let i=6;i>=0;i--){const x=new Date();x.setDate(x.getDate()-i);const s=x.getFullYear()+"-"+pad(x.getMonth()+1)+"-"+pad(x.getDate());const it=S.food.filter(f=>f.date===s);days.push({s,k:it.reduce((t,f)=>t+(f.kcal||0),0),p:it.reduce((t,f)=>t+(f.protein||0),0),n:it.length})}
+  h+=`<h2>آخر ٧ أيام</h2><div class="card tbl-wrap"><table><thead><tr><th>اليوم</th><th>السعرات</th><th>البروتين</th><th></th></tr></thead><tbody>
+   ${days.map(x=>`<tr><td>${fmtD(x.s)}</td><td class="num">${x.n?Math.round(x.k):"—"}</td><td class="num">${x.n?Math.round(x.p):"—"}</td><td>${x.n&&T.prot?(x.p>=T.prot?'<span class="tag up">بروتين ✓</span>':'<span class="tag hold">أقل</span>'):""}</td></tr>`).join("")}
+  </tbody></table></div>`;
+  if(T.tdee)h+=`<p class="small muted">الهدف محسوب بمعادلة Mifflin-St Jeor: الحرق اليومي التقديري <span class="num">${Math.round(T.tdee)}</span> سعرة + فائض <span class="num">${S.profile.surplus}</span>. هذه تقديرات تقريبية؛ راقب وزنك أسبوعيًا وعدّل.</p>`;
+  return h;
+}
+bind.food=function(){
+  $("#fDate").onchange=e=>{foodDate=e.target.value||null;render()};
+  $("#fAdd").onclick=()=>{const name=$("#fName").value.trim(),kcal=num($("#fKcal").value),protein=num($("#fProt").value);
+    if(!name&&kcal==null&&protein==null){toast("اكتب الوجبة أو قيمها");return}
+    S.food.push({id:uid(),date:foodDate||today(),name,kcal:kcal||0,protein:protein||0});save();render();toast("تمت الإضافة")};
+  const recent=[];const seen=new Set();for(const f of [...S.food].reverse()){const k=f.name.trim();if(k&&!seen.has(k)){seen.add(k);recent.push(f)}if(recent.length>=8)break}
+  document.querySelectorAll("[data-quick]").forEach(b=>b.onclick=()=>{const f=recent[+b.dataset.quick];S.food.push({id:uid(),date:foodDate||today(),name:f.name,kcal:f.kcal,protein:f.protein});save();render();toast("تمت إضافة "+f.name)});
+  document.querySelectorAll("[data-delf]").forEach(b=>b.onclick=()=>{S.food=S.food.filter(f=>f.id!==b.dataset.delf);save();render()});
+};
+
+/* Edit a saved session */
+function vSess(){
+  const se=sessEdit;if(!se)return`<div class="empty">لا يوجد تمرين للتعديل.</div>`;
+  const d=DAYS.find(x=>x.id===se.day);
+  let h=`<h2>تعديل تمرين محفوظ</h2><p class="muted small" style="margin:0 0 10px">${d?esc(d.ar):"يوم محذوف"}. عدّل أي جولة ثم اضغط حفظ.</p>
+  <div class="card"><label class="f">التاريخ<input id="seDate" type="date" value="${se.date}"></label></div><div class="stack" style="margin-top:12px">`;
+  se.ex.forEach((e,ei)=>{const x=EX[e.id]||{ar:"تمرين محذوف",en:""};
+    h+=`<section class="card"><div class="ex-head"><div style="min-width:0"><h3>${esc(x.ar)}</h3><div class="en">${esc(x.en||"")}</div></div>
+     <button type="button" class="ghost small" data-sedelex="${ei}" style="color:var(--warn)">حذف التمرين</button></div>
+     <div class="sets"><span class="h">#</span><span class="h">الوزن (كجم)</span><span class="h">التكرارات</span><span class="h"></span>
+     ${e.sets.map((st,i)=>`<span class="idx">${i+1}</span>
+      <input id="se-w-${ei}-${i}" type="number" inputmode="decimal" step="0.5" min="0" data-sei="${ei}" data-si="${i}" data-sf="w" value="${st.w??""}" aria-label="الوزن للجولة ${i+1}">
+      <input id="se-r-${ei}-${i}" type="number" inputmode="numeric" step="1" min="0" data-sei="${ei}" data-si="${i}" data-sf="r" value="${st.r??""}" aria-label="التكرارات للجولة ${i+1}">
+      <button type="button" class="tick" data-sedel="${ei}" data-si="${i}" aria-label="حذف الجولة ${i+1}" style="color:var(--warn)">×</button>`).join("")}</div>
+     <button type="button" class="ghost small" data-seadd="${ei}" style="margin-top:8px">+ جولة</button></section>`});
+  const missing=Object.values(EX).filter(e=>!e.retired&&!se.ex.some(x=>x.id===e.id));
+  if(missing.length)h+=`<div class="card row"><label class="f" style="flex:1">إضافة تمرين لهذا اليوم<select id="seNew">${missing.map(e=>`<option value="${e.id}">${esc(e.ar)}</option>`).join("")}</select></label><button type="button" id="seAddEx" style="align-self:flex-end">إضافة</button></div>`;
+  h+=`</div><div class="stack" style="margin-top:12px"><button type="button" class="primary block" id="seSave">حفظ التعديلات</button><button type="button" class="block" id="seCancel">إلغاء</button>
+   <p class="muted small" style="margin:0">الجولات الفارغة (بدون وزن أو تكرارات) تُحذف عند الحفظ.</p></div>`;
+  return h;
+}
+bind.sess=function(){
+  const se=sessEdit;const keep=()=>{const y=window.scrollY;render();window.scrollTo(0,y)};
+  const back=()=>{sessEdit=null;tab="progress";render();window.scrollTo(0,0)};
+  if(!se)return;
+  $("#seDate").onchange=e=>{if(e.target.value)se.date=e.target.value};
+  document.querySelectorAll("[data-sf]").forEach(inp=>inp.addEventListener("input",()=>{se.ex[+inp.dataset.sei].sets[+inp.dataset.si][inp.dataset.sf]=inp.value===""?null:num(inp.value)}));
+  document.querySelectorAll("[data-sedel]").forEach(b=>b.onclick=()=>{se.ex[+b.dataset.sedel].sets.splice(+b.dataset.si,1);keep()});
+  document.querySelectorAll("[data-seadd]").forEach(b=>b.onclick=()=>{const a=se.ex[+b.dataset.seadd].sets;const l=a[a.length-1];a.push({w:l?l.w:null,r:null});keep()});
+  document.querySelectorAll("[data-sedelex]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد"))return;se.ex.splice(+b.dataset.sedelex,1);keep()});
+  $("#seAddEx")&&($("#seAddEx").onclick=()=>{se.ex.push({id:$("#seNew").value,sets:[{w:null,r:null}]});keep()});
+  $("#seCancel").onclick=back;
+  $("#seSave").onclick=()=>{
+    se.ex.forEach(e=>{e.sets=e.sets.filter(st=>st.w!=null&&st.r!=null&&st.r>0)});se.ex=se.ex.filter(e=>e.sets.length);
+    const i=S.sessions.findIndex(x=>x.id===se.id);
+    if(!se.ex.length){toast("لا توجد جولات. لحذف التمرين كله استخدم زر «حذف» في السجل");return}
+    if(i>=0)S.sessions[i]=se;save();back();toast("تم حفظ التعديلات")};
+};
+
+/* Program editor */
+const RESTS=[45,60,75,90,120,150,180,240];
+const LIB=[["ضغط صدر بالبار","Barbell Bench Press","u",6,10,150],["ضغط صدر بالدمبل","Dumbbell Bench Press","u",8,12,120],["ضغط صدر مائل بالبار","Incline Barbell Press","u",6,10,150],["ضغط صدر مائل بالدمبل","Incline DB Press","u",8,12,120],["جهاز ضغط صدر","Machine Chest Press","u",8,12,90],["تفتيح صدر بالكيبل","Cable Fly","u",10,15,75],["جهاز فراشة (Pec Deck)","Pec Deck","u",10,15,75],["متوازي (Dips)","Dips","u",6,12,120],["عقلة (Pull-up)","Pull-up","u",5,10,150],["سحب عالي (Lat Pulldown)","Lat Pulldown","u",8,12,120],["تجديف بالبار منحني","Barbell Bent-Over Row","u",6,10,150],["تجديف بالدمبل يد واحدة","One-Arm DB Row","u",8,12,90],["سحب أرضي بالكيبل جالس","Seated Cable Row","u",8,12,90],["جهاز تجديف (T-Bar)","T-Bar Row","u",8,12,120],["ضغط أكتاف بالبار واقف","Overhead Press","u",6,10,150],["ضغط أكتاف بالدمبل جالس","Seated DB Shoulder Press","u",8,12,120],["رفرفة جانبي بالدمبل","DB Lateral Raise","u",12,15,60],["رفرفة جانبي بالكيبل","Cable Lateral Raise","u",12,15,60],["خلفي كتف (Reverse Fly)","Reverse Pec Deck","u",12,15,60],["فيس بول (Face Pull)","Face Pull","u",12,15,60],["باي بالبار","Barbell Curl","u",8,12,75],["باي بالدمبل","Dumbbell Biceps Curl","u",10,15,75],["باي مطرقة (Hammer)","Hammer Curl","u",10,15,75],["باي ارتكاز (Preacher)","Preacher Curl","u",10,15,75],["تراي بالكيبل (Pushdown)","Cable Triceps Pushdown","u",10,15,75],["تراي خلف الرأس بالكيبل","Overhead Cable Triceps Ext.","u",10,15,75],["تراي بالبار نائم (Skull Crusher)","Skull Crusher","u",8,12,90],["بطن بالكيبل","Cable Crunch","u",10,15,60],["رفع أرجل معلّق","Hanging Leg Raise","u",8,15,60],["سكوات بالبار","Barbell Back Squat","l",6,10,180],["هاك سكوات","Hack Squat","l",8,12,150],["دفع أرجل (Leg Press)","Leg Press","l",8,12,150],["ديدلفت","Deadlift","l",5,8,180],["ديدلفت روماني","Romanian Deadlift","l",8,12,150],["هيب ثرست بالبار","Barbell Hip Thrust","l",8,12,120],["سكوات بلغاري بالدمبل (لكل رجل)","DB Bulgarian Split Squat","l",8,12,90],["طعنات مشي بالدمبل","DB Walking Lunge","l",10,12,90],["رفرفة أمامي (Leg Extension)","Leg Extension","l",10,15,75],["رفرفة خلفي نائم","Lying Leg Curl","l",10,15,90],["رفرفة خلفي جالس","Seated Leg Curl","l",10,15,75],["سمانة واقف","Standing Calf Raise","l",10,15,60],["سمانة جالس","Seated Calf Raise","l",12,15,60]];
+function vEdit(){
+  const P=DAYS;if(!editDay||!P.some(d=>d.id===editDay))editDay=P[0]?P[0].id:null;
+  const d=P.find(x=>x.id===editDay);
+  let h=`<h2>تعديل البرنامج</h2>
+  <p class="muted small" style="margin:0 0 10px">اختر اليوم ثم عدّل تمارينه. التغييرات تُحفظ تلقائيًا. سجلّك القديم يبقى كما هو.</p>
+  <div class="chips">${P.map(x=>`<button type="button" class="chip ${x.id===editDay?"on":""}" data-eday="${x.id}">${esc(x.ar)} · ${esc(x.wdName)}</button>`).join("")}<button type="button" class="chip" id="addDay">+ يوم</button></div>
+  <datalist id="exLib">${LIB.map(l=>`<option value="${esc(l[0])}"></option>`).join("")}</datalist>`;
+  if(!d)return h+`<div class="empty" style="margin-top:12px">لا توجد أيام في البرنامج. أضف يومًا.</div>`;
+  h+=`<div class="card stack" style="margin-top:12px">
+   <div class="grid2"><label class="f">اسم اليوم<input id="dAr" data-dk="ar" value="${esc(d.ar)}"></label>
+   <label class="f">يوم الأسبوع<select id="dWd" data-dk="wd"><option value="-1" ${d.wd<0?"selected":""}>بدون يوم ثابت</option>${[6,0,1,2,3,4,5].map(w=>`<option value="${w}" ${d.wd===w?"selected":""}>${WDN[w]}</option>`).join("")}</select></label></div>
+   <label class="f">العضلات المستهدفة (اختياري)<input id="dFocus" data-dk="focus" value="${esc(d.focus||"")}"></label>
+  </div><div class="stack" style="margin-top:12px">`;
+  d.ex.forEach((e,i)=>{const q=`data-ei="${i}"`;
+    h+=`<section class="card stack" style="gap:8px">
+     <div class="ex-head"><b class="num">${i+1}</b><div class="row" style="gap:4px">
+      <button type="button" class="ghost" data-mv="-1" ${q} aria-label="تحريك لأعلى" ${i===0?"disabled":""}>↑</button>
+      <button type="button" class="ghost" data-mv="1" ${q} aria-label="تحريك لأسفل" ${i===d.ex.length-1?"disabled":""}>↓</button>
+      <button type="button" class="ghost" data-delex ${q} style="color:var(--warn)">حذف</button></div></div>
+     <label class="f">اسم التمرين<input id="e-ar-${e.id}" list="exLib" data-ek="ar" ${q} value="${esc(e.ar)}" placeholder="اكتب أو اختر من القائمة"></label>
+     <label class="f">الاسم بالإنجليزي (اختياري)<input id="e-en-${e.id}" data-ek="en" ${q} value="${esc(e.en||"")}" style="direction:ltr;text-align:right"></label>
+     <div class="grid3">
+      <label class="f">الجولات<input id="e-s-${e.id}" type="number" inputmode="numeric" min="1" max="10" data-ek="s" ${q} value="${e.s}"></label>
+      <label class="f">أقل تكرار<input id="e-lo-${e.id}" type="number" inputmode="numeric" min="1" data-ek="lo" ${q} value="${e.lo}"></label>
+      <label class="f">أعلى تكرار<input id="e-hi-${e.id}" type="number" inputmode="numeric" min="1" data-ek="hi" ${q} value="${e.hi}"></label>
+      <label class="f">الراحة<select id="e-rest-${e.id}" data-ek="rest" ${q}>${(RESTS.includes(e.rest)?RESTS:[...RESTS,e.rest].sort((a,b)=>a-b)).map(r=>`<option value="${r}" ${r===e.rest?"selected":""}>${mmss(r)}</option>`).join("")}</select></label>
+      <label class="f" style="grid-column:span 2">زيادة الوزن<select id="e-k-${e.id}" data-ek="k" ${q}><option value="u" ${e.k!=="l"?"selected":""}>علوي (+${S.settings.incU} كجم)</option><option value="l" ${e.k==="l"?"selected":""}>أرجل (+${S.settings.incL} كجم)</option></select></label>
+     </div></section>`});
+  if(!d.ex.length)h+=`<div class="empty">لا توجد تمارين في هذا اليوم بعد.</div>`;
+  h+=`</div><div class="stack" style="margin-top:12px">
+   <button type="button" class="primary block" id="addEx">+ إضافة تمرين</button>
+   <button type="button" class="block" id="doneEdit">تم، ارجع للتمرين</button>
+   <div class="row" style="justify-content:space-between"><button type="button" class="danger" id="delDay">حذف هذا اليوم</button><button type="button" class="ghost" id="resetProg">استرجاع البرنامج الأصلي</button></div>
+   <p class="muted small" style="margin:0">ملاحظة: إذا حذفت تمرينًا يبقى سجله وأرقامه القياسية في تبويب «التقدّم».</p></div>`;
+  return h;
+}
+bind.edit=function(){
+  const v=$("#view");const keep=()=>{const y=window.scrollY;render();window.scrollTo(0,y)};
+  const D=()=>editable().find(x=>x.id===editDay);
+  v.querySelectorAll("[data-eday]").forEach(b=>b.onclick=()=>{editDay=b.dataset.eday;render()});
+  $("#addDay").onclick=()=>{const P=editable();const used=new Set(P.map(x=>x.wd));const wd=[6,0,1,2,3,4,5].find(w=>!used.has(w))??-1;
+    const nd={id:"d"+uid(),ar:"يوم "+(P.length+1),en:"",wd,focus:"",ex:[]};P.push(nd);editDay=nd.id;loadProgram();save();render()};
+  v.querySelectorAll("[data-dk]").forEach(inp=>inp.addEventListener("change",()=>{const d=D();const k=inp.dataset.dk;
+    d[k]=k==="wd"?Number(inp.value):inp.value.trim();if(k==="ar"){d.en="";if(!d.ar)d.ar="بدون اسم"}loadProgram();save();keep()}));
+  v.querySelectorAll("[data-ek]").forEach(inp=>inp.addEventListener("change",()=>{const d=D();const e=d.ex[+inp.dataset.ei];const k=inp.dataset.ek;
+    if(k==="ar"){e.ar=inp.value.trim()||"تمرين";const l=LIB.find(x=>x[0]===e.ar);if(l&&!e.en){e.en=l[1];e.k=l[2];e.lo=l[3];e.hi=l[4];e.rest=l[5]}}
+    else if(k==="en")e.en=inp.value.trim();
+    else if(k==="k")e.k=inp.value;
+    else{let n=Math.round(num(inp.value)||0);if(k==="s")n=Math.min(10,Math.max(1,n));if(k==="lo"||k==="hi")n=Math.max(1,n);if(k==="rest")n=Number(inp.value);e[k]=n;
+      if(e.lo>e.hi){if(k==="lo")e.hi=e.lo;else e.lo=e.hi}}
+    loadProgram();save();keep();toast("تم الحفظ")}));
+  v.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{const d=D();const i=+b.dataset.ei,j=i+Number(b.dataset.mv);if(j<0||j>=d.ex.length)return;
+    [d.ex[i],d.ex[j]]=[d.ex[j],d.ex[i]];loadProgram();save();keep()});
+  v.querySelectorAll("[data-delex]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد"))return;const d=D();const e=d.ex.splice(+b.dataset.ei,1)[0];
+    if(history(e.id).length&&!S.retired.some(x=>x.id===e.id))S.retired.push({id:e.id,ar:e.ar,en:e.en,s:e.s,lo:e.lo,hi:e.hi,rest:e.rest,k:e.k});
+    loadProgram();save();keep();toast("تم حذف "+e.ar)});
+  $("#addEx")&&($("#addEx").onclick=()=>{const d=D();const e={id:"x"+uid(),ar:"",en:"",s:3,lo:8,hi:12,rest:90,k:"u"};d.ex.push(e);loadProgram();save();keep();
+    const i=$("#e-ar-"+e.id);if(i){i.scrollIntoView({block:"center"});i.focus()}});
+  $("#doneEdit")&&($("#doneEdit").onclick=()=>{const d=D();if(d)d.ex.forEach(e=>{if(!e.ar)e.ar="تمرين"});loadProgram();save();selDay=editDay;tab="today";render();window.scrollTo(0,0)});
+  $("#delDay")&&($("#delDay").onclick=()=>{const b=$("#delDay");if(S.draft&&S.draft.day===editDay){toast("أنهِ تمرين هذا اليوم الجاري أو ألغِه أولًا");return}
+    if(!armed(b,"اضغط مرة أخرى لحذف اليوم"))return;const P=editable();const d=P.find(x=>x.id===editDay);
+    for(const e of d.ex)if(history(e.id).length&&!S.retired.some(x=>x.id===e.id))S.retired.push(Object.assign({},e));
+    S.program=P.filter(x=>x.id!==editDay);editDay=null;loadProgram();save();render();toast("تم حذف اليوم")});
+  $("#resetProg").onclick=()=>{const b=$("#resetProg");if(!armed(b,"اضغط مرة أخرى للاسترجاع"))return;
+    for(const d of DAYS)for(const e of d.ex)if(!DEFAULT_DAYS.some(x=>x.ex.some(y=>y.id===e.id))&&history(e.id).length&&!S.retired.some(x=>x.id===e.id))S.retired.push(Object.assign({},e));
+    S.program=null;if(S.draft&&!DEFAULT_DAYS.some(x=>x.id===S.draft.day))S.draft=null;editDay=null;loadProgram();save();render();toast("رجع البرنامج الأصلي")};
+};
+
+/* Settings */
+function vSettings(){
+  const p=S.profile,T=targets();
+  return`<h2>بياناتي</h2><div class="card stack">
+   <div class="grid2">
+    <label class="f">الجنس<select id="pSex"><option value="male" ${p.sex==="male"?"selected":""}>ذكر</option><option value="female" ${p.sex==="female"?"selected":""}>أنثى</option></select></label>
+    <label class="f">العمر<input id="pAge" type="number" inputmode="numeric" value="${esc(p.age)}"></label>
+    <label class="f">الطول (سم)<input id="pH" type="number" inputmode="decimal" value="${esc(p.height)}"></label>
+    <label class="f">الوزن (كجم)<input id="pW" type="number" inputmode="decimal" step="0.1" value="${esc(p.weight)}"></label></div>
+   <label class="f">النشاط اليومي خارج الجم<select id="pAct">
+    ${[[1.2,"قليل جدًا (جلوس معظم اليوم)"],[1.375,"خفيف (عمل مكتبي + ٣–٤ تمارين)"],[1.55,"متوسط (حركة يومية أكثر)"],[1.725,"عالٍ (عمل بدني)"]].map(([v,l])=>`<option value="${v}" ${Number(p.activity)===v?"selected":""}>${l}</option>`).join("")}</select></label>
+   <div class="grid2">
+    <label class="f">الفائض للتضخيم (سعرة)<input id="pSur" type="number" inputmode="numeric" step="50" value="${esc(p.surplus)}"></label>
+    <label class="f">البروتين (جم لكل كجم)<input id="pPk" type="number" inputmode="decimal" step="0.1" value="${esc(p.protPerKg)}"></label>
+    <label class="f">هدف سعرات يدوي (اختياري)<input id="pKo" type="number" inputmode="numeric" value="${esc(p.kcalOverride)}"></label>
+    <label class="f">هدف بروتين يدوي (اختياري)<input id="pPo" type="number" inputmode="numeric" value="${esc(p.protOverride)}"></label></div>
+   <button type="button" class="primary" id="pSave">حفظ</button>
+   ${T.kcal?`<div class="hint">هدفك الحالي: <span class="num">${T.kcal}</span> سعرة و<span class="num">${T.prot}</span> جم بروتين يوميًا (تقديري).</div>`:""}
+   <div class="small muted">الإعداد المقترح لمبتدئ في تضخيم: فائض ٢٠٠–٤٠٠ سعرة تقريبًا، وبروتين ١٫٦–٢٫٢ جم لكل كجم. هذه نطاقات شائعة وليست قاعدة ثابتة.</div>
+  </div>
+  <h2>برنامجي</h2><div class="card"><button type="button" class="block" id="goEdit2">تعديل الأيام والتمارين</button></div>
+  <h2>زيادة الوزن المقترحة</h2><div class="card grid2">
+   <label class="f">تمارين الجزء العلوي (كجم)<input id="sIncU" type="number" inputmode="decimal" step="0.5" value="${S.settings.incU}"></label>
+   <label class="f">تمارين الأرجل (كجم)<input id="sIncL" type="number" inputmode="decimal" step="0.5" value="${S.settings.incL}"></label>
+   <button type="button" id="sSave" style="grid-column:1/-1">حفظ</button></div>
+  <h2>النسخة الاحتياطية</h2><div class="card stack">
+   <div class="small muted">بياناتك محفوظة في هذا المتصفح على هذا الجهاز فقط. خذ نسخة احتياطية كل فترة واحفظها في الملاحظات أو أرسلها لنفسك، وإلا قد تضيع إذا مُسحت بيانات المتصفح.</div>
+   <div class="row"><button type="button" class="primary" id="bCopy">نسخ النسخة الاحتياطية</button><button type="button" id="bDl">تنزيل ملف</button></div>
+   <textarea id="bText" readonly aria-label="نص النسخة الاحتياطية"></textarea>
+   <h3 style="margin-top:6px">استعادة</h3>
+   <label class="f">الصق نص النسخة الاحتياطية هنا<textarea id="bIn"></textarea></label>
+   <label class="f">أو اختر ملف النسخة<input id="bFile" type="file" accept=".json,application/json,text/plain"></label>
+   <button type="button" id="bImp">استعادة (تستبدل البيانات الحالية)</button>
+  </div>
+  <h2>منطقة الخطر</h2><div class="card"><button type="button" class="danger block" id="bReset">حذف كل البيانات</button></div>
+  <p class="small muted" style="margin-top:16px">سجل: <span class="num">${S.sessions.length}</span> تمرين · <span class="num">${S.bodyw.length}</span> وزن · <span class="num">${S.meas.length}</span> قياس · <span class="num">${S.food.length}</span> وجبة</p>`;
+}
+bind.settings=function(){
+  const dump=()=>JSON.stringify(Object.assign({app:"ironlog",v:1,exported:new Date().toISOString()},S));
+  $("#bText").value=dump();
+  $("#goEdit2").onclick=()=>{editDay=null;tab="edit";render();window.scrollTo(0,0)};
+  $("#pSave").onclick=()=>{Object.assign(S.profile,{sex:$("#pSex").value,age:$("#pAge").value,height:$("#pH").value,weight:$("#pW").value,activity:Number($("#pAct").value),surplus:num($("#pSur").value)??300,protPerKg:num($("#pPk").value)??2,kcalOverride:$("#pKo").value,protOverride:$("#pPo").value});
+    const w=num(S.profile.weight);if(w&&!S.bodyw.some(x=>x.date===today())){S.bodyw.push({date:today(),kg:w})}save();render();toast("تم الحفظ")};
+  $("#sSave").onclick=()=>{S.settings.incU=num($("#sIncU").value)??2.5;S.settings.incL=num($("#sIncL").value)??5;save();toast("تم الحفظ")};
+  $("#bCopy").onclick=()=>{const t=$("#bText");const txt=t.value;
+    try{navigator.clipboard.writeText(txt).then(()=>toast("تم النسخ"),()=>{t.focus();t.select();toast("حدّد النص وانسخه يدويًا")})}catch(e){t.focus();t.select();toast("حدّد النص وانسخه يدويًا")}};
+  $("#bDl").onclick=()=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([dump()],{type:"application/json"}));a.download="ironlog-"+today()+".json";document.body.appendChild(a);a.click();a.remove();toast("إن لم يبدأ التنزيل فاستخدم زر النسخ")}catch(e){toast("التنزيل غير متاح هنا، استخدم زر النسخ")}};
+  $("#bFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{$("#bIn").value=rd.result;toast("تم تحميل الملف، اضغط استعادة")};rd.readAsText(f)};
+  $("#bImp").onclick=()=>{const b=$("#bImp");let o;try{o=JSON.parse($("#bIn").value)}catch(e){toast("النص ليس نسخة احتياطية صالحة");return}
+    if(!o||o.app!=="ironlog"||!Array.isArray(o.sessions)){toast("هذه ليست نسخة احتياطية من دفتر الحديد");return}
+    if(!armed(b,"اضغط مرة أخرى لتأكيد الاستبدال"))return;
+    delete o.app;delete o.v;delete o.exported;S=merge(DEF(),o);loadProgram();save();render();toast("تمت الاستعادة")};
+  $("#bReset").onclick=()=>{const b=$("#bReset");if(!armed(b,"اضغط مرة أخرى لحذف كل شيء نهائيًا"))return;S=DEF();loadProgram();save();render();toast("تم حذف البيانات")};
+};
+
+/* ---------- rest timer ---------- */
+let tEnd=0,tInt=null,actx=null;
+function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();[0,0.25,0.5].forEach(t=>{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;g.gain.setValueAtTime(0.2,actx.currentTime+t);g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+t+0.2);o.connect(g);g.connect(actx.destination);o.start(actx.currentTime+t);o.stop(actx.currentTime+t+0.2)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}}
+function startTimer(sec,label){tEnd=Date.now()+sec*1000;$("#tLabel").textContent="راحة بعد: "+label;$("#timer").hidden=false;$("#timer").classList.remove("ding");
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume()}catch(e){}
+  clearInterval(tInt);tInt=setInterval(tick,250);tick()}
+function tick(){const left=Math.ceil((tEnd-Date.now())/1000);
+  if(left<=0){$("#tClock").textContent="0:00";if(!$("#timer").classList.contains("ding")){$("#timer").classList.add("ding");$("#tLabel").textContent="ابدأ الجولة التالية";beep();setTimeout(()=>{if($("#timer").classList.contains("ding"))stopTimer()},6000)}return}
+  $("#tClock").textContent=mmss(left)}
+function stopTimer(){clearInterval(tInt);$("#timer").hidden=true;$("#timer").classList.remove("ding")}
+$("#tPlus").onclick=()=>{tEnd=Math.max(tEnd,Date.now())+30000;$("#timer").classList.remove("ding");tick()};
+$("#tStop").onclick=stopTimer;
+
+/* ---------- boot ---------- */
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();window.scrollTo(0,0)});
+if(!storeOK)$("#storeWarn").hidden=false;
+if(location.hash&&["today","progress","body","food","settings"].includes(location.hash.slice(1)))tab=location.hash.slice(1);
+render();
+})();
+</script>
+</body></html>
