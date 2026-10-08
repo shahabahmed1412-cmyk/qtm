@@ -209,7 +209,7 @@ function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTi
 function armed(btn,label){if(btn.dataset.armed){return true}btn.dataset.armed="1";const old=btn.textContent;btn.textContent=label||"اضغط مرة أخرى للتأكيد";btn.classList.add("confirm-on");setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=old;btn.classList.remove("confirm-on")}},3500);return false}
 
 /* ---------- training logic ---------- */
-function history(exId){const L=LIFT(exId),out=[];for(const s of S.sessions){for(const e of s.ex){if(LIFT(e.id)===L&&e.sets.length)out.push({date:s.date,sets:e.sets})}}return out.sort((a,b)=>a.date<b.date?-1:1)}
+function history(exId){const L=LIFT(exId),out=[];for(const s of S.sessions){for(const e of s.ex){if(LIFT(e.id)===L&&e.sets.length)out.push({date:s.date,sets:e.sets,sid:s.id})}}return out.sort((a,b)=>a.date<b.date?-1:1)}
 function bestOf(sets){let b=null;for(const st of sets){const v=e1rm(st.w,st.r);if(!b||v>b.e)b={e:v,w:st.w,r:st.r}}return b}
 function prs(exId){const h=history(exId);let maxW=null,maxE=null;for(const x of h)for(const st of x.sets){if(!maxW||st.w>maxW.w||(st.w===maxW.w&&st.r>maxW.r))maxW={w:st.w,r:st.r,date:x.date};const v=e1rm(st.w,st.r);if(!maxE||v>maxE.e)maxE={e:v,w:st.w,r:st.r,date:x.date}}return{maxW,maxE}}
 function suggest(ex){
@@ -252,7 +252,7 @@ function lineChart(pts,unit){
   const xs=pts.map(p=>parseD(p.x).getTime()),ys=pts.map(p=>p.y);
   let x0=Math.min(...xs),x1=Math.max(...xs);if(x0===x1){x0-=864e5;x1+=864e5}
   let y0=Math.min(...ys),y1=Math.max(...ys);const padY=(y1-y0)*0.15||Math.max(1,y1*0.05);y0-=padY;y1+=padY;
-  const X=t=>W-R-(t-x0)/(x1-x0)*(W-L-R); // RTL: newest on the left? keep time flowing right-to-left for Arabic reading
+  const X=t=>L+(t-x0)/(x1-x0)*(W-L-R); // time runs left→right so "up and to the right" reads as progress
   const Y=v=>T+(1-(v-y0)/(y1-y0))*(H-T-B);
   const ticks=[0,1,2,3].map(i=>y0+(y1-y0)*i/3);
   const line=pts.map((p,i)=>(i?"L":"M")+X(xs[i]).toFixed(1)+" "+Y(p.y).toFixed(1)).join(" ");
@@ -264,18 +264,18 @@ function lineChart(pts,unit){
    <path d="${area}" fill="var(--accent)" fill-opacity=".10"/>
    <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
    ${pts.map((p,i)=>`<circle cx="${X(xs[i])}" cy="${Y(p.y)}" r="${i===lastI?5.5:3}" fill="${i===lastI?"var(--accent)":"var(--surface)"}" stroke="var(--accent)" stroke-width="2"/>`).join("")}
-   <text x="${X(xs[0])}" y="${H-8}" text-anchor="end" font-size="12" fill="var(--muted)">${shortD(pts[0].x)}</text>
-   <text x="${X(xs[lastI])}" y="${H-8}" text-anchor="start" font-size="12" fill="var(--fg)" font-weight="700">${shortD(pts[lastI].x)} · ${r1(pts[lastI].y)} ${unit}</text>
+   <text x="${X(xs[0])}" y="${H-8}" text-anchor="start" font-size="12" fill="var(--muted)">${shortD(pts[0].x)}</text>
+   <text x="${X(xs[lastI])}" y="${H-8}" text-anchor="end" font-size="12" fill="var(--fg)" font-weight="700">${r1(pts[lastI].y)} ${unit} · ${shortD(pts[lastI].x)}</text>
   </svg>`;
 }
 
 /* ---------- views ---------- */
 loadProgram();
-let tab="today",selDay=null,progEx="bench",editDay=null;
+let tab="today",selDay=null,progEx="bench",editDay=null,progMetric="top",sessEdit=null;
 function render(){
-  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(tab==="sess"?"progress":tab)));
   const v=$("#view");
-  v.innerHTML=({today:vToday,progress:vProgress,body:vBody,food:vFood,settings:vSettings,edit:vEdit})[tab]();
+  v.innerHTML=({today:vToday,progress:vProgress,body:vBody,food:vFood,settings:vSettings,edit:vEdit,sess:vSess})[tab]();
   bind[tab]&&bind[tab]();
 }
 const bind={};
@@ -386,27 +386,42 @@ function vProgress(){
   const opt=e=>`<option value="${e.id}" ${e.id===progEx?"selected":""}>${esc(e.ar)}</option>`;
   const ret=Object.values(EX).filter(e=>e.retired);
   const opts=DAYS.map(d=>`<optgroup label="${esc(d.ar)}">${d.ex.filter(e=>!(e.id==="legpress2"&&EX.legpress)).map(opt).join("")}</optgroup>`).join("")+(ret.length?`<optgroup label="تمارين حذفتها">${ret.map(opt).join("")}</optgroup>`:"");
-  const hx=history(progEx);const pts=hx.map(x=>({x:x.date,y:r1(bestOf(x.sets).e)}));
+  const hx=history(progEx);
+  const M={top:["أثقل وزن",x=>Math.max(...x.sets.map(s=>s.w)),"أثقل وزن رفعته في التمرين بكل مرة."],
+    vol:["حجم التمرين",x=>x.sets.reduce((t,s)=>t+s.w*s.r,0),"مجموع (الوزن × التكرارات) لكل الجولات. ارتفاعه يعني أنك تشتغل أكثر."],
+    e1rm:["1RM تقديري",x=>bestOf(x.sets).e,"القوة القصوى التقديرية لتكرار واحد (معادلة Epley) من أفضل جولة. رقم تقريبي للمقارنة فقط."]};
+  const m=M[progMetric]||M.top;const pts=hx.map(x=>({x:x.date,y:r1(m[1](x))}));
   const p=prs(progEx);
   h+=`<h2>منحنى التمرين</h2><div class="card stack">
    <label class="f">اختر التمرين<select id="progEx">${opts}</select></label>
-   <div class="small muted">القوة القصوى التقديرية لتكرار واحد (معادلة Epley) من أفضل جولة في كل تمرين. هي رقم تقريبي للمقارنة فقط.</div>
+   <div class="chips">${Object.entries(M).map(([k,v])=>`<button type="button" class="chip ${k===progMetric?"on":""}" data-metric="${k}">${v[0]}</button>`).join("")}</div>
+   <div class="small muted">${m[2]}</div>
    <div class="chart">${lineChart(pts,"كجم")}</div>
    ${p.maxW?`<div class="row small"><span class="tag pr">أثقل وزن</span><span class="num">${p.maxW.w} كجم × ${p.maxW.r}</span><span class="muted">${shortD(p.maxW.date)}</span>
      <span class="tag pr">أفضل تقدير</span><span class="num">${r1(p.maxE.e)} كجم</span></div>`:""}
   </div>`;
+  const maxSets=Math.max(0,...hx.map(x=>x.sets.length));
+  h+=`<h2>كل الجولات</h2>`+(hx.length?`<div class="card tbl-wrap"><table><thead><tr><th>التاريخ</th>${Array.from({length:maxSets},(_,i)=>`<th>جولة ${i+1}</th>`).join("")}<th>الحجم</th></tr></thead><tbody>
+   ${[...hx].reverse().map((x,ri,arr)=>{const prev=arr[ri+1];const top=Math.max(...x.sets.map(s=>s.w));const ptop=prev?Math.max(...prev.sets.map(s=>s.w)):null;
+     return`<tr><td><button type="button" class="ghost small" style="padding:4px 6px;min-height:32px;color:var(--accent)" data-editsess="${x.sid}" aria-label="تعديل جولات ${shortD(x.date)}">${shortD(x.date)} ✎</button>${ptop!=null&&top>ptop?'<span class="tag up">↑</span>':""}</td>${Array.from({length:maxSets},(_,i)=>{const st=x.sets[i];return`<td class="num">${st?st.w+"×"+st.r:'<span class="muted">—</span>'}</td>`}).join("")}
+     <td class="num">${Math.round(x.sets.reduce((t,s)=>t+s.w*s.r,0)).toLocaleString("en")}</td></tr>`}).join("")}
+   </tbody></table></div><p class="small muted" style="margin:6px 0 0">اضغط على التاريخ ✎ لتعديل جولات ذلك اليوم. كل خانة = الوزن (كجم) × التكرارات. السهم ↑ يعني أن أثقل وزن زاد عن المرة السابقة.</p>`
+   :`<div class="empty">لم تسجّل هذا التمرين بعد.</div>`);
   const rowsPR=Object.values(EX).filter(e=>!(e.id==="legpress2"&&EX.legpress)).map(e=>({e,p:prs(e.id)})).filter(x=>x.p.maxW);
   h+=`<h2>الأرقام القياسية</h2>`+(rowsPR.length?`<div class="card tbl-wrap"><table><thead><tr><th>التمرين</th><th>أثقل جولة</th><th>1RM تقديري</th><th>التاريخ</th></tr></thead><tbody>
    ${rowsPR.map(x=>`<tr><td>${esc(x.e.ar)}</td><td class="num">${x.p.maxW.w}×${x.p.maxW.r}</td><td class="num">${r1(x.p.maxE.e)}</td><td class="num">${shortD(x.p.maxE.date)}</td></tr>`).join("")}
    </tbody></table></div>`:`<div class="empty">بعد أول تمرين تحفظه تظهر هنا أفضل أرقامك لكل تمرين.</div>`);
   h+=`<h2>سجل التمارين</h2>`+(sorted.length?`<div class="card"><ul class="clean list">${sorted.map(s=>{const d=DAYS.find(x=>x.id===s.day)||{ar:"يوم محذوف"};const n=s.ex.reduce((t,e)=>t+e.sets.length,0);
      return`<li><div style="min-width:0"><b>${d?esc(d.ar):""}</b> <span class="muted small">${fmtD(s.date)}</span><div class="small muted">${n} جولة · حجم <span class="num">${Math.round(vol(s)).toLocaleString("en")}</span> كجم${s.min?` · ${s.min} د`:""}</div></div>
-     <button type="button" class="ghost small" data-delsess="${s.id}">حذف</button></li>`}).join("")}</ul></div>`
+     <div class="row" style="gap:2px;flex-wrap:nowrap"><button type="button" class="ghost small" data-editsess="${s.id}">تعديل</button><button type="button" class="ghost small" data-delsess="${s.id}">حذف</button></div></li>`}).join("")}</ul></div>`
      :`<div class="empty">لم تحفظ أي تمرين بعد. ابدأ من تبويب «التمرين».</div>`);
   return h;
 }
 bind.progress=function(){
   $("#progEx").onchange=e=>{progEx=e.target.value;render()};
+  document.querySelectorAll("[data-metric]").forEach(b=>b.onclick=()=>{progMetric=b.dataset.metric;const y=window.scrollY;render();window.scrollTo(0,y)});
+  document.querySelectorAll("[data-editsess]").forEach(b=>b.onclick=()=>{const s0=S.sessions.find(x=>x.id===b.dataset.editsess);if(!s0)return;
+    sessEdit=clone(s0);tab="sess";render();window.scrollTo(0,0)});
   document.querySelectorAll("[data-delsess]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد الحذف"))return;S.sessions=S.sessions.filter(s=>s.id!==b.dataset.delsess);save();render()});
 };
 
@@ -494,6 +509,45 @@ bind.food=function(){
   const recent=[];const seen=new Set();for(const f of [...S.food].reverse()){const k=f.name.trim();if(k&&!seen.has(k)){seen.add(k);recent.push(f)}if(recent.length>=8)break}
   document.querySelectorAll("[data-quick]").forEach(b=>b.onclick=()=>{const f=recent[+b.dataset.quick];S.food.push({id:uid(),date:foodDate||today(),name:f.name,kcal:f.kcal,protein:f.protein});save();render();toast("تمت إضافة "+f.name)});
   document.querySelectorAll("[data-delf]").forEach(b=>b.onclick=()=>{S.food=S.food.filter(f=>f.id!==b.dataset.delf);save();render()});
+};
+
+/* Edit a saved session */
+function vSess(){
+  const se=sessEdit;if(!se)return`<div class="empty">لا يوجد تمرين للتعديل.</div>`;
+  const d=DAYS.find(x=>x.id===se.day);
+  let h=`<h2>تعديل تمرين محفوظ</h2><p class="muted small" style="margin:0 0 10px">${d?esc(d.ar):"يوم محذوف"}. عدّل أي جولة ثم اضغط حفظ.</p>
+  <div class="card"><label class="f">التاريخ<input id="seDate" type="date" value="${se.date}"></label></div><div class="stack" style="margin-top:12px">`;
+  se.ex.forEach((e,ei)=>{const x=EX[e.id]||{ar:"تمرين محذوف",en:""};
+    h+=`<section class="card"><div class="ex-head"><div style="min-width:0"><h3>${esc(x.ar)}</h3><div class="en">${esc(x.en||"")}</div></div>
+     <button type="button" class="ghost small" data-sedelex="${ei}" style="color:var(--warn)">حذف التمرين</button></div>
+     <div class="sets"><span class="h">#</span><span class="h">الوزن (كجم)</span><span class="h">التكرارات</span><span class="h"></span>
+     ${e.sets.map((st,i)=>`<span class="idx">${i+1}</span>
+      <input id="se-w-${ei}-${i}" type="number" inputmode="decimal" step="0.5" min="0" data-sei="${ei}" data-si="${i}" data-sf="w" value="${st.w??""}" aria-label="الوزن للجولة ${i+1}">
+      <input id="se-r-${ei}-${i}" type="number" inputmode="numeric" step="1" min="0" data-sei="${ei}" data-si="${i}" data-sf="r" value="${st.r??""}" aria-label="التكرارات للجولة ${i+1}">
+      <button type="button" class="tick" data-sedel="${ei}" data-si="${i}" aria-label="حذف الجولة ${i+1}" style="color:var(--warn)">×</button>`).join("")}</div>
+     <button type="button" class="ghost small" data-seadd="${ei}" style="margin-top:8px">+ جولة</button></section>`});
+  const missing=Object.values(EX).filter(e=>!e.retired&&!se.ex.some(x=>x.id===e.id));
+  if(missing.length)h+=`<div class="card row"><label class="f" style="flex:1">إضافة تمرين لهذا اليوم<select id="seNew">${missing.map(e=>`<option value="${e.id}">${esc(e.ar)}</option>`).join("")}</select></label><button type="button" id="seAddEx" style="align-self:flex-end">إضافة</button></div>`;
+  h+=`</div><div class="stack" style="margin-top:12px"><button type="button" class="primary block" id="seSave">حفظ التعديلات</button><button type="button" class="block" id="seCancel">إلغاء</button>
+   <p class="muted small" style="margin:0">الجولات الفارغة (بدون وزن أو تكرارات) تُحذف عند الحفظ.</p></div>`;
+  return h;
+}
+bind.sess=function(){
+  const se=sessEdit;const keep=()=>{const y=window.scrollY;render();window.scrollTo(0,y)};
+  const back=()=>{sessEdit=null;tab="progress";render();window.scrollTo(0,0)};
+  if(!se)return;
+  $("#seDate").onchange=e=>{if(e.target.value)se.date=e.target.value};
+  document.querySelectorAll("[data-sf]").forEach(inp=>inp.addEventListener("input",()=>{se.ex[+inp.dataset.sei].sets[+inp.dataset.si][inp.dataset.sf]=inp.value===""?null:num(inp.value)}));
+  document.querySelectorAll("[data-sedel]").forEach(b=>b.onclick=()=>{se.ex[+b.dataset.sedel].sets.splice(+b.dataset.si,1);keep()});
+  document.querySelectorAll("[data-seadd]").forEach(b=>b.onclick=()=>{const a=se.ex[+b.dataset.seadd].sets;const l=a[a.length-1];a.push({w:l?l.w:null,r:null});keep()});
+  document.querySelectorAll("[data-sedelex]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد"))return;se.ex.splice(+b.dataset.sedelex,1);keep()});
+  $("#seAddEx")&&($("#seAddEx").onclick=()=>{se.ex.push({id:$("#seNew").value,sets:[{w:null,r:null}]});keep()});
+  $("#seCancel").onclick=back;
+  $("#seSave").onclick=()=>{
+    se.ex.forEach(e=>{e.sets=e.sets.filter(st=>st.w!=null&&st.r!=null&&st.r>0)});se.ex=se.ex.filter(e=>e.sets.length);
+    const i=S.sessions.findIndex(x=>x.id===se.id);
+    if(!se.ex.length){toast("لا توجد جولات. لحذف التمرين كله استخدم زر «حذف» في السجل");return}
+    if(i>=0)S.sessions[i]=se;save();back();toast("تم حفظ التعديلات")};
 };
 
 /* Program editor */
