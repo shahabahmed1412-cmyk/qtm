@@ -1,5 +1,8 @@
 <!doctype html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style></head><body>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#142130"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Iron Log">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body>
 <title>دفتر الحديد</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Lalezar&display=swap">
@@ -7,7 +10,7 @@
 /* Layout: single-column mobile log, sticky header, bottom tab bar, rest timer docked above it */
 :root{
   --bg:#eceff3; --surface:#ffffff; --surface-2:#f4f6f9; --line:#d5dbe3;
-  --fg:#142130; --muted:#5b6878; --accent:#1d4fc4; --accent-ink:#ffffff;
+  --fg:#142130; --muted:#5b6878; --accent:#1d4fc4; --accent-ink:#ffffff; --accent-soft:#e1e9fb;
   --pr:#b98200; --pr-soft:#fbefd0; --good:#1f7a4d; --good-soft:#dcf1e5; --warn:#b4471f; --warn-soft:#fbe3d9;
   --f-display:"Lalezar","IBM Plex Sans Arabic",system-ui,sans-serif;
   --f-body:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
@@ -16,19 +19,20 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0e141b; --surface:#17202a; --surface-2:#1e2935; --line:#2c3a49;
-  --fg:#e6ebf1; --muted:#97a4b4; --accent:#7ea3ff; --accent-ink:#0b1320;
+  --fg:#e6ebf1; --muted:#97a4b4; --accent:#7ea3ff; --accent-ink:#0b1320; --accent-soft:#1c2a47;
   --pr:#f0c04a; --pr-soft:#3a2f12; --good:#5fcf95; --good-soft:#163527; --warn:#ff9a72; --warn-soft:#3d2219;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0e141b; --surface:#17202a; --surface-2:#1e2935; --line:#2c3a49;
-  --fg:#e6ebf1; --muted:#97a4b4; --accent:#7ea3ff; --accent-ink:#0b1320;
+  --fg:#e6ebf1; --muted:#97a4b4; --accent:#7ea3ff; --accent-ink:#0b1320; --accent-soft:#1c2a47;
   --pr:#f0c04a; --pr-soft:#3a2f12; --good:#5fcf95; --good-soft:#163527; --warn:#ff9a72; --warn-soft:#3d2219;
   color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
 .app{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 170px}
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)}
-.brand{font-family:var(--f-display);font-size:28px;line-height:1;letter-spacing:.5px}
+.brand{font-family:var(--f-display);font-size:28px;line-height:1;letter-spacing:.5px;min-width:0}
 .brand small{display:block;font-family:var(--f-body);font-size:12px;color:var(--muted);letter-spacing:0;margin-top:4px}
 .plates{display:flex;gap:3px;align-items:center}
 .plates i{display:block;width:7px;border-radius:2px}
@@ -40,42 +44,50 @@ h3{font-size:16px;margin:0;font-weight:700}
 .stack{display:flex;flex-direction:column;gap:12px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
-.card.flat{background:var(--surface-2);border-color:transparent}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media (max-width:380px){.grid3{grid-template-columns:1fr 1fr}}
-.stat b{display:block;font-family:var(--f-num);font-size:22px;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
-.stat span{font-size:12px;color:var(--muted)}
+.stat b{display:block;font-size:22px}
+.stat span.l{font-size:12px;color:var(--muted)}
 button,select,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 14px;min-height:40px}
+button:disabled{opacity:.4;cursor:default}
 button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
 button.ghost{background:transparent;border-color:transparent;color:var(--muted)}
 button.danger{color:var(--warn);border-color:var(--warn)}
 button.block{width:100%}
+button.link{background:none;border:0;padding:4px 6px;min-height:32px;color:var(--accent)}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 input,select,textarea{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:40px;width:100%;min-width:0}
 textarea{min-height:110px;font-family:var(--f-num);font-size:12px;direction:ltr}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips.wrap{flex-wrap:wrap;overflow:visible}
 .chip{flex:0 0 auto;border-radius:999px;padding:6px 14px;min-height:36px;font-size:14px}
 .chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .chip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-inline-start:6px;vertical-align:middle}
 .tag{display:inline-block;font-size:12px;border-radius:6px;padding:1px 8px;background:var(--surface-2);color:var(--muted)}
 .tag.pr{background:var(--pr-soft);color:var(--pr);font-weight:700}
 .tag.up{background:var(--good-soft);color:var(--good);font-weight:600}
-.tag.hold{background:var(--surface-2);color:var(--muted)}
+.tag.acc{background:var(--accent-soft);color:var(--accent);font-weight:600}
 .ex-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.ex-head .en{font-size:12px;color:var(--muted);direction:ltr;text-align:right}
-.target{font-size:13px;color:var(--muted);white-space:nowrap}
+.ex-head .sub{font-size:12px;color:var(--muted)}
+.target{font-size:13px;color:var(--muted);white-space:nowrap;text-align:end}
 .hint{font-size:13px;margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--surface-2)}
 .hint.up{background:var(--good-soft);color:var(--good)}
+.info{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--accent-soft);font-size:13px}
+.info ol,.info ul{margin:4px 0 6px;padding-inline-start:20px}
+.info b{display:block;margin-top:4px}
 .sets{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:6px 8px;align-items:center;margin-top:10px}
+.sets.rpe{grid-template-columns:28px 1fr 1fr 62px 44px}
 .sets .h{font-size:12px;color:var(--muted)}
-.sets input{text-align:center;font-family:var(--f-num);direction:ltr}
+.sets input,.sets select{text-align:center;font-family:var(--f-num);direction:ltr;padding-inline:4px}
 .sets .idx{font-family:var(--f-num);color:var(--muted);text-align:center}
+.sets .idx.wu{color:var(--pr);font-weight:700;font-family:var(--f-body);font-size:12px}
+.sets .wuin{background:var(--pr-soft);border-color:transparent}
 .tick{width:44px;height:40px;padding:0;border-radius:8px;font-size:18px;line-height:1}
 .tick.done{background:var(--good);border-color:var(--good);color:var(--surface)}
-.set-done input{border-color:var(--good)}
+.set-done{border-color:var(--good)!important}
 details.card summary{cursor:pointer;font-weight:700}
 details.card[open] summary{margin-bottom:8px}
 ul.clean{list-style:none;margin:0;padding:0}
@@ -86,11 +98,14 @@ ul.list li:last-child{border-bottom:0}
 .bar.over i{background:var(--good)}
 .tbl-wrap{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th,td{padding:7px 6px;text-align:start;border-bottom:1px solid var(--line);white-space:nowrap}
 th{font-size:12px;color:var(--muted);font-weight:600}
 .chart svg{width:100%;height:auto;display:block}
 .empty{padding:18px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r);font-size:14px}
 .banner{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:13px;margin-top:12px}
+.prog.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.q{display:flex;flex-direction:column;gap:8px}
+.q>span{font-weight:700}
 nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:10;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0px)}
 nav.tabs button{border:0;border-radius:0;background:transparent;padding:8px 2px 10px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:56px}
 nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -106,594 +121,965 @@ nav.tabs button.on{color:var(--accent);font-weight:700}
 @media (prefers-reduced-motion:no-preference){.tick,.chip,button{transition:background .15s,color .15s}}
 </style>
 
-<div class="app" dir="rtl" lang="ar">
+<div class="app" id="app" dir="rtl" lang="ar">
   <header class="top">
-    <div class="brand">دفتر الحديد<small id="subtitle">برنامجك الشخصي للتضخيم</small></div>
+    <div class="brand"><span id="brandName">دفتر الحديد</span><small id="subtitle"></small></div>
     <div class="plates" aria-hidden="true">
       <i style="height:34px;background:#c8312b"></i><i style="height:30px;background:#2453c9"></i><i style="height:26px;background:#e2b014"></i><i style="height:22px;background:#2b8a4b"></i>
     </div>
   </header>
-  <div id="storeWarn" class="banner" hidden>التخزين في هذا المتصفح غير متاح الآن، فلن تُحفظ بياناتك بعد إغلاق الصفحة. افتح الصفحة في متصفح عادي (ليس وضع التصفح الخاص)، أو انسخ نسخة احتياطية من الإعدادات.</div>
+  <div id="storeWarn" class="banner" hidden></div>
   <main id="view"></main>
 </div>
 
 <div class="timer" id="timer" hidden>
   <div class="in">
     <div class="clock" id="tClock">2:00</div>
-    <div class="lbl" id="tLabel">راحة</div>
-    <button type="button" id="tPlus">+30ث</button>
-    <button type="button" id="tStop">إيقاف</button>
+    <div class="lbl" id="tLabel"></div>
+    <button type="button" id="tPlus">+30</button>
+    <button type="button" id="tStop"></button>
   </div>
 </div>
 
-<nav class="tabs" dir="rtl" id="tabs">
-  <button type="button" data-tab="today"><svg viewBox="0 0 24 24"><path d="M2 12h3M19 12h3M5 8v8M19 8v8M8 6v12M16 6v12M8 12h8"/></svg>التمرين</button>
-  <button type="button" data-tab="progress"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/></svg>التقدّم</button>
-  <button type="button" data-tab="body"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9l3 4 3-4"/></svg>الجسم</button>
-  <button type="button" data-tab="food"><svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8M7 7h4M17 3c-2 2-2 6 0 9v9"/></svg>التغذية</button>
-  <button type="button" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>ملفي</button>
-</nav>
+<nav class="tabs" id="tabs"></nav>
 <div class="toast" id="toast" hidden></div>
-
 <script>
-(function(){
-"use strict";
-/* ---------- program ---------- */
-const DEFAULT_DAYS=[
- {id:"UA",ar:"علوي A",en:"Upper A",wd:6,wdName:"السبت",focus:"صدر · ظهر · أكتاف · ذراعين",ex:[
-  {id:"bench",ar:"ضغط صدر بالبار",en:"Barbell Bench Press",s:3,lo:6,hi:10,rest:150,k:"u"},
-  {id:"latpd",ar:"سحب عالي (Lat Pulldown)",en:"Lat Pulldown",s:3,lo:8,hi:12,rest:120,k:"u"},
-  {id:"dbohp",ar:"ضغط أكتاف بالدمبل جالس",en:"Seated DB Shoulder Press",s:3,lo:8,hi:12,rest:120,k:"u"},
-  {id:"cablerow",ar:"سحب أرضي بالكيبل جالس",en:"Seated Cable Row",s:3,lo:8,hi:12,rest:90,k:"u"},
-  {id:"pushdown",ar:"تراي بالكيبل (Pushdown)",en:"Cable Triceps Pushdown",s:2,lo:10,hi:15,rest:75,k:"u"},
-  {id:"dbcurl",ar:"باي بالدمبل",en:"Dumbbell Biceps Curl",s:2,lo:10,hi:15,rest:75,k:"u"}]},
- {id:"LA",ar:"سفلي A",en:"Lower A",wd:0,wdName:"الأحد",focus:"أمامي الفخذ · الخلفي · السمانة",ex:[
-  {id:"squat",ar:"سكوات بالبار",en:"Barbell Back Squat",s:3,lo:6,hi:10,rest:180,k:"l"},
-  {id:"rdl",ar:"ديدلفت روماني",en:"Romanian Deadlift",s:3,lo:8,hi:12,rest:150,k:"l"},
-  {id:"legpress",ar:"دفع أرجل (Leg Press)",en:"Leg Press",s:3,lo:10,hi:12,rest:120,k:"l"},
-  {id:"lyingcurl",ar:"رفرفة خلفي نائم",en:"Lying Leg Curl",s:3,lo:10,hi:15,rest:90,k:"l"},
-  {id:"calfstand",ar:"سمانة واقف",en:"Standing Calf Raise",s:3,lo:10,hi:15,rest:60,k:"l"},
-  {id:"crunch",ar:"بطن بالكيبل",en:"Cable Crunch",s:3,lo:10,hi:15,rest:60,k:"u"}]},
- {id:"UB",ar:"علوي B",en:"Upper B",wd:2,wdName:"الثلاثاء",focus:"صدر علوي · ظهر · جانبي كتف",ex:[
-  {id:"incdb",ar:"ضغط صدر مائل بالدمبل",en:"Incline DB Press",s:3,lo:8,hi:12,rest:120,k:"u"},
-  {id:"bbrow",ar:"تجديف بالبار منحني",en:"Barbell Bent-Over Row",s:3,lo:6,hi:10,rest:150,k:"u"},
-  {id:"latpdn",ar:"سحب عالي قبضة ضيقة",en:"Close-Grip Lat Pulldown",s:3,lo:8,hi:12,rest:120,k:"u"},
-  {id:"lateral",ar:"رفرفة جانبي بالدمبل",en:"DB Lateral Raise",s:3,lo:12,hi:15,rest:60,k:"u"},
-  {id:"ohtri",ar:"تراي خلف الرأس بالكيبل",en:"Overhead Cable Triceps Ext.",s:2,lo:10,hi:15,rest:75,k:"u"},
-  {id:"hammer",ar:"باي مطرقة (Hammer)",en:"Hammer Curl",s:2,lo:10,hi:15,rest:75,k:"u"}]},
- {id:"LB",ar:"سفلي B",en:"Lower B",wd:3,wdName:"الأربعاء",focus:"المؤخرة · الفخذ · السمانة",ex:[
-  {id:"legpress2",ar:"دفع أرجل (Leg Press)",en:"Leg Press",s:3,lo:8,hi:12,rest:150,k:"l"},
-  {id:"hipthrust",ar:"هيب ثرست بالبار",en:"Barbell Hip Thrust",s:3,lo:8,hi:12,rest:120,k:"l"},
-  {id:"bulgarian",ar:"سكوات بلغاري بالدمبل (لكل رجل)",en:"DB Bulgarian Split Squat",s:3,lo:8,hi:12,rest:90,k:"l"},
-  {id:"legext",ar:"رفرفة أمامي (Leg Extension)",en:"Leg Extension",s:3,lo:10,hi:15,rest:75,k:"l"},
-  {id:"seatcurl",ar:"رفرفة خلفي جالس",en:"Seated Leg Curl",s:3,lo:10,hi:15,rest:75,k:"l"},
-  {id:"calfseat",ar:"سمانة جالس",en:"Seated Calf Raise",s:3,lo:12,hi:15,rest:60,k:"l"}]}
-];
-let DAYS=DEFAULT_DAYS,EX={};
-// Leg Press appears on both lower days; track them as one lift for PRs & charts.
-const LIFT=id=>id==="legpress2"?"legpress":id;
-const MEAS=[["chest","الصدر"],["shoulders","الأكتاف"],["arm","الذراع"],["waist","الخصر"],["hips","الورك"],["thigh","الفخذ"]];
-const WDN=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+(function(){"use strict";
+/* ---------- exercise library ----------
+   id, group, k (u = upper-body increment, l = leg increment), c (compound: gets a warm-up plan),
+   default lo/hi/rest, name [ar,en], muscles [ar,en], steps [ar,en] ("|" separated), mistakes [ar,en] */
+const LIB={};
+function X(id,g,k,c,lo,hi,rest,name,mu,st,mi){LIB[id]={id,g,k,c:!!c,lo,hi,rest,name:{ar:name[0],en:name[1]},mu:{ar:mu[0],en:mu[1]},st:{ar:st[0],en:st[1]},mi:{ar:mi[0],en:mi[1]}}}
+const BW=new Set(["pushup","pullup","dips","hlr"]); // bodyweight: log added weight only
+// Chest
+X("bench","ch","u",1,6,10,150,["ضغط صدر بالبار","Barbell Bench Press"],["الصدر، الكتف الأمامي، التراي","Chest, front delts, triceps"],
+ ["استلقِ وعيناك تحت البار والقدمان ثابتتان على الأرض|اقبض البار أعرض قليلًا من الكتفين وشدّ لوحي الكتف للخلف وللأسفل|أنزل البار بتحكم إلى أسفل الصدر ثم ادفعه لأعلى","Lie with your eyes under the bar, feet planted|Grip slightly wider than your shoulders; pull shoulder blades back and down|Lower under control to the lower chest, then press up"],
+ ["ارتداد البار عن الصدر|فتح المرفقين ٩٠ درجة عن الجسم|رفع المؤخرة عن المقعد","Bouncing the bar off the chest|Flaring the elbows out to 90°|Lifting the hips off the bench"]);
+X("dbbench","ch","u",1,8,12,120,["ضغط صدر بالدمبل","Dumbbell Bench Press"],["الصدر، الكتف الأمامي، التراي","Chest, front delts, triceps"],
+ ["اجلس والدمبلات على فخذيك ثم استلقِ وارفعها فوق الصدر|أنزلها ببطء إلى مستوى الصدر والمرفقان بزاوية ٤٥° تقريبًا|ادفعها لأعلى مع تقريبها قليلًا من بعض","Sit with the dumbbells on your thighs, lie back and press them over your chest|Lower slowly to chest level, elbows at about 45°|Press up, bringing them slightly together"],
+ ["إنزال الدمبلات بسرعة|ضرب الدمبلات ببعض في الأعلى","Dropping the weights too fast|Clanking the dumbbells together at the top"]);
+X("incbb","ch","u",1,6,10,150,["ضغط صدر مائل بالبار","Incline Barbell Press"],["الصدر العلوي، الكتف الأمامي، التراي","Upper chest, front delts, triceps"],
+ ["اضبط المقعد على ميل ٣٠–٤٥°|أنزل البار إلى أعلى الصدر تحت الترقوة|ادفع لأعلى مع إبقاء لوحي الكتف مشدودين","Set the bench to 30–45°|Lower the bar to the upper chest, just below the collarbone|Press up, keeping your shoulder blades tight"],
+ ["ميل المقعد عالٍ جدًا فيتحول التمرين للأكتاف|رفع الصدر والمؤخرة عن المقعد","Bench too steep, turning it into a shoulder press|Lifting the chest and hips off the bench"]);
+X("incdb","ch","u",1,8,12,120,["ضغط صدر مائل بالدمبل","Incline Dumbbell Press"],["الصدر العلوي، الكتف الأمامي، التراي","Upper chest, front delts, triceps"],
+ ["مقعد بميل ٣٠–٤٥°|أنزل الدمبلات بجانب أعلى الصدر|ادفع لأعلى دون قفل المرفقين بعنف","Bench at 30–45°|Lower the dumbbells beside the upper chest|Press up without slamming the elbows into lockout"],
+ ["مدى حركة قصير|تقوّس مبالغ في أسفل الظهر","Cutting the range of motion short|Over-arching the lower back"]);
+X("machpress","ch","u",0,8,12,90,["جهاز ضغط صدر","Machine Chest Press"],["الصدر، التراي","Chest, triceps"],
+ ["اضبط المقعد بحيث تكون المقابض بمستوى منتصف الصدر|ادفع حتى يستقيم الذراعان تقريبًا|ارجع ببطء حتى تشعر بتمدد الصدر","Adjust the seat so the handles are at mid-chest|Press until your arms are nearly straight|Return slowly until you feel a chest stretch"],
+ ["رفع الكتفين نحو الأذنين|ترك الأوزان ترتطم","Shrugging the shoulders up|Letting the weight stack slam"]);
+X("cablefly","ch","u",0,10,15,75,["تفتيح صدر بالكيبل","Cable Fly"],["الصدر","Chest"],
+ ["قف بين البكرتين مع خطوة للأمام|حافظ على ثنية خفيفة ثابتة في المرفقين|اجمع اليدين أمام الصدر كأنك تحضن شجرة ثم ارجع ببطء","Stand between the pulleys with one foot forward|Keep a slight, fixed bend in the elbows|Bring your hands together in front of your chest like hugging a tree, then return slowly"],
+ ["ثني المرفقين وتحويل الحركة إلى ضغط|وزن ثقيل يشد الكتفين للخلف بقوة","Bending the elbows and turning it into a press|So much weight it yanks the shoulders back"]);
+X("pecdeck","ch","u",0,10,15,75,["جهاز فراشة (Pec Deck)","Pec Deck"],["الصدر","Chest"],
+ ["اضبط المقعد لتكون المقابض بمستوى الصدر|اجمع الذراعين أمامك واعصر الصدر ثانية|ارجع ببطء دون أن يسحبك الوزن","Set the seat so the handles are at chest height|Bring your arms together and squeeze for a second|Return slowly without letting the weight pull you back"],
+ ["استخدام اندفاع الجسم|مدى حركة قصير","Using momentum|Short range of motion"]);
+X("dips","ch","u",1,6,12,120,["متوازي (Dips)","Dips"],["الصدر السفلي، التراي، الكتف الأمامي","Lower chest, triceps, front delts"],
+ ["ابدأ والذراعان مستقيمان|مِل قليلًا للأمام وانزل حتى يصبح الكتف بمستوى المرفق تقريبًا|ادفع لأعلى. سجّل الوزن الإضافي فقط (0 إن لم يوجد)","Start with your arms locked out|Lean slightly forward and lower until your shoulders are about level with your elbows|Press back up. Log added weight only (0 if none)"],
+ ["النزول أعمق مما يتحمله الكتف|التأرجح","Going deeper than your shoulders tolerate|Swinging"]);
+X("pushup","ch","u",1,8,20,75,["ضغط (Push-up)","Push-up"],["الصدر، التراي، الكتف الأمامي","Chest, triceps, front delts"],
+ ["اليدان أعرض قليلًا من الكتفين والجسم مستقيم من الرأس للكعب|انزل حتى يقترب الصدر من الأرض|ادفع لأعلى. سجّل 0 كوزن إن لم تضف وزنًا","Hands slightly wider than your shoulders, body straight from head to heels|Lower until your chest nearly touches the floor|Push up. Log 0 kg unless you add weight"],
+ ["هبوط الحوض|أنصاف التكرارات","Sagging hips|Half reps"]);
+X("dbfloor","ch","u",1,8,12,90,["ضغط صدر بالدمبل على الأرض","Dumbbell Floor Press"],["الصدر، التراي","Chest, triceps"],
+ ["استلقِ على الأرض والركبتان مثنيتان|أنزل الدمبلات حتى يلمس أعلى الذراع الأرض بهدوء|ادفع لأعلى","Lie on the floor with your knees bent|Lower until your upper arms gently touch the floor|Press up"],
+ ["ارتطام المرفقين بالأرض|فتح المرفقين ٩٠°","Banging the elbows on the floor|Flaring the elbows to 90°"]);
+// Back
+X("pullup","bk","u",1,5,10,150,["عقلة (Pull-up)","Pull-up"],["الظهر العريض، الباي","Lats, biceps"],
+ ["تعلّق بقبضة أعرض قليلًا من الكتفين|اسحب صدرك نحو البار وأنت تُنزل المرفقين|انزل حتى يستقيم الذراعان. سجّل الوزن الإضافي فقط (0 إن لم يوجد)","Hang with a grip slightly wider than your shoulders|Pull your chest toward the bar, driving your elbows down|Lower to straight arms. Log added weight only (0 if none)"],
+ ["التأرجح والركل|أنصاف التكرارات","Kipping and swinging|Half reps"]);
+X("latpd","bk","u",0,8,12,120,["سحب عالي (Lat Pulldown)","Lat Pulldown"],["الظهر العريض، الباي","Lats, biceps"],
+ ["ثبّت فخذيك تحت الوسادة|اسحب البار إلى أعلى الصدر مع إنزال المرفقين|ارجع ببطء حتى يمتد الذراعان","Lock your thighs under the pad|Pull the bar to your upper chest, driving the elbows down|Return slowly to a full stretch"],
+ ["الميل للخلف كثيرًا|سحب البار خلف الرقبة","Leaning way back|Pulling behind the neck"]);
+X("latpdn","bk","u",0,8,12,120,["سحب عالي قبضة ضيقة","Close-Grip Lat Pulldown"],["الظهر العريض، منتصف الظهر، الباي","Lats, mid back, biceps"],
+ ["استخدم مقبض V أو قبضة ضيقة|اسحب نحو أسفل الصدر|ارجع ببطء مع تمدد كامل","Use a V-handle or a close grip|Pull toward your lower chest|Return slowly to a full stretch"],
+ ["الميل للخلف كثيرًا|ترك الوزن يرتفع بسرعة","Leaning way back|Letting the weight fly up"]);
+X("bbrow","bk","u",1,6,10,150,["تجديف بالبار منحني","Barbell Bent-Over Row"],["منتصف الظهر، العريض، الكتف الخلفي","Mid back, lats, rear delts"],
+ ["انحنِ من الورك بظهر مستقيم والجذع شبه موازٍ للأرض|اسحب البار نحو أسفل البطن|أنزله بتحكم","Hinge at the hips with a flat back, torso close to parallel|Row the bar to your lower stomach|Lower under control"],
+ ["تقويس الظهر|رفع الجذع مع كل تكرار للغش","Rounding the back|Standing up on each rep to cheat"]);
+X("dbrow","bk","u",1,8,12,90,["تجديف بالدمبل يد واحدة","One-Arm Dumbbell Row"],["الظهر العريض، منتصف الظهر","Lats, mid back"],
+ ["ضع يدًا وركبة على مقعد (أو استند على كرسي) والظهر مستقيم|اسحب الدمبل نحو الورك|أنزله حتى يمتد الذراع","One hand and knee on a bench (or brace on a chair), back flat|Pull the dumbbell toward your hip|Lower to a full stretch"],
+ ["لفّ الجذع|السحب بالباي فقط","Twisting the torso|Pulling with the biceps only"]);
+X("cablerow","bk","u",0,8,12,90,["سحب أرضي بالكيبل جالس","Seated Cable Row"],["منتصف الظهر، العريض","Mid back, lats"],
+ ["اجلس والركبتان مثنيتان قليلًا والظهر مستقيم|اسحب المقبض نحو البطن مع ضم لوحي الكتف|ارجع ببطء","Sit tall with your knees slightly bent|Pull the handle to your stomach, squeezing the shoulder blades|Return slowly"],
+ ["التأرجح للأمام والخلف|تقويس الظهر عند التمدد","Rocking back and forth|Rounding the back at the stretch"]);
+X("tbar","bk","u",1,8,12,120,["تجديف T-Bar","T-Bar Row"],["منتصف الظهر، العريض","Mid back, lats"],
+ ["قف فوق البار وانحنِ بظهر مستقيم|اسحب المقبض نحو الصدر|أنزله بتحكم","Straddle the bar and hinge with a flat back|Pull the handle toward your chest|Lower under control"],
+ ["تقويس الظهر|رفع الجذع للغش","Rounding the back|Standing up to cheat"]);
+// Shoulders
+X("ohp","sh","u",1,6,10,150,["ضغط أكتاف بالبار واقف","Overhead Press"],["الكتف الأمامي والجانبي، التراي","Front & side delts, triceps"],
+ ["قف والبار على أعلى الصدر وشدّ البطن والمؤخرة|ادفع البار فوق الرأس مع إبعاد الرأس قليلًا ثم إرجاعه تحت البار|أنزله إلى أعلى الصدر","Stand with the bar on your upper chest; brace abs and glutes|Press overhead, moving your head back and then through|Lower to the upper chest"],
+ ["تقويس أسفل الظهر بقوة|دفع البار بعيدًا للأمام","Over-arching the lower back|Pressing the bar out in front"]);
+X("dbohp","sh","u",1,8,12,120,["ضغط أكتاف بالدمبل جالس","Seated Dumbbell Shoulder Press"],["الكتف الأمامي والجانبي، التراي","Front & side delts, triceps"],
+ ["مقعد بظهر شبه عمودي (أو واقفًا في البيت)|ابدأ والدمبلات بمستوى الأذنين|ادفع لأعلى ثم أنزل ببطء","Bench nearly upright (or standing at home)|Start with the dumbbells at ear level|Press up, then lower slowly"],
+ ["تقويس الظهر بعيدًا عن المسند|مدى حركة قصير","Arching off the backrest|Short range of motion"]);
+X("lateral","sh","u",0,12,15,60,["رفرفة جانبي بالدمبل","Dumbbell Lateral Raise"],["الكتف الجانبي","Side delts"],
+ ["قف مع ثنية خفيفة في المرفقين|ارفع الدمبلات للجانبين حتى مستوى الكتف|أنزلها ببطء","Stand with a slight bend in the elbows|Raise the dumbbells out to shoulder height|Lower slowly"],
+ ["التأرجح بالجسم|رفع الكتفين نحو الأذنين","Swinging the body|Shrugging toward the ears"]);
+X("cablelat","sh","u",0,12,15,60,["رفرفة جانبي بالكيبل","Cable Lateral Raise"],["الكتف الجانبي","Side delts"],
+ ["بكرة منخفضة والمقبض في اليد البعيدة|ارفع الذراع للجانب حتى مستوى الكتف|أنزل ببطء","Low pulley, handle in the far hand|Raise out to the side to shoulder height|Lower slowly"],
+ ["التأرجح بالجسم|رفع الكتف نحو الأذن","Swinging the body|Shrugging toward the ear"]);
+X("revfly","sh","u",0,12,15,60,["خلفي كتف (Reverse Fly)","Reverse Pec Deck"],["الكتف الخلفي","Rear delts"],
+ ["اجلس مواجهًا للجهاز والمقابض بمستوى الكتف|افتح الذراعين للخلف مع ثنية خفيفة|ارجع ببطء","Sit facing the machine, handles at shoulder height|Sweep your arms back with a slight bend|Return slowly"],
+ ["ضم لوحي الكتف بدل تحريك الذراعين|وزن ثقيل","Squeezing the shoulder blades instead of moving the arms|Too heavy"]);
+X("facepull","sh","u",0,12,15,60,["فيس بول (Face Pull)","Face Pull"],["الكتف الخلفي، أعلى الظهر","Rear delts, upper back"],
+ ["حبل على بكرة بمستوى الوجه|اسحب الحبل نحو الوجه مع فتح اليدين للجانبين|اثبت ثانية ثم ارجع","Rope on a pulley at face height|Pull toward your face, spreading your hands apart|Hold for a second, then return"],
+ ["وزن ثقيل يجعلك تميل للخلف|السحب نحو الصدر بدل الوجه","Too heavy, so you lean back|Pulling to the chest instead of the face"]);
+// Arms
+X("bbcurl","ar","u",0,8,12,75,["باي بالبار","Barbell Curl"],["الباي","Biceps"],
+ ["قف والمرفقان بجانب الجسم|ارفع البار بثني المرفقين فقط|أنزله ببطء حتى يمتد الذراع","Stand with your elbows at your sides|Curl by bending only at the elbows|Lower slowly to full extension"],
+ ["التأرجح بالظهر|تقديم المرفقين للأمام","Swinging with the back|Letting the elbows drift forward"]);
+X("dbcurl","ar","u",0,10,15,75,["باي بالدمبل","Dumbbell Biceps Curl"],["الباي","Biceps"],
+ ["قف والكفان للأمام|ارفع الدمبل مع إبقاء المرفق ثابتًا|أنزله ببطء","Stand with your palms facing forward|Curl while keeping the elbow still|Lower slowly"],
+ ["التأرجح بالظهر|تقديم المرفقين للأمام","Swinging with the back|Letting the elbows drift forward"]);
+X("hammer","ar","u",0,10,15,75,["باي مطرقة (Hammer)","Hammer Curl"],["الباي، العضدية، الساعد","Biceps, brachialis, forearms"],
+ ["أمسك الدمبلات والكفان متقابلان|ارفع دون تدوير الرسغ|أنزل ببطء","Hold the dumbbells with palms facing each other|Curl without rotating the wrist|Lower slowly"],
+ ["التأرجح بالظهر|تحريك المرفقين","Swinging with the back|Moving the elbows"]);
+X("preacher","ar","u",0,10,15,75,["باي ارتكاز (Preacher)","Preacher Curl"],["الباي","Biceps"],
+ ["ضع ظهر الذراعين على الوسادة|ارفع حتى يقترب البار من الكتفين|أنزل ببطء دون قفل المرفق بعنف","Rest the backs of your arms on the pad|Curl up toward your shoulders|Lower slowly without snapping into lockout"],
+ ["رفع المؤخرة عن المقعد|إسقاط الوزن في الأسفل","Lifting off the seat|Dropping the weight at the bottom"]);
+X("pushdown","ar","u",0,10,15,75,["تراي بالكيبل (Pushdown)","Cable Triceps Pushdown"],["التراي","Triceps"],
+ ["قف والمرفقان ملتصقان بالجسم|ادفع المقبض لأسفل حتى يستقيم الذراعان|ارجع حتى زاوية ٩٠° تقريبًا","Stand with your elbows pinned to your sides|Push down until your arms are straight|Return to about 90°"],
+ ["تحريك المرفقين|الانحناء فوق الوزن","Elbows moving|Leaning over the weight"]);
+X("ohtri","ar","u",0,10,15,75,["تراي خلف الرأس بالكيبل","Overhead Cable Triceps Extension"],["التراي (الرأس الطويل)","Triceps (long head)"],
+ ["أدر ظهرك للبكرة والحبل خلف الرأس|مدّ الذراعين للأمام وللأعلى|ارجع ببطء مع تمدد التراي","Face away from the pulley with the rope behind your head|Extend your arms forward and up|Return slowly into the stretch"],
+ ["فتح المرفقين للخارج|تقويس الظهر","Flaring the elbows|Arching the back"]);
+X("skull","ar","u",0,8,12,90,["تراي بالبار نائم (Skull Crusher)","Skull Crusher"],["التراي","Triceps"],
+ ["استلقِ والبار فوق الصدر|اثنِ المرفقين لإنزال البار نحو الجبهة أو خلف الرأس قليلًا|مدّ الذراعين لأعلى","Lie with the bar over your chest|Bend the elbows to lower it toward your forehead or just behind it|Extend back up"],
+ ["تحريك الكتفين|فتح المرفقين للخارج","Moving at the shoulders|Flaring the elbows"]);
+X("ohdbtri","ar","u",0,10,15,75,["تراي خلف الرأس بالدمبل","Overhead Dumbbell Triceps Extension"],["التراي (الرأس الطويل)","Triceps (long head)"],
+ ["أمسك دمبل واحدًا بكلتا اليدين فوق الرأس|أنزله خلف الرأس بثني المرفقين|مدّ لأعلى","Hold one dumbbell overhead with both hands|Lower it behind your head by bending the elbows|Extend back up"],
+ ["فتح المرفقين للخارج|تقويس الظهر","Flaring the elbows|Arching the back"]);
+// Core
+X("crunch","co","u",0,10,15,60,["بطن بالكيبل","Cable Crunch"],["عضلات البطن","Abs"],
+ ["اركع أمام البكرة والحبل بجانب الرأس|اثنِ العمود الفقري لأسفل نحو الركبتين|ارجع ببطء","Kneel facing the pulley with the rope beside your head|Curl your spine down toward your knees|Return slowly"],
+ ["السحب بالذراعين|الانحناء من الورك بدل البطن","Pulling with the arms|Hinging at the hips instead of crunching"]);
+X("hlr","co","u",0,8,15,60,["رفع أرجل معلّق","Hanging Leg Raise"],["البطن، عضلات ثني الورك","Abs, hip flexors"],
+ ["تعلّق من البار|ارفع الركبتين أو الرجلين مع لفّ الحوض لأعلى|أنزل ببطء دون تأرجح. سجّل 0 كوزن","Hang from the bar|Raise your knees or legs, curling the pelvis up|Lower slowly without swinging. Log 0 kg"],
+ ["التأرجح|رفع الرجلين دون لفّ الحوض","Swinging|Lifting the legs without curling the pelvis"]);
+// Legs
+X("squat","lg","l",1,6,10,180,["سكوات بالبار","Barbell Back Squat"],["الفخذ الأمامي، المؤخرة، أسفل الظهر","Quads, glutes, lower back"],
+ ["البار على أعلى الظهر والقدمان بعرض الكتفين تقريبًا|خذ نفسًا وشدّ البطن ثم انزل بالورك والركبتين معًا|انزل حتى يوازي الفخذ الأرض أو أعمق بأداء سليم ثم اصعد","Bar on your upper back, feet about shoulder-width|Breathe in, brace, and sit down with hips and knees together|Go to parallel or deeper with good form, then stand up"],
+ ["انهيار الركبتين للداخل|رفع الكعبين|تقوّس أسفل الظهر في الأسفل","Knees caving in|Heels lifting|Lower back rounding at the bottom"]);
+X("gobletsq","lg","l",1,10,15,90,["سكوات جوبلت بالدمبل","Goblet Squat"],["الفخذ الأمامي، المؤخرة","Quads, glutes"],
+ ["أمسك دمبلًا عموديًا أمام الصدر|انزل بين ركبتيك والصدر مرفوع|اصعد بدفع الأرض","Hold one dumbbell vertically at your chest|Squat down between your knees, chest up|Drive through the floor to stand"],
+ ["ميلان الجذع للأمام|انهيار الركبتين للداخل","Chest falling forward|Knees caving in"]);
+X("hacksq","lg","l",1,8,12,150,["هاك سكوات","Hack Squat"],["الفخذ الأمامي، المؤخرة","Quads, glutes"],
+ ["ظهرك على الوسادة والقدمان في منتصف المنصة|انزل بالعمق المريح لك|ادفع دون قفل الركبتين بعنف","Back on the pad, feet mid-platform|Lower as deep as is comfortable|Press up without slamming the knees into lockout"],
+ ["مدى حركة قصير|رفع الكعبين","Short range of motion|Heels lifting"]);
+X("legpress","lg","l",1,8,12,150,["دفع أرجل (Leg Press)","Leg Press"],["الفخذ الأمامي، المؤخرة","Quads, glutes"],
+ ["القدمان بعرض الكتفين في منتصف المنصة|أنزل حتى ٩٠° تقريبًا في الركبة دون أن يرتفع الحوض عن المقعد|ادفع دون قفل الركبتين","Feet shoulder-width in the middle of the platform|Lower to about a 90° knee bend without your hips lifting off the seat|Press without locking the knees"],
+ ["ارتفاع الحوض في الأسفل|قفل الركبتين بقوة","Hips rolling up at the bottom|Locking the knees hard"]);
+X("deadlift","lg","l",1,5,8,180,["ديدلفت","Deadlift"],["المؤخرة، الخلفي، الظهر","Glutes, hamstrings, back"],
+ ["البار فوق منتصف القدم|انحنِ وامسك البار بظهر مستقيم وصدر مرفوع|ادفع الأرض بقدميك وقف مع إبقاء البار قريبًا من الساقين","Bar over mid-foot|Hinge and grip the bar with a flat back and chest up|Push the floor away and stand, keeping the bar close to your legs"],
+ ["تقويس الظهر|ابتعاد البار عن الجسم|الشد بالذراعين","Rounding the back|Bar drifting away from the body|Yanking with the arms"]);
+X("rdl","lg","l",1,8,12,150,["ديدلفت روماني","Romanian Deadlift"],["الخلفي، المؤخرة","Hamstrings, glutes"],
+ ["قف والبار في يديك والركبتان مثنيتان قليلًا|ادفع الورك للخلف وأنزل البار على الفخذين حتى تشعر بشد الخلفي|ارجع بدفع الورك للأمام","Stand holding the bar, knees slightly bent|Push your hips back and slide the bar down your thighs until the hamstrings stretch|Drive the hips forward to stand"],
+ ["تقويس الظهر|ثني الركبتين كأنه سكوات","Rounding the back|Bending the knees into a squat"]);
+X("dbrdl","lg","l",1,10,12,90,["ديدلفت روماني بالدمبل","Dumbbell Romanian Deadlift"],["الخلفي، المؤخرة","Hamstrings, glutes"],
+ ["أمسك الدمبلات أمام الفخذين والركبتان مثنيتان قليلًا|ادفع الورك للخلف وأنزلها حتى تشعر بشد الخلفي|ارجع بدفع الورك للأمام","Hold the dumbbells in front of your thighs, knees soft|Push your hips back and lower until the hamstrings stretch|Drive the hips forward to stand"],
+ ["تقويس الظهر|ثني الركبتين كأنه سكوات","Rounding the back|Bending the knees into a squat"]);
+X("hipthrust","lg","l",1,8,12,120,["هيب ثرست بالبار","Barbell Hip Thrust"],["المؤخرة، الخلفي","Glutes, hamstrings"],
+ ["أعلى الظهر على المقعد والبار على الحوض (مع وسادة)|ادفع الحوض لأعلى حتى يستقيم الجسم من الكتف للركبة|اعصر المؤخرة ثانية ثم انزل","Upper back on a bench, bar over your hips (use a pad)|Drive your hips up until shoulders to knees form a straight line|Squeeze the glutes for a second, then lower"],
+ ["تقويس أسفل الظهر في الأعلى|القدمان بعيدتان جدًا","Over-arching the lower back at the top|Feet too far away"]);
+X("glutebridge","lg","l",0,10,15,75,["جسر المؤخرة بالدمبل","Dumbbell Glute Bridge"],["المؤخرة","Glutes"],
+ ["استلقِ والركبتان مثنيتان والدمبل على الحوض|ادفع الحوض لأعلى واعصر المؤخرة|انزل ببطء","Lie with your knees bent and a dumbbell on your hips|Drive your hips up and squeeze the glutes|Lower slowly"],
+ ["الدفع بتقويس الظهر بدل المؤخرة|النزول السريع","Arching the back instead of using the glutes|Dropping down fast"]);
+X("bulgarian","lg","l",1,8,12,90,["سكوات بلغاري بالدمبل (لكل رجل)","Dumbbell Bulgarian Split Squat"],["الفخذ الأمامي، المؤخرة","Quads, glutes"],
+ ["ضع القدم الخلفية على مقعد|انزل حتى تقترب الركبة الخلفية من الأرض|ادفع بالقدم الأمامية. سجّل تكرارات رجل واحدة","Rear foot up on a bench|Lower until the back knee nears the floor|Drive through the front foot. Log the reps for one leg"],
+ ["القدم الأمامية قريبة جدًا|انهيار الركبة للداخل","Front foot too close|Knee caving in"]);
+X("lunge","lg","l",1,10,12,90,["طعنات مشي بالدمبل","Dumbbell Walking Lunge"],["الفخذ الأمامي، المؤخرة","Quads, glutes"],
+ ["خطوة طويلة للأمام|انزل حتى تقترب الركبة الخلفية من الأرض|ادفع وتقدّم بالرجل الأخرى. سجّل تكرارات كل رجل","Take a long step forward|Lower until the back knee nears the floor|Push through and step with the other leg. Log the reps per leg"],
+ ["خطوات قصيرة|ميلان الجذع للأمام","Steps too short|Leaning forward"]);
+X("legext","lg","l",0,10,15,75,["رفرفة أمامي (Leg Extension)","Leg Extension"],["الفخذ الأمامي","Quads"],
+ ["الوسادة فوق الكاحل والركبة بمحاذاة محور الجهاز|مدّ الرجلين حتى تستقيما|انزل ببطء","Pad above the ankles, knees lined up with the machine's pivot|Extend until your legs are straight|Lower slowly"],
+ ["رفس الوزن بسرعة|رفع المؤخرة عن المقعد","Kicking the weight up|Lifting off the seat"]);
+X("lyingcurl","lg","l",0,10,15,90,["رفرفة خلفي نائم","Lying Leg Curl"],["الخلفي","Hamstrings"],
+ ["استلقِ على بطنك والوسادة فوق الكعب|اسحب الكعب نحو المؤخرة|انزل ببطء","Lie face down with the pad above your heels|Curl your heels toward your glutes|Lower slowly"],
+ ["رفع الحوض|إسقاط الوزن","Hips lifting|Dropping the weight"]);
+X("seatcurl","lg","l",0,10,15,75,["رفرفة خلفي جالس","Seated Leg Curl"],["الخلفي","Hamstrings"],
+ ["اجلس وثبّت الفخذين تحت الوسادة|اسحب الكعبين لأسفل وللخلف|ارجع ببطء","Sit with your thighs locked under the pad|Curl your heels down and back|Return slowly"],
+ ["مدى حركة قصير|إسقاط الوزن","Short range of motion|Dropping the weight"]);
+X("calfstand","lg","l",0,10,15,60,["سمانة واقف","Standing Calf Raise"],["السمانة","Calves"],
+ ["مقدمة القدم على حافة والكعب حر|انزل بالكعب لأقصى تمدد|ارتفع على أطراف الأصابع واثبت ثانية","Balls of the feet on an edge, heels free|Lower the heels to a full stretch|Rise onto your toes and hold for a second"],
+ ["الارتداد السريع|مدى حركة قصير","Bouncing|Short range of motion"]);
+X("calfseat","lg","l",0,12,15,60,["سمانة جالس","Seated Calf Raise"],["السمانة","Calves"],
+ ["الوسادة فوق الركبتين|انزل بالكعب لأقصى تمدد|ارتفع واثبت ثانية","Pad over the knees|Lower the heels to a full stretch|Rise and hold for a second"],
+ ["الارتداد السريع|مدى حركة قصير","Bouncing|Short range of motion"]);
+X("dbcalf","lg","l",0,12,20,60,["سمانة رجل واحدة بالدمبل","Single-Leg Dumbbell Calf Raise"],["السمانة","Calves"],
+ ["قف على رجل واحدة على درجة وأمسك دمبلًا|انزل لأقصى تمدد ثم ارتفع|سجّل تكرارات رجل واحدة","Stand on one foot on a step holding a dumbbell|Lower to a full stretch, then rise|Log the reps for one leg"],
+ ["الارتداد السريع|مدى حركة قصير","Bouncing|Short range of motion"]);
+const GROUPS=[["ch","الصدر","Chest"],["bk","الظهر","Back"],["sh","الأكتاف","Shoulders"],["ar","الذراعين","Arms"],["co","البطن","Core"],["lg","الأرجل","Legs"]];
 
-/* ---------- storage ---------- */
-const KEY="ironlog.v1";
-const DEF=()=>({profile:{sex:"male",age:"",height:"",weight:"",activity:1.375,surplus:300,protPerKg:2,kcalOverride:"",protOverride:""},
-  settings:{incU:2.5,incL:5},program:null,retired:[],sessions:[],draft:null,bodyw:[],meas:[],food:[]});
-let S=DEF(),storeOK=true;
-try{const raw=localStorage.getItem(KEY);if(raw)S=merge(DEF(),JSON.parse(raw));}catch(e){storeOK=false}
-const clone=o=>JSON.parse(JSON.stringify(o));
-const wdLabel=d=>d.wd>=0?WDN[d.wd]:"يوم مرن";
-// Rebuild the lookup tables from the user's program (or the default one).
-function loadProgram(){DAYS=Array.isArray(S.program)&&S.program.length?S.program:DEFAULT_DAYS;EX={};
-  for(const e of S.retired||[])EX[e.id]=Object.assign({retired:true},e);
-  DAYS.forEach(d=>{d.wdName=wdLabel(d);d.ex.forEach(e=>{EX[e.id]=Object.assign({day:d.id},e)})})}
-function editable(){if(!Array.isArray(S.program)||!S.program.length)S.program=clone(DEFAULT_DAYS);loadProgram();return S.program}
-function merge(d,o){for(const k in o){if(o[k]&&typeof o[k]==="object"&&!Array.isArray(o[k])&&d[k]&&typeof d[k]==="object")d[k]=merge(d[k],o[k]);else d[k]=o[k]}return d}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){storeOK=false;$("#storeWarn").hidden=false}}
+/* ---------- ready-made programs ----------
+   item: [exerciseId, sets, lo?, hi?, rest?]  (missing values come from the library) */
+const PROGRAMS={
+ fb3:{name:{ar:"جسم كامل ٣ أيام",en:"Full Body · 3 days"},level:"beginner",equip:"gym",
+  desc:{ar:"الأنسب لأغلب المبتدئين: كل عضلة تتمرن ٣ مرات أسبوعيًا بحجم معتدل.",en:"Best fit for most beginners: every muscle trained 3× a week at a moderate volume."},
+  days:[{id:"FA",name:{ar:"جسم كامل A",en:"Full Body A"},wd:6,items:[["squat",3],["bench",3],["latpd",3],["dbohp",2],["lyingcurl",2],["crunch",2]]},
+        {id:"FB",name:{ar:"جسم كامل B",en:"Full Body B"},wd:1,items:[["rdl",3],["incdb",3],["cablerow",3],["legpress",2,10,12,120],["lateral",2],["dbcurl",2]]},
+        {id:"FC",name:{ar:"جسم كامل C",en:"Full Body C"},wd:3,items:[["legpress",3],["machpress",3],["latpdn",3],["bulgarian",2],["pushdown",2],["calfstand",2]]}]},
+ ul4:{name:{ar:"علوي / سفلي ٤ أيام",en:"Upper / Lower · 4 days"},level:"beginner",equip:"gym",
+  desc:{ar:"كل عضلة مرتين أسبوعيًا مع وقت أطول لكل جلسة. مناسب للمبتدئ والمتوسط.",en:"Each muscle twice a week with more time per session. Good for beginners and intermediates."},
+  days:[{id:"UA",name:{ar:"علوي A",en:"Upper A"},wd:6,focus:{ar:"صدر · ظهر · أكتاف · ذراعين",en:"Chest · back · shoulders · arms"},items:[["bench",3,6,10,150],["latpd",3],["dbohp",3],["cablerow",3],["pushdown",2],["dbcurl",2]]},
+        {id:"LA",name:{ar:"سفلي A",en:"Lower A"},wd:0,focus:{ar:"أمامي الفخذ · الخلفي · السمانة",en:"Quads · hamstrings · calves"},items:[["squat",3],["rdl",3],["legpress",3,10,12,120],["lyingcurl",3],["calfstand",3],["crunch",3]]},
+        {id:"UB",name:{ar:"علوي B",en:"Upper B"},wd:2,focus:{ar:"صدر علوي · ظهر · جانبي كتف",en:"Upper chest · back · side delts"},items:[["incdb",3],["bbrow",3],["latpdn",3],["lateral",3],["ohtri",2],["hammer",2]]},
+        {id:"LB",name:{ar:"سفلي B",en:"Lower B"},wd:3,focus:{ar:"المؤخرة · الفخذ · السمانة",en:"Glutes · thighs · calves"},items:[["legpress",3],["hipthrust",3],["bulgarian",3],["legext",3],["seatcurl",3],["calfseat",3]]}]},
+ ppl3:{name:{ar:"دفع / سحب / أرجل ٣ أيام",en:"Push / Pull / Legs · 3 days"},level:"intermediate",equip:"gym",
+  desc:{ar:"كل عضلة مرة أسبوعيًا بحجم أعلى في الجلسة. للمتوسط الذي يملك ٣ أيام فقط.",en:"Each muscle once a week with more volume per session. For intermediates with only 3 days."},
+  days:[{id:"P3P",name:{ar:"دفع",en:"Push"},wd:6,items:[["bench",3],["dbohp",3],["incdb",3],["lateral",3],["pushdown",3],["ohtri",2]]},
+        {id:"P3L",name:{ar:"سحب",en:"Pull"},wd:1,items:[["bbrow",3],["latpd",3],["cablerow",3],["facepull",3],["bbcurl",3],["hammer",2]]},
+        {id:"P3G",name:{ar:"أرجل",en:"Legs"},wd:3,items:[["squat",3],["rdl",3],["legpress",3,10,12,120],["lyingcurl",3],["calfstand",3],["crunch",3]]}]},
+ ppl6:{name:{ar:"دفع / سحب / أرجل ٦ أيام",en:"Push / Pull / Legs · 6 days"},level:"advanced",equip:"gym",
+  desc:{ar:"حجم تدريب عالٍ وكل عضلة مرتين أسبوعيًا. للمتقدم الذي يتعافى جيدًا.",en:"High volume, every muscle twice a week. For advanced lifters who recover well."},
+  days:[{id:"P6PA",name:{ar:"دفع A",en:"Push A"},wd:6,items:[["bench",4],["dbohp",3],["incdb",3],["lateral",4],["pushdown",3],["ohtri",3]]},
+        {id:"P6LA",name:{ar:"سحب A",en:"Pull A"},wd:0,items:[["bbrow",4],["latpd",3],["cablerow",3],["facepull",3],["bbcurl",3],["hammer",3]]},
+        {id:"P6GA",name:{ar:"أرجل A",en:"Legs A"},wd:1,items:[["squat",4],["rdl",3],["legpress",3,10,12,120],["lyingcurl",3],["calfstand",4],["crunch",3]]},
+        {id:"P6PB",name:{ar:"دفع B",en:"Push B"},wd:2,items:[["ohp",4],["incbb",3],["dips",3],["cablelat",4],["cablefly",3],["skull",3]]},
+        {id:"P6LB",name:{ar:"سحب B",en:"Pull B"},wd:3,items:[["pullup",4],["dbrow",3],["latpdn",3],["revfly",3],["preacher",3],["hammer",2]]},
+        {id:"P6GB",name:{ar:"أرجل B",en:"Legs B"},wd:4,items:[["hacksq",4],["hipthrust",3],["bulgarian",3],["legext",3],["seatcurl",3],["calfseat",4],["hlr",3]]}]},
+ home3:{name:{ar:"البيت بالدمبل ٣ أيام",en:"Home Dumbbells · 3 days"},level:"beginner",equip:"home",
+  desc:{ar:"جسم كامل بدمبلات قابلة للتعديل وأرضية فقط. يناسب التمرين في البيت.",en:"Full body with adjustable dumbbells and floor space only. Built for training at home."},
+  days:[{id:"HA",name:{ar:"البيت A",en:"Home A"},wd:6,items:[["gobletsq",3],["dbfloor",3],["dbrow",3],["dbohp",3],["dbcurl",2],["ohdbtri",2]]},
+        {id:"HB",name:{ar:"البيت B",en:"Home B"},wd:1,items:[["dbrdl",3],["pushup",3],["lunge",3],["lateral",3],["hammer",2],["glutebridge",3]]},
+        {id:"HC",name:{ar:"البيت C",en:"Home C"},wd:3,items:[["bulgarian",3],["pushup",3],["dbrow",3],["glutebridge",3],["lateral",3],["dbcalf",3]]}]}
+};
+/* ---------- UI text: [arabic, english] ---------- */
+const TX={
+ app:["دفتر الحديد","Iron Log"],
+ tToday:["التمرين","Workout"],tProg:["التقدّم","Progress"],tBody:["الجسم","Body"],tFood:["التغذية","Nutrition"],tMe:["ملفي","Me"],
+ kg:["كجم","kg"],cm:["سم","cm"],
+ storeWarn:["التخزين في هذا المتصفح غير متاح الآن، فلن تُحفظ بياناتك بعد إغلاق الصفحة. افتح الصفحة في متصفح عادي (ليس وضع التصفح الخاص)، أو انسخ نسخة احتياطية من «ملفي».","Storage isn't available in this browser right now, so your data won't be kept after you close the page. Open it in a normal (non-private) browser window, or copy a backup from \"Me\"."],
+ rest:["راحة","Rest"],restAfter:["راحة بعد: {x}","Rest after: {x}"],nextSet:["ابدأ الجولة التالية","Start your next set"],stop:["إيقاف","Stop"],
+ confirm:["اضغط مرة أخرى للتأكيد","Tap again to confirm"],confirmShort:["تأكيد","Confirm"],
+ // onboarding
+ welcome:["أهلًا بك في دفتر الحديد","Welcome to Iron Log"],
+ welcomeLead:["أجب عن ٥ أسئلة سريعة ونجهّز لك برنامجًا يناسبك. تقدر تغيّر كل شيء لاحقًا.","Answer 5 quick questions and we'll set up a program that fits you. You can change everything later."],
+ qLang:["اللغة","Language"],qGoal:["ما هدفك؟","What's your goal?"],qLevel:["ما مستواك؟","What's your experience?"],qDays:["كم يومًا تتمرن في الأسبوع؟","How many days a week can you train?"],qEquip:["أين تتمرن؟","Where do you train?"],
+ gMuscle:["بناء عضل","Build muscle"],gStrength:["زيادة القوة","Get stronger"],gFit:["لياقة عامة","General fitness"],
+ lvBeg:["مبتدئ (أقل من ٦ أشهر)","Beginner (under 6 months)"],lvInt:["متوسط (٦ أشهر – سنتين)","Intermediate (6 months – 2 years)"],lvAdv:["متقدم (أكثر من سنتين)","Advanced (2+ years)"],
+ lvBegS:["مبتدئ","Beginner"],lvIntS:["متوسط","Intermediate"],lvAdvS:["متقدم","Advanced"],
+ dN:["{n} أيام","{n} days"],eqGym:["جم متكامل","Full gym"],eqHome:["البيت (دمبلات)","Home (dumbbells)"],
+ build:["أنشئ برنامجي","Build my program"],skip:["تخطَّ واستخدم البرنامج الافتراضي","Skip and use the default program"],
+ recFor:["البرنامج المقترح لك","Recommended for you"],
+ built:["تم تجهيز برنامجك: {x}","Your program is ready: {x}"],
+ // today
+ emptyProg:["برنامجك فارغ","Your program is empty"],emptyProgTxt:["لا توجد أيام تمرين.","There are no training days."],addDays:["إضافة أيام وتمارين","Add days and exercises"],
+ running:["تمرين جارٍ منذ {x}","Workout in progress since {x}"],
+ todaySched:["اليوم {d}: موعد تمرين {x}","Today is {d}: time for {x}"],
+ todayRest:["اليوم {d} يوم راحة في جدولك. إن أردت التمرين فالتالي هو {x}.","{d} is a rest day on your schedule. If you want to train, next up is {x}."],
+ suggested:["المقترح","Suggested"],editProg:["تعديل تمارين البرنامج","Edit program exercises"],
+ how:["كيف يعمل البرنامج؟","How does the program work?"],
+ howSched:["الجدول:","Schedule:"],howSchedTail:["باقي الأيام راحة.","Other days are rest days."],
+ howProg:["التدرّج المزدوج:","Double progression:"],howProgT:["لكل تمرين نطاق تكرارات (مثل ٦–١٠). ثبّت الوزن وزد التكرارات، وعندما تكمل الحد الأعلى في كل الجولات يقترح التطبيق زيادة الوزن ({u} كجم للعلوي و{l} كجم للأرجل، ويمكن تغييرها من «ملفي»).","Each exercise has a rep range (e.g. 6–10). Keep the weight and add reps; once you hit the top of the range on every set, the app suggests adding weight ({u} kg upper body, {l} kg legs, adjustable in \"Me\")."],
+ howEff:["الجهد (RPE):","Effort (RPE):"],howEffT:["أنهِ معظم الجولات وأنت قادر تقريبًا على ١–٣ تكرارات إضافية بأداء نظيف، أي RPE ٧–٩. ‏RPE ١٠ يعني لم يكن ممكنًا تكرار إضافي. تسجيله اختياري.","Finish most sets with roughly 1–3 clean reps left in the tank, i.e. RPE 7–9. RPE 10 means no more reps were possible. Logging it is optional."],
+ howWu:["الإحماء:","Warm-up:"],howWuT:["٥ دقائق خفيفة، ثم جولات إحماء بأوزان أخف قبل التمارين المركّبة. أضفها بزر «+ إحماء»؛ لا تُحسب في التقدّم أو الأرقام القياسية.","5 easy minutes, then lighter warm-up sets before compound lifts. Add them with \"+ Warm-up\"; they don't count toward progress or records."],
+ disclaimer:["هذه إرشادات عامة شائعة وليست استشارة طبية. توقف إذا شعرت بألم حاد واستشر مختصًا.","This is general guidance, not medical advice. Stop if you feel sharp pain and see a professional."],
+ howTo:["طريقة الأداء","How to"],muscles:["العضلات:","Muscles:"],steps:["الخطوات:","Steps:"],mistakes:["أخطاء شائعة:","Common mistakes:"],noInfo:["لا يوجد شرح لهذا التمرين المخصص.","No guide for this custom exercise."],
+ lastTime:["آخر مرة ({d}):","Last time ({d}):"],
+ sgNew:["أول مرة: اختر وزنًا تؤدي به {hi} تكرار بأداء نظيف وتبقى قادرًا على ١–٢ تكرار إضافي.","First time: pick a weight you can do {hi} clean reps with, keeping 1–2 reps in reserve."],
+ sgUp:["أكملت {hi} تكرار في كل الجولات آخر مرة. زِد الوزن إلى {w} كجم وابدأ من {lo} تكرارات.","You hit {hi} reps on every set last time. Go up to {w} kg and start back at {lo} reps."],
+ sgUpBw:["أكملت {hi} تكرار في كل الجولات. أضف وزنًا (حزام أو حقيبة) أو اختر نسخة أصعب من التمرين.","You hit {hi} reps on every set. Add weight (belt or backpack) or move to a harder variation."],
+ sgDown:["لم تصل إلى {lo} تكرارات بهذا الوزن مرتين متتاليتين. خفّف إلى {w} كجم تقريبًا وابنِ التكرارات من جديد.","You missed {lo} reps at this weight twice in a row. Drop to about {w} kg and build the reps back up."],
+ sgHold:["ثبّت {w} كجم وحاول إضافة تكرار في كل جولة حتى تصل إلى {hi}.","Stay at {w} kg and try to add a rep to each set until you reach {hi}."],
+ sgHard:[" آخر مرة كان الجهد عاليًا (RPE {r})، فركّز على الأداء النظيف."," Last time was very hard (RPE {r}), so focus on clean reps."],
+ tagUp:["زِد الوزن","Add weight"],tagDown:["خفّف","Deload"],
+ wuPlan:["إحماء مقترح:","Suggested warm-up:"],
+ hWeight:["الوزن (كجم)","Weight (kg)"],hReps:["التكرارات","Reps"],hRpe:["RPE","RPE"],
+ addSet:["+ جولة","+ Set"],addWu:["+ إحماء","+ Warm-up"],wuShort:["إحماء","W"],
+ finish:["إنهاء التمرين وحفظه","Finish and save workout"],discard:["إلغاء التمرين الجاري","Discard current workout"],
+ draftNote:["التمرين يُحفظ كمسودة أثناء الكتابة. تُحفظ فقط الجولات التي فيها وزن وتكرارات.","Your workout is saved as a draft while you type. Only sets with weight and reps are saved."],
+ needWR:["اكتب الوزن والتكرارات أولًا","Enter weight and reps first"],finishFirst:["أنهِ التمرين الجاري أو ألغِه أولًا","Finish or discard the current workout first"],
+ discarded:["تم إلغاء التمرين","Workout discarded"],noSets:["لا توجد جولات مكتملة للحفظ","No completed sets to save"],
+ newPR:["رقم قياسي جديد في: {x}","New record in: {x}"],saved:["تم الحفظ","Saved"],workoutSaved:["تم حفظ التمرين","Workout saved"],
+ // progress
+ progress:["التقدّم","Progress"],thisWeek:["تمارين هذا الأسبوع","Workouts this week"],total:["إجمالي التمارين","Total workouts"],lastVol:["حجم آخر تمرين (كجم)","Last workout volume (kg)"],
+ exChart:["منحنى التمرين","Exercise chart"],pickEx:["اختر التمرين","Choose exercise"],removedEx:["تمارين حذفتها","Removed exercises"],
+ mTop:["أثقل وزن","Top weight"],mVol:["حجم التمرين","Volume"],mE1:["1RM تقديري","Est. 1RM"],
+ mTopD:["أثقل وزن رفعته في التمرين بكل مرة (بدون الإحماء).","Heaviest weight lifted each time (warm-ups excluded)."],
+ mVolD:["مجموع (الوزن × التكرارات) لكل الجولات. ارتفاعه يعني أنك تشتغل أكثر.","Sum of weight × reps across all sets. Going up means you're doing more work."],
+ mE1D:["القوة القصوى التقديرية لتكرار واحد (معادلة Epley) من أفضل جولة. رقم تقريبي للمقارنة فقط.","Estimated one-rep max (Epley formula) from your best set. An approximation for comparison only."],
+ chartNeeds:["يظهر الرسم بعد تسجيل قيمتين على الأقل.","The chart appears once you have at least two entries."],
+ heaviest:["أثقل وزن","Heaviest"],bestEst:["أفضل تقدير","Best estimate"],
+ allSets:["كل الجولات","Every set"],date:["التاريخ","Date"],setN:["جولة {n}","Set {n}"],volume:["الحجم","Volume"],
+ allSetsNote:["اضغط على التاريخ ✎ لتعديل جولات ذلك اليوم. كل خانة = الوزن × التكرارات، و@ تعني الجهد RPE. السهم ↑ يعني أن أثقل وزن زاد عن المرة السابقة.","Tap a date ✎ to edit that day's sets. Each cell = weight × reps; @ is the effort (RPE). ↑ means your top weight went up from last time."],
+ notLogged:["لم تسجّل هذا التمرين بعد.","You haven't logged this exercise yet."],
+ records:["الأرقام القياسية","Personal records"],exercise:["التمرين","Exercise"],bestSet:["أثقل جولة","Heaviest set"],noRecords:["بعد أول تمرين تحفظه تظهر هنا أفضل أرقامك لكل تمرين.","Your best numbers for each exercise show up here after your first saved workout."],
+ history:["سجل التمارين","Workout history"],setsN:["{n} جولة","{n} sets"],volKg:["حجم {v} كجم","volume {v} kg"],minN:["{n} د","{n} min"],
+ edit:["تعديل","Edit"],del:["حذف","Delete"],confirmDel:["تأكيد الحذف","Confirm delete"],noHistory:["لم تحفظ أي تمرين بعد. ابدأ من تبويب «التمرين».","No workouts saved yet. Start from the Workout tab."],
+ deletedDay:["يوم محذوف","Deleted day"],deletedEx:["تمرين محذوف","Deleted exercise"],
+ // session editor
+ editSess:["تعديل تمرين محفوظ","Edit saved workout"],editSessLead:["عدّل أي جولة ثم اضغط حفظ.","Change any set, then tap Save."],
+ delEx:["حذف التمرين","Remove exercise"],addExDay:["إضافة تمرين لهذا اليوم","Add an exercise to this day"],add:["إضافة","Add"],
+ saveEdits:["حفظ التعديلات","Save changes"],cancel:["إلغاء","Cancel"],emptySetsNote:["الجولات الفارغة (بدون وزن أو تكرارات) تُحذف عند الحفظ.","Empty sets (no weight or reps) are removed when you save."],
+ noSetsLeft:["لا توجد جولات. لحذف التمرين كله استخدم زر «حذف» في السجل","No sets left. To delete the whole workout, use Delete in the history"],
+ editsSaved:["تم حفظ التعديلات","Changes saved"],delSet:["حذف الجولة {n}","Delete set {n}"],
+ // program editor
+ editProgT:["تعديل البرنامج","Edit program"],editProgLead:["اختر اليوم ثم عدّل تمارينه. التغييرات تُحفظ تلقائيًا، وسجلّك القديم يبقى كما هو.","Pick a day, then edit its exercises. Changes save automatically and your past log stays as it is."],
+ addDay:["+ يوم","+ Day"],noDays:["لا توجد أيام في البرنامج. أضف يومًا.","There are no days in the program. Add one."],
+ dayName:["اسم اليوم","Day name"],weekday:["يوم الأسبوع","Weekday"],flexDay:["بدون يوم ثابت","No fixed day"],flexDayS:["يوم مرن","Flexible day"],
+ focus:["العضلات المستهدفة (اختياري)","Target muscles (optional)"],
+ up:["تحريك لأعلى","Move up"],down:["تحريك لأسفل","Move down"],
+ sets:["الجولات","Sets"],lo:["أقل تكرار","Min reps"],hi:["أعلى تكرار","Max reps"],restL:["الراحة","Rest"],
+ noEx:["لا توجد تمارين في هذا اليوم بعد.","No exercises on this day yet."],
+ addEx:["إضافة تمرين","Add exercise"],customT:["تمرين غير موجود في القائمة؟","Exercise not in the list?"],customName:["اسم التمرين","Exercise name"],
+ incType:["زيادة الوزن","Weight increment"],incU:["علوي (+{n} كجم)","Upper (+{n} kg)"],incL:["أرجل (+{n} كجم)","Legs (+{n} kg)"],
+ createAdd:["إنشاء وإضافة","Create and add"],customGroup:["تماريني المخصصة","My custom exercises"],
+ needName:["اكتب اسم التمرين","Enter the exercise name"],exAdded:["تمت إضافة {x}","Added {x}"],exRemoved:["تم حذف {x}","Removed {x}"],
+ doneEdit:["تم، ارجع للتمرين","Done, back to workout"],delDay:["حذف هذا اليوم","Delete this day"],delDayC:["اضغط مرة أخرى لحذف اليوم","Tap again to delete the day"],dayDeleted:["تم حذف اليوم","Day deleted"],
+ pickReady:["اختيار برنامج جاهز","Choose a ready program"],
+ removedNote:["إذا حذفت تمرينًا يبقى سجله وأرقامه القياسية في تبويب «التقدّم».","Removing an exercise keeps its history and records in the Progress tab."],
+ dupEx:["هذا التمرين موجود في هذا اليوم","That exercise is already in this day"],
+ dayN:["يوم {n}","Day {n}"],noName:["بدون اسم","Untitled"],
+ // programs
+ programs:["البرامج الجاهزة","Ready programs"],programsLead:["اختر برنامجًا ليصبح برنامجك الحالي. سجلّك وأرقامك القياسية تبقى كما هي.","Pick one to become your current program. Your log and records are kept."],
+ perWeek:["{n} أيام/أسبوع","{n} days/week"],current:["برنامجك الحالي","Your current program"],useProg:["استخدم هذا البرنامج","Use this program"],useProgC:["اضغط مرة أخرى للاستبدال","Tap again to replace"],
+ progSwitched:["تم التبديل إلى: {x}","Switched to: {x}"],custom:["برنامج مخصص","Custom program"],
+ // body
+ bodyW:["وزن الجسم","Body weight"],weightKg:["الوزن (كجم)","Weight (kg)"],eg:["مثلًا {x}","e.g. {x}"],logW:["تسجيل الوزن","Log weight"],
+ weighTip:["للمقارنة العادلة: وزّن نفسك صباحًا بعد دورة المياه وقبل الأكل، ٢–٣ مرات أسبوعيًا.","For fair comparisons, weigh yourself in the morning after the bathroom and before eating, 2–3 times a week."],
+ rate:["المعدّل منذ أول تسجيل:","Rate since your first entry:"],perWeekKg:["كجم أسبوعيًا","kg per week"],
+ rateSlow:["أبطأ من المعتاد للتضخيم. جرّب زيادة ١٠٠–٢٠٠ سعرة يوميًا.","Slower than typical for a bulk. Try adding 100–200 kcal a day."],
+ rateFast:["أسرع من المعتاد، وقد يزيد الدهون. جرّب إنقاص ١٠٠–٢٠٠ سعرة.","Faster than typical and may add more fat. Try cutting 100–200 kcal."],
+ rateOk:["ضمن النطاق الشائع للتضخيم (حوالي ٠٫٢٥–٠٫٥٪ أسبوعيًا).","Within the common range for a bulk (about 0.25–0.5% a week)."],
+ enterW:["اكتب الوزن","Enter your weight"],wLogged:["تم تسجيل الوزن","Weight logged"],
+ meas:["قياسات الجسم","Body measurements"],saveMeas:["حفظ القياسات","Save measurements"],
+ measTip:["قِس بشريط القياس على نفس النقطة كل مرة، مرة كل ٢–٤ أسابيع. يكفي أن تملأ ما تريده من الخانات.","Measure at the same spot each time with a tape, every 2–4 weeks. Fill in only the boxes you want."],
+ measure:["القياس","Measure"],start:["البداية","Start"],latest:["الأحدث","Latest"],change:["التغيّر","Change"],nMeas:["{n} قياسات","{n} measurements"],
+ firstMeas:["سجّل قياساتك الأولى اليوم لتقارن بها لاحقًا.","Log your first measurements today to compare against later."],
+ fillOne:["املأ قياسًا واحدًا على الأقل","Fill in at least one measurement"],measSaved:["تم حفظ القياسات","Measurements saved"],
+ mChest:["الصدر","Chest"],mShoulders:["الأكتاف","Shoulders"],mArm:["الذراع","Arm"],mWaist:["الخصر","Waist"],mHips:["الورك","Hips"],mThigh:["الفخذ","Thigh"],
+ // food
+ food:["التغذية","Nutrition"],needProfile:["أكمل العمر والطول والوزن في تبويب «ملفي» لحساب هدف السعرات والبروتين تلقائيًا.","Fill in your age, height and weight in \"Me\" to calculate calorie and protein targets."],
+ day:["اليوم","Day"],kcal:["السعرات","Calories"],protein:["البروتين (جم)","Protein (g)"],left:["باقي {n}","{n} left"],reached:["وصلت للهدف","Target reached"],
+ addMeal:["إضافة وجبة","Add a meal"],mealName:["الاسم","Name"],mealPh:["مثلًا: صدر دجاج ٢٠٠ جم + أرز","e.g. 200 g chicken breast + rice"],
+ quickAdd:["إضافة سريعة من وجباتك السابقة:","Quick add from previous meals:"],
+ foodTip:["القيم الغذائية تقريبية؛ خذها من ملصق المنتج أو من قاعدة بيانات أطعمة موثوقة.","Nutrition values are approximate; take them from the label or a trusted food database."],
+ mealsOf:["وجبات {d}","Meals on {d}"],noMeals:["لم تسجّل أكلًا لهذا اليوم بعد.","Nothing logged for this day yet."],untitled:["بدون اسم","Untitled"],
+ kcalN:["{n} سعرة","{n} kcal"],protN:["{n} جم بروتين","{n} g protein"],
+ last7:["آخر ٧ أيام","Last 7 days"],protOk:["بروتين ✓","Protein ✓"],protLow:["أقل","Low"],
+ enterMeal:["اكتب الوجبة أو قيمها","Enter a meal or its values"],added:["تمت الإضافة","Added"],
+ tdeeNote:["الهدف محسوب بمعادلة Mifflin-St Jeor: الحرق اليومي التقديري {t} سعرة + فائض {s}. هذه تقديرات تقريبية؛ راقب وزنك أسبوعيًا وعدّل.","Target uses the Mifflin-St Jeor equation: estimated daily burn {t} kcal + {s} surplus. These are rough estimates; watch your weight weekly and adjust."],
+ // settings
+ me:["بياناتي","My details"],sex:["الجنس","Sex"],male:["ذكر","Male"],female:["أنثى","Female"],age:["العمر","Age"],height:["الطول (سم)","Height (cm)"],
+ activity:["النشاط اليومي خارج الجم","Daily activity outside the gym"],
+ act1:["قليل جدًا (جلوس معظم اليوم)","Very low (sitting most of the day)"],act2:["خفيف (عمل مكتبي + ٣–٤ تمارين)","Light (desk job + 3–4 workouts)"],act3:["متوسط (حركة يومية أكثر)","Moderate (more daily movement)"],act4:["عالٍ (عمل بدني)","High (physical job)"],
+ surplus:["الفائض اليومي (سعرة)","Daily surplus (kcal)"],protKg:["البروتين (جم لكل كجم)","Protein (g per kg)"],kcalMan:["هدف سعرات يدوي (اختياري)","Manual calorie target (optional)"],protMan:["هدف بروتين يدوي (اختياري)","Manual protein target (optional)"],
+ save:["حفظ","Save"],curTarget:["هدفك الحالي: {k} سعرة و{p} جم بروتين يوميًا (تقديري).","Your current target: {k} kcal and {p} g protein a day (estimated)."],
+ targetTip:["للتضخيم: فائض ٢٠٠–٤٠٠ سعرة تقريبًا، وبروتين ١٫٦–٢٫٢ جم لكل كجم. للحفاظ على الوزن ضع الفائض 0. هذه نطاقات شائعة وليست قاعدة ثابتة.","For a bulk: roughly a 200–400 kcal surplus and 1.6–2.2 g protein per kg. To maintain, set the surplus to 0. These are common ranges, not fixed rules."],
+ myProg:["برنامجي","My program"],changeProg:["تغيير البرنامج","Change program"],editDaysEx:["تعديل الأيام والتمارين","Edit days and exercises"],redoQ:["إعادة أسئلة البداية","Redo the setup questions"],
+ prefs:["التفضيلات","Preferences"],showRpe:["إظهار خانة الجهد (RPE) في التمرين","Show the effort (RPE) column in workouts"],
+ incTitle:["زيادة الوزن المقترحة","Suggested weight increase"],incUpper:["تمارين الجزء العلوي (كجم)","Upper-body lifts (kg)"],incLower:["تمارين الأرجل (كجم)","Leg lifts (kg)"],
+ install:["تثبيت التطبيق","Install the app"],installBtn:["ثبّت على الشاشة الرئيسية","Install to home screen"],
+ installIos:["على آيفون: افتح الصفحة في Safari، اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».","On iPhone: open the page in Safari, tap Share, then \"Add to Home Screen\"."],
+ installAndroid:["على أندرويد: من قائمة المتصفح اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».","On Android: from the browser menu choose \"Install app\" or \"Add to Home screen\"."],
+ installed:["التطبيق مثبّت ويعمل بدون إنترنت.","The app is installed and works offline."],
+ backup:["النسخة الاحتياطية","Backup"],backupTip:["بياناتك محفوظة في هذا المتصفح على هذا الجهاز فقط. خذ نسخة احتياطية كل فترة واحفظها في الملاحظات أو أرسلها لنفسك.","Your data is stored only in this browser on this device. Take a backup now and then and keep it in your notes or send it to yourself."],
+ copyBackup:["نسخ النسخة الاحتياطية","Copy backup"],dlFile:["تنزيل ملف","Download file"],backupText:["نص النسخة الاحتياطية","Backup text"],
+ restore:["استعادة","Restore"],pasteHere:["الصق نص النسخة الاحتياطية هنا","Paste the backup text here"],orFile:["أو اختر ملف النسخة","Or choose a backup file"],
+ restoreBtn:["استعادة (تستبدل البيانات الحالية)","Restore (replaces current data)"],restoreC:["اضغط مرة أخرى لتأكيد الاستبدال","Tap again to confirm replacing"],
+ danger:["منطقة الخطر","Danger zone"],wipe:["حذف كل البيانات","Delete all data"],wipeC:["اضغط مرة أخرى لحذف كل شيء نهائيًا","Tap again to delete everything for good"],
+ counts:["سجل: {a} تمرين · {b} وزن · {c} قياس · {d} وجبة","Log: {a} workouts · {b} weights · {c} measurements · {d} meals"],
+ copied:["تم النسخ","Copied"],selectCopy:["حدّد النص وانسخه يدويًا","Select the text and copy it manually"],dlMaybe:["إن لم يبدأ التنزيل فاستخدم زر النسخ","If the download doesn't start, use Copy"],dlNo:["التنزيل غير متاح هنا، استخدم زر النسخ","Download isn't available here; use Copy"],
+ fileLoaded:["تم تحميل الملف، اضغط استعادة","File loaded, tap Restore"],badBackup:["النص ليس نسخة احتياطية صالحة","That isn't a valid backup"],notOurs:["هذه ليست نسخة احتياطية من دفتر الحديد","That isn't an Iron Log backup"],
+ restored:["تمت الاستعادة","Restored"],wiped:["تم حذف البيانات","Data deleted"]
+};
+const WD={ar:["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
+/* ---------- language ---------- */
+let LANG="ar";
+function t(k,v){const e=TX[k];let s=e?e[LANG==="en"?1:0]:k;if(v)for(const x in v)s=s.split("{"+x+"}").join(v[x]);return s}
+const L=x=>x==null?"":typeof x==="string"?x:(x[LANG]||x.ar||x.en||"");
+const other=x=>x&&typeof x==="object"?(x[LANG==="en"?"ar":"en"]||""):"";
 
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const pad=n=>String(n).padStart(2,"0");
-const today=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today=()=>ymd(new Date());
 const parseD=s=>{const[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c)};
-const fmtD=s=>{const d=parseD(s);return WDN[d.getDay()]+" "+d.getDate()+"/"+(d.getMonth()+1)};
+const fmtD=s=>{const d=parseD(s);return WD[LANG][d.getDay()]+" "+d.getDate()+"/"+(d.getMonth()+1)};
 const shortD=s=>{const d=parseD(s);return d.getDate()+"/"+(d.getMonth()+1)};
-const num=v=>{const n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:null};
+const num=v=>{const n=parseFloat(String(v??"").replace(",","."));return isFinite(n)?n:null};
 const r1=n=>Math.round(n*10)/10;
+const r25=n=>Math.max(0,Math.round(n/2.5)*2.5);
 const e1rm=(w,r)=>w*(1+r/30); // Epley estimate
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const mmss=s=>Math.floor(s/60)+":"+pad(Math.max(0,s%60));
-function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2600)}
-// Two-tap confirmation (the viewer blocks confirm()).
-function armed(btn,label){if(btn.dataset.armed){return true}btn.dataset.armed="1";const old=btn.textContent;btn.textContent=label||"اضغط مرة أخرى للتأكيد";btn.classList.add("confirm-on");setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=old;btn.classList.remove("confirm-on")}},3500);return false}
+const clone=o=>JSON.parse(JSON.stringify(o));
+const fmtN=n=>Math.round(n).toLocaleString("en");
+function toast(msg){const el=$("#toast");el.textContent=msg;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,2600)}
+// Two-tap confirmation (the artifact viewer blocks confirm()).
+function armed(btn,label){if(btn.dataset.armed)return true;btn.dataset.armed="1";const old=btn.textContent;btn.textContent=label||t("confirm");btn.classList.add("confirm-on");
+  setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=old;btn.classList.remove("confirm-on")}},3500);return false}
+const keepScroll=fn=>{const y=window.scrollY;fn();window.scrollTo(0,y)};
+
+/* ---------- state & storage ---------- */
+const KEY="ironlog.v1";
+const DEF=()=>({v:2,lang:"ar",onboarded:false,prefs:{goal:"muscle",level:"beginner",days:4,equip:"gym"},
+  profile:{sex:"male",age:"",height:"",weight:"",activity:1.375,surplus:300,protPerKg:2,kcalOverride:"",protOverride:""},
+  settings:{incU:2.5,incL:5,rpe:false},program:null,custom:{},sessions:[],draft:null,bodyw:[],meas:[],food:[]});
+function merge(d,o){for(const k in o){if(o[k]&&typeof o[k]==="object"&&!Array.isArray(o[k])&&d[k]&&typeof d[k]==="object"&&!Array.isArray(d[k]))d[k]=merge(d[k],o[k]);else d[k]=o[k]}return d}
+
+function buildProgram(key,goal){
+  const P=PROGRAMS[key];
+  const days=P.days.map(d=>({id:d.id,name:clone(d.name),wd:d.wd,focus:d.focus?clone(d.focus):"",items:d.items.map(([ex,s,lo,hi,rest])=>{
+    const b=LIB[ex];const it={ex,s,lo:lo??b.lo,hi:hi??b.hi,rest:rest??b.rest};
+    if(goal==="strength"&&b.c&&!BW.has(ex)){it.lo=4;it.hi=6;it.rest=Math.max(it.rest,180)}
+    if(goal==="fit"){it.lo=Math.max(it.lo,10);it.hi=Math.max(it.hi,15);it.rest=Math.min(it.rest,90)}
+    return it})}));
+  return{key,name:clone(P.name),days};
+}
+// v1 stored each program exercise with its own id/name; v2 keys everything by library id.
+function migrate(o){
+  if(o.v===2)return merge(DEF(),o);
+  const n=merge(DEF(),{profile:o.profile||{},settings:o.settings||{},sessions:o.sessions||[],bodyw:o.bodyw||[],meas:o.meas||[],food:o.food||[]});
+  const map=id=>id==="legpress2"?"legpress":id;
+  const addCustom=e=>{if(e&&!LIB[map(e.id)]&&!n.custom[e.id])n.custom[e.id]={name:e.ar||e.en||"?",k:e.k==="l"?"l":"u"}};
+  (o.retired||[]).forEach(addCustom);
+  if(Array.isArray(o.program)&&o.program.length){
+    n.program={key:"custom",name:"",days:o.program.map(d=>({id:d.id,name:PROGRAMS.ul4.days.some(x=>x.id===d.id&&x.name.ar===d.ar)?clone(PROGRAMS.ul4.days.find(x=>x.id===d.id).name):d.ar,wd:d.wd,focus:d.focus||"",
+      items:d.ex.map(e=>{addCustom(e);return{ex:map(e.id),s:e.s,lo:e.lo,hi:e.hi,rest:e.rest}})}))};
+  }else n.program=buildProgram("ul4","muscle");
+  n.sessions.forEach(s=>s.ex.forEach(e=>{e.id=map(e.id);if(!LIB[e.id]&&!n.custom[e.id])n.custom[e.id]={name:"?",k:"u"}}));
+  if(o.draft&&o.draft.ex){const ex={};for(const k in o.draft.ex)ex[map(k)]=o.draft.ex[k];n.draft={day:o.draft.day,date:o.draft.date,startedAt:o.draft.startedAt,ex,wu:{}}}
+  n.onboarded=true;return n;
+}
+let S=DEF(),storeOK=true;
+try{const raw=localStorage.getItem(KEY);if(raw)S=migrate(JSON.parse(raw));}catch(e){storeOK=false}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){storeOK=false;$("#storeWarn").hidden=false}}
+
+/* ---------- program access ---------- */
+let DAYS=[];
+function loadProgram(){if(!S.program||!Array.isArray(S.program.days))S.program=buildProgram("ul4","muscle");DAYS=S.program.days}
+const exInfo=id=>LIB[id]||(S.custom[id]?{id,custom:true,name:S.custom[id].name,k:S.custom[id].k,c:false,lo:8,hi:12,rest:90}:{id,custom:true,name:t("deletedEx"),k:"u",c:false,lo:8,hi:12,rest:90});
+const exName=id=>L(exInfo(id).name);
+const dayName=d=>L(d.name)||t("noName");
+const wdLabel=d=>d.wd>=0?WD[LANG][d.wd]:t("flexDayS");
+const progName=()=>S.program.key&&PROGRAMS[S.program.key]&&S.program.name?L(S.program.name):t("custom");
+// Exercises that have been logged or are in the program — for pickers & records.
+function knownEx(){const ids=new Set();DAYS.forEach(d=>d.items.forEach(i=>ids.add(i.ex)));S.sessions.forEach(s=>s.ex.forEach(e=>ids.add(e.id)));return[...ids]}
 
 /* ---------- training logic ---------- */
-function history(exId){const L=LIFT(exId),out=[];for(const s of S.sessions){for(const e of s.ex){if(LIFT(e.id)===L&&e.sets.length)out.push({date:s.date,sets:e.sets,sid:s.id})}}return out.sort((a,b)=>a.date<b.date?-1:1)}
+const work=sets=>sets.filter(s=>!s.wu);
+function history(id){const out=[];for(const s of S.sessions)for(const e of s.ex){if(e.id===id){const w=work(e.sets);if(w.length)out.push({date:s.date,sets:w,sid:s.id})}}return out.sort((a,b)=>a.date<b.date?-1:1)}
 function bestOf(sets){let b=null;for(const st of sets){const v=e1rm(st.w,st.r);if(!b||v>b.e)b={e:v,w:st.w,r:st.r}}return b}
-function prs(exId){const h=history(exId);let maxW=null,maxE=null;for(const x of h)for(const st of x.sets){if(!maxW||st.w>maxW.w||(st.w===maxW.w&&st.r>maxW.r))maxW={w:st.w,r:st.r,date:x.date};const v=e1rm(st.w,st.r);if(!maxE||v>maxE.e)maxE={e:v,w:st.w,r:st.r,date:x.date}}return{maxW,maxE}}
-function suggest(ex){
-  const h=history(ex.id);const inc=ex.k==="l"?S.settings.incL:S.settings.incU;
-  if(!h.length)return{kind:"new",w:null,text:`أول مرة: اختر وزنًا تؤدي به ${ex.hi} تكرار بأداء نظيف وتبقى قادرًا على ١–٢ تكرار إضافي. سجّل الوزن والتكرارات بعد كل جولة.`};
-  const last=h[h.length-1];const work=last.sets;const topW=Math.max(...work.map(s=>s.w));
-  const atTop=work.filter(s=>s.w===topW);
-  const allHit=work.length>=ex.s&&atTop.length>=ex.s&&atTop.every(s=>s.r>=ex.hi);
-  if(allHit)return{kind:"up",w:r1(topW+inc),text:`أكملت ${ex.hi} تكرار في كل الجولات آخر مرة. زِد الوزن إلى ${r1(topW+inc)} كجم وابدأ من ${ex.lo} تكرارات.`};
-  const fails=atTop.filter(s=>s.r<ex.lo).length;
-  if(fails>=2&&h.length>=2){const prev=h[h.length-2];const prevTop=Math.max(...prev.sets.map(s=>s.w));const prevFails=prev.sets.filter(s=>s.w===prevTop&&s.r<ex.lo).length;
-    if(prevTop===topW&&prevFails>=2){const dw=r1(topW*0.9);return{kind:"down",w:dw,text:`لم تصل إلى ${ex.lo} تكرارات بهذا الوزن مرتين متتاليتين. خفّف إلى ${dw} كجم تقريبًا وابنِ التكرارات من جديد.`}}}
-  return{kind:"hold",w:topW,text:`ثبّت ${topW} كجم وحاول إضافة تكرار في كل جولة حتى تصل إلى ${ex.hi}.`};
+function prs(id){const h=history(id);let maxW=null,maxE=null;for(const x of h)for(const st of x.sets){if(!maxW||st.w>maxW.w||(st.w===maxW.w&&st.r>maxW.r))maxW={w:st.w,r:st.r,date:x.date};const v=e1rm(st.w,st.r);if(!maxE||v>maxE.e)maxE={e:v,w:st.w,r:st.r,date:x.date}}return{maxW,maxE}}
+function suggest(it){
+  const ex=exInfo(it.ex);const h=history(it.ex);const inc=ex.k==="l"?S.settings.incL:S.settings.incU;
+  if(!h.length)return{kind:"new",w:null,text:t("sgNew",{hi:it.hi})};
+  const last=h[h.length-1].sets;const topW=Math.max(...last.map(s=>s.w));const atTop=last.filter(s=>s.w===topW);
+  const maxR=Math.max(0,...last.map(s=>s.rpe||0));const hard=maxR>=10?t("sgHard",{r:maxR}):"";
+  if(last.length>=it.s&&atTop.length>=it.s&&atTop.every(s=>s.r>=it.hi)){
+    if(BW.has(it.ex)&&topW===0)return{kind:"up",w:0,text:t("sgUpBw",{hi:it.hi})};
+    return{kind:"up",w:r1(topW+inc),text:t("sgUp",{hi:it.hi,w:r1(topW+inc),lo:it.lo})}}
+  const fails=atTop.filter(s=>s.r<it.lo).length;
+  if(fails>=2&&h.length>=2){const prev=h[h.length-2].sets;const pTop=Math.max(...prev.map(s=>s.w));
+    if(pTop===topW&&prev.filter(s=>s.w===pTop&&s.r<it.lo).length>=2){const dw=r25(topW*0.9);return{kind:"down",w:dw,text:t("sgDown",{lo:it.lo,w:dw})}}}
+  return{kind:"hold",w:topW,text:t("sgHold",{w:topW,hi:it.hi})+hard};
 }
+// Ramp of lighter sets before a compound lift.
+function warmPlan(w){if(!w||w<20)return null;const p=[[0.5,8],[0.7,4]];if(w>=60)p.push([0.85,2]);return p.map(([f,r])=>({w:r25(w*f),r})).filter(x=>x.w>0&&x.w<w)}
 function nextDayId(){
-  const wd=new Date().getDay();const sched=DAYS.find(d=>d.wd===wd);
-  if(sched)return{id:sched.id,why:"sched"};
   if(!DAYS.length)return{id:null,why:"rest"};
+  const sched=DAYS.find(d=>d.wd===new Date().getDay());if(sched)return{id:sched.id,why:"sched"};
   const last=[...S.sessions].sort((a,b)=>a.date<b.date?1:-1)[0];
-  if(!last)return{id:"UA",why:"rest"};
+  if(!last)return{id:DAYS[0].id,why:"rest"};
   const i=DAYS.findIndex(d=>d.id===last.day);return{id:DAYS[(i+1)%DAYS.length].id,why:"rest"};
+}
+function recommend(p){
+  if(p.equip==="home")return"home3";
+  if(p.days===3)return p.level==="beginner"?"fb3":"ppl3";
+  if(p.days===6)return p.level==="beginner"?"ul4":"ppl6";
+  return"ul4";
 }
 
 /* ---------- nutrition ---------- */
 function targets(){
-  const p=S.profile;const w=num(p.weight),h=num(p.height),a=num(p.age);
-  let kcal=null,prot=null,bmr=null,tdee=null;
-  if(w&&h&&a){bmr=10*w+6.25*h-5*a+(p.sex==="female"?-161:5);tdee=bmr*Number(p.activity||1.375);kcal=Math.round((tdee+Number(p.surplus||0))/10)*10}
+  const p=S.profile;const w=num(p.weight),h=num(p.height),a=num(p.age);let kcal=null,prot=null,tdee=null;
+  if(w&&h&&a){const bmr=10*w+6.25*h-5*a+(p.sex==="female"?-161:5);tdee=bmr*Number(p.activity||1.375);kcal=Math.round((tdee+Number(p.surplus||0))/10)*10}
   if(w)prot=Math.round(w*Number(p.protPerKg||2));
-  if(num(p.kcalOverride))kcal=num(p.kcalOverride);
-  if(num(p.protOverride))prot=num(p.protOverride);
-  return{kcal,prot,bmr,tdee};
+  if(num(p.kcalOverride))kcal=num(p.kcalOverride);if(num(p.protOverride))prot=num(p.protOverride);
+  return{kcal,prot,tdee};
 }
 function latestWeight(){const b=[...S.bodyw].sort((a,b)=>a.date<b.date?-1:1);return b.length?b[b.length-1].kg:num(S.profile.weight)}
 
 /* ---------- chart ---------- */
 function lineChart(pts,unit){
-  if(pts.length<2)return`<div class="empty">يظهر الرسم بعد تسجيل قيمتين على الأقل.</div>`;
-  const W=600,H=220,L=48,R=14,T=16,B=30;
+  if(pts.length<2)return`<div class="empty">${t("chartNeeds")}</div>`;
+  const W=600,H=220,Lp=52,R=14,T=16,B=30;
   const xs=pts.map(p=>parseD(p.x).getTime()),ys=pts.map(p=>p.y);
   let x0=Math.min(...xs),x1=Math.max(...xs);if(x0===x1){x0-=864e5;x1+=864e5}
-  let y0=Math.min(...ys),y1=Math.max(...ys);const padY=(y1-y0)*0.15||Math.max(1,y1*0.05);y0-=padY;y1+=padY;
-  const X=t=>L+(t-x0)/(x1-x0)*(W-L-R); // time runs left→right so "up and to the right" reads as progress
+  let y0=Math.min(...ys),y1=Math.max(...ys);const pY=(y1-y0)*0.15||Math.max(1,y1*0.05);y0-=pY;y1+=pY;
+  const X=v=>Lp+(v-x0)/(x1-x0)*(W-Lp-R); // time runs left→right so "up and to the right" reads as progress
   const Y=v=>T+(1-(v-y0)/(y1-y0))*(H-T-B);
   const ticks=[0,1,2,3].map(i=>y0+(y1-y0)*i/3);
   const line=pts.map((p,i)=>(i?"L":"M")+X(xs[i]).toFixed(1)+" "+Y(p.y).toFixed(1)).join(" ");
-  const area=line+` L${X(xs[xs.length-1]).toFixed(1)} ${H-B} L${X(xs[0]).toFixed(1)} ${H-B} Z`;
-  const lastI=pts.length-1;
-  return`<svg viewBox="0 0 ${W} ${H}" style="direction:ltr" role="img" aria-label="رسم بياني">
-   ${ticks.map(t=>`<line x1="${L}" x2="${W-R}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)" stroke-width="1"/>
-     <text x="${L-6}" y="${Y(t)+4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${r1(t)}</text>`).join("")}
+  const area=line+` L${X(xs[xs.length-1]).toFixed(1)} ${H-B} L${X(xs[0]).toFixed(1)} ${H-B} Z`;const li=pts.length-1;
+  return`<svg viewBox="0 0 ${W} ${H}" style="direction:ltr" role="img" aria-label="chart">
+   ${ticks.map(v=>`<line x1="${Lp}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${Lp-6}" y="${Y(v)+4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${fmtN(v)}</text>`).join("")}
    <path d="${area}" fill="var(--accent)" fill-opacity=".10"/>
    <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-   ${pts.map((p,i)=>`<circle cx="${X(xs[i])}" cy="${Y(p.y)}" r="${i===lastI?5.5:3}" fill="${i===lastI?"var(--accent)":"var(--surface)"}" stroke="var(--accent)" stroke-width="2"/>`).join("")}
+   ${pts.map((p,i)=>`<circle cx="${X(xs[i])}" cy="${Y(p.y)}" r="${i===li?5.5:3}" fill="${i===li?"var(--accent)":"var(--surface)"}" stroke="var(--accent)" stroke-width="2"/>`).join("")}
    <text x="${X(xs[0])}" y="${H-8}" text-anchor="start" font-size="12" fill="var(--muted)">${shortD(pts[0].x)}</text>
-   <text x="${X(xs[lastI])}" y="${H-8}" text-anchor="end" font-size="12" fill="var(--fg)" font-weight="700">${r1(pts[lastI].y)} ${unit} · ${shortD(pts[lastI].x)}</text>
-  </svg>`;
+   <text x="${X(xs[li])}" y="${H-8}" text-anchor="end" font-size="12" fill="var(--fg)" font-weight="700">${r1(pts[li].y)} ${unit} · ${shortD(pts[li].x)}</text></svg>`;
 }
 
-/* ---------- views ---------- */
-loadProgram();
-let tab="today",selDay=null,progEx="bench",editDay=null,progMetric="top",sessEdit=null;
+/* ---------- shell ---------- */
+const TABS=[["today","tToday",'<path d="M2 12h3M19 12h3M5 8v8M19 8v8M8 6v12M16 6v12M8 12h8"/>'],["progress","tProg",'<path d="M3 20h18M5 16l4-5 4 3 6-8"/>'],
+ ["body","tBody",'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9l3 4 3-4"/>'],["food","tFood",'<path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8M7 7h4M17 3c-2 2-2 6 0 9v9"/>'],
+ ["settings","tMe",'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>']];
+const PARENT={sess:"progress",edit:"today",programs:"settings",welcome:"settings"};
+let tab="today",selDay=null,progEx=null,editDay=null,progMetric="top",sessEdit=null;const openInfo=new Set();
+function applyLang(){
+  const app=$("#app");app.dir=LANG==="ar"?"rtl":"ltr";app.lang=LANG;document.documentElement.lang=LANG;
+  $("#tabs").dir=app.dir;$("#timer").dir=app.dir;
+  $("#brandName").textContent=t("app");document.title=t("app");
+  $("#storeWarn").textContent=t("storeWarn");$("#tStop").textContent=t("stop");
+  $("#tabs").innerHTML=TABS.map(([k,l,svg])=>`<button type="button" data-tab="${k}"><svg viewBox="0 0 24 24">${svg}</svg>${t(l)}</button>`).join("");
+  $$("#tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();window.scrollTo(0,0)});
+}
 function render(){
-  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(tab==="sess"?"progress":tab)));
-  const v=$("#view");
-  v.innerHTML=({today:vToday,progress:vProgress,body:vBody,food:vFood,settings:vSettings,edit:vEdit,sess:vSess})[tab]();
-  bind[tab]&&bind[tab]();
+  if(!S.onboarded&&tab!=="welcome")tab="welcome";
+  $("#subtitle").textContent=S.onboarded?progName():"";
+  $$("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(PARENT[tab]||tab)));
+  $("#tabs").hidden=tab==="welcome"&&!S.onboarded;
+  $("#view").innerHTML=VIEWS[tab]();
+  BIND[tab]&&BIND[tab]();
 }
-const bind={};
+const VIEWS={},BIND={};
+const go=(k)=>{tab=k;render();window.scrollTo(0,0)};
 
-/* Today */
-function vToday(){
+/* ---------- onboarding ---------- */
+let OB=null;
+VIEWS.welcome=function(){
+  OB=OB||clone(S.prefs);
+  const grp=(key,opts)=>`<div class="chips wrap">${opts.map(([v,l])=>`<button type="button" class="chip ${String(OB[key])===String(v)?"on":""}" data-ob="${key}" data-v="${v}">${l}</button>`).join("")}</div>`;
+  const rec=recommend(OB);const P=PROGRAMS[rec];
+  return`<h2>${t("welcome")}</h2><p class="muted" style="margin:0 0 14px">${t("welcomeLead")}</p>
+  <div class="card stack">
+   <div class="q"><span>${t("qLang")}</span><div class="chips"><button type="button" class="chip ${LANG==="ar"?"on":""}" data-lang="ar">العربية</button><button type="button" class="chip ${LANG==="en"?"on":""}" data-lang="en">English</button></div></div>
+   <div class="q"><span>${t("qGoal")}</span>${grp("goal",[["muscle",t("gMuscle")],["strength",t("gStrength")],["fit",t("gFit")]])}</div>
+   <div class="q"><span>${t("qLevel")}</span>${grp("level",[["beginner",t("lvBeg")],["intermediate",t("lvInt")],["advanced",t("lvAdv")]])}</div>
+   <div class="q"><span>${t("qDays")}</span>${grp("days",[[3,t("dN",{n:3})],[4,t("dN",{n:4})],[6,t("dN",{n:6})]])}</div>
+   <div class="q"><span>${t("qEquip")}</span>${grp("equip",[["gym",t("eqGym")],["home",t("eqHome")]])}</div>
+  </div>
+  <div class="card stack prog cur" style="margin-top:12px"><span class="tag acc" style="align-self:flex-start">${t("recFor")}</span>
+   <h3>${L(P.name)}</h3><div class="small muted">${L(P.desc)}</div>
+   <div class="small">${P.days.map(d=>esc(L(d.name))+" · "+WD[LANG][d.wd]).join("<br>")}</div></div>
+  <div class="stack" style="margin-top:12px"><button type="button" class="primary block" id="obGo">${t("build")}</button>
+   ${S.onboarded?"":`<button type="button" class="ghost block" id="obSkip">${t("skip")}</button>`}</div>`;
+};
+BIND.welcome=function(){
+  $$("[data-lang]").forEach(b=>b.onclick=()=>{LANG=S.lang=b.dataset.lang;save();applyLang();render()});
+  $$("[data-ob]").forEach(b=>b.onclick=()=>{const k=b.dataset.ob;OB[k]=k==="days"?Number(b.dataset.v):b.dataset.v;keepScroll(render)});
+  const finish=(key,goal)=>{S.program=buildProgram(key,goal);loadProgram();S.prefs=clone(OB);S.settings.rpe=OB.level!=="beginner";S.onboarded=true;
+    if(S.draft&&!DAYS.some(d=>d.id===S.draft.day))S.draft=null;selDay=null;OB=null;save();go("today");toast(t("built",{x:progName()}))};
+  $("#obGo").onclick=()=>finish(recommend(OB),OB.goal);
+  $("#obSkip")&&($("#obSkip").onclick=()=>finish("ul4","muscle"));
+};
+
+/* ---------- today ---------- */
+function infoPanel(id){
+  const ex=exInfo(id);
+  if(ex.custom)return`<div class="info">${t("noInfo")}</div>`;
+  return`<div class="info"><b>${t("muscles")}</b>${esc(L(ex.mu))}<b>${t("steps")}</b><ol>${L(ex.st).split("|").map(s=>`<li>${esc(s)}</li>`).join("")}</ol><b>${t("mistakes")}</b><ul>${L(ex.mi).split("|").map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>`;
+}
+const rpeOpts=v=>`<option value=""></option>${[6,7,8,9,10].map(n=>`<option value="${n}" ${Number(v)===n?"selected":""}>${n}</option>`).join("")}`;
+VIEWS.today=function(){
+  if(!DAYS.length)return`<h2>${t("emptyProg")}</h2><div class="empty stack">${t("emptyProgTxt")}<button type="button" id="goEdit">${t("addDays")}</button></div>`;
   if(S.draft&&!DAYS.some(d=>d.id===S.draft.day)){S.draft=null;save()}
   if(selDay&&!DAYS.some(d=>d.id===selDay))selDay=null;
-  if(!DAYS.length)return`<h2>برنامجك فارغ</h2><div class="empty">لا توجد أيام تمرين. <button type="button" id="goEdit">إضافة أيام وتمارين</button></div>`;
-  const nd=nextDayId();
-  const day=DAYS.find(d=>d.id===(S.draft?S.draft.day:(selDay||nd.id)));
-  const wdToday=WDN[new Date().getDay()];
-  const lead=S.draft?`تمرين جارٍ منذ ${new Date(S.draft.startedAt).toLocaleTimeString("ar",{hour:"numeric",minute:"2-digit"})}`
-    :nd.why==="sched"?`اليوم ${wdToday}: موعد تمرين ${DAYS.find(d=>d.id===nd.id).ar}`
-    :`اليوم ${wdToday} يوم راحة في جدولك. إن أردت التمرين فالتالي هو ${DAYS.find(d=>d.id===nd.id).ar}.`;
-  const dr=S.draft&&S.draft.day===day.id?S.draft:null;
-  let h=`<h2>${esc(day.ar)} <span class="muted small" style="font-family:var(--f-body)">${esc(day.en)} · ${esc(day.wdName)}</span></h2>
-  <p class="muted small" style="margin:0 0 10px">${lead}<br>${esc(day.focus)}</p>`;
-  if(!S.draft)h+=`<div class="chips" role="tablist">${DAYS.map(d=>`<button type="button" class="chip ${d.id===day.id?"on":""}" data-day="${d.id}">${d.ar} · ${d.wdName}${d.id===nd.id?'<span class="dot" title="المقترح"></span>':""}</button>`).join("")}</div>`;
-  h+=`<div class="row" style="margin-top:8px"><button type="button" id="goEdit">تعديل تمارين البرنامج</button></div>`;
-  h+=`<details class="card" style="margin-top:12px"><summary>كيف يعمل البرنامج؟</summary>
-   <div class="small stack" style="gap:6px">
-   <div><b>الجدول:</b> ${DAYS.map(d=>esc(d.wdName)+" "+esc(d.ar)).join(" · ")}. باقي الأيام راحة. يمكنك تغيير الأيام والتمارين من زر «تعديل تمارين البرنامج».</div>
-   <div><b>التدرّج المزدوج:</b> لكل تمرين نطاق تكرارات (مثل ٦–١٠). ثبّت الوزن وزد التكرارات، وعندما تكمل الحد الأعلى في كل الجولات يقترح التطبيق زيادة الوزن (٢٫٥ كجم للعلوي و٥ كجم للسفلي، ويمكنك تغييرها من «ملفي»).</div>
-   <div><b>الجهد:</b> أنهِ كل جولة وأنت قادر تقريبًا على ١–٣ تكرارات إضافية بأداء نظيف. الأداء الصحيح أهم من الوزن.</div>
-   <div><b>الإحماء:</b> ٥ دقائق خفيفة ثم ١–٢ جولة إحماء بوزن أخف قبل أول تمرين مركّب. لا تسجّل جولات الإحماء.</div>
-   <div class="muted">هذه إرشادات عامة شائعة للمبتدئين وليست استشارة طبية. توقف إذا شعرت بألم حاد واستشر مختصًا.</div>
-   </div></details>`;
-  h+=`<div class="stack" style="margin-top:12px">`;
-  day.ex.forEach((ex,ei)=>{
-    const sg=suggest(ex);const h0=history(ex.id);const last=h0[h0.length-1];
-    const rows=dr?(dr.ex[ex.id]||[]):[];
-    const n=Math.max(ex.s,rows.length);
-    h+=`<section class="card"><div class="ex-head"><div style="min-width:0"><h3>${ei+1}. ${esc(ex.ar)}</h3><div class="en">${esc(ex.en)}</div></div>
-      <div class="target"><span class="num">${ex.s} × ${ex.lo}–${ex.hi}</span><br>راحة <span class="num">${mmss(ex.rest)}</span></div></div>
-      ${last?`<div class="small muted" style="margin-top:6px">آخر مرة (${shortD(last.date)}): <span class="num">${last.sets.map(s=>s.w+"×"+s.r).join("  ")}</span></div>`:""}
-      <div class="hint ${sg.kind==="up"?"up":""}">${sg.kind==="up"?'<span class="tag up">زِد الوزن</span> ':sg.kind==="down"?'<span class="tag">خفّف</span> ':""}${esc(sg.text)}</div>
-      <div class="sets"><span class="h">#</span><span class="h">الوزن (كجم)</span><span class="h">التكرارات</span><span class="h"></span>`;
-    for(let i=0;i<n;i++){const r=rows[i]||{};const ph=last&&last.sets[i]?last.sets[i]:null;
-      h+=`<span class="idx">${i+1}</span>
-      <input id="w-${ex.id}-${i}" class="${r.done?"set-done":""}" inputmode="decimal" type="number" step="0.5" min="0" data-ex="${ex.id}" data-i="${i}" data-f="w" value="${r.w!==undefined?(r.w??""):(sg.w??"")}" placeholder="${ph?ph.w:"كجم"}" aria-label="الوزن للجولة ${i+1}">
-      <input id="r-${ex.id}-${i}" class="${r.done?"set-done":""}" inputmode="numeric" type="number" step="1" min="0" data-ex="${ex.id}" data-i="${i}" data-f="r" value="${r.r??""}" placeholder="${ph?ph.r:ex.lo+"–"+ex.hi}" aria-label="التكرارات للجولة ${i+1}">
-      <button type="button" class="tick ${r.done?"done":""}" data-tick="${ex.id}" data-i="${i}" aria-label="أنهيت الجولة ${i+1}">✓</button>`}
-    h+=`</div><div class="row" style="margin-top:8px"><button type="button" class="ghost small" data-addset="${ex.id}">+ جولة</button></div></section>`;
+  const nd=nextDayId();const day=DAYS.find(d=>d.id===(S.draft?S.draft.day:(selDay||nd.id)));
+  const ndName=dayName(DAYS.find(d=>d.id===nd.id));const wdT=WD[LANG][new Date().getDay()];
+  const lead=S.draft?t("running",{x:new Date(S.draft.startedAt).toLocaleTimeString(LANG,{hour:"numeric",minute:"2-digit"})}):nd.why==="sched"?t("todaySched",{d:wdT,x:esc(ndName)}):t("todayRest",{d:wdT,x:esc(ndName)});
+  const dr=S.draft&&S.draft.day===day.id?S.draft:null;const rpe=S.settings.rpe;
+  let h=`<h2>${esc(dayName(day))} <span class="muted small" style="font-family:var(--f-body)">${esc(other(day.name))}${other(day.name)?" · ":""}${wdLabel(day)}</span></h2>
+  <p class="muted small" style="margin:0 0 10px">${lead}${day.focus?"<br>"+esc(L(day.focus)):""}</p>`;
+  if(!S.draft)h+=`<div class="chips">${DAYS.map(d=>`<button type="button" class="chip ${d.id===day.id?"on":""}" data-day="${d.id}">${esc(dayName(d))} · ${wdLabel(d)}${d.id===nd.id?`<span class="dot" title="${t("suggested")}"></span>`:""}</button>`).join("")}</div>`;
+  h+=`<div class="row" style="margin-top:8px"><button type="button" id="goEdit">${t("editProg")}</button></div>
+  <details class="card" style="margin-top:12px"><summary>${t("how")}</summary><div class="small stack" style="gap:6px">
+   <div><b>${t("howSched")}</b> ${DAYS.map(d=>wdLabel(d)+" "+esc(dayName(d))).join(" · ")}. ${t("howSchedTail")}</div>
+   <div><b>${t("howProg")}</b> ${t("howProgT",{u:S.settings.incU,l:S.settings.incL})}</div>
+   <div><b>${t("howEff")}</b> ${t("howEffT")}</div><div><b>${t("howWu")}</b> ${t("howWuT")}</div>
+   <div class="muted">${t("disclaimer")}</div></div></details><div class="stack" style="margin-top:12px">`;
+  day.items.forEach((it,ei)=>{
+    const id=it.ex,ex=exInfo(id),sg=suggest(it),h0=history(id),last=h0[h0.length-1];
+    const rows=dr?(dr.ex[id]||[]):[],wus=dr?(dr.wu&&dr.wu[id]||[]):[];const n=Math.max(it.s,rows.length);
+    const plan=ex.c?warmPlan(sg.w):null;
+    const cell=(pre,i,r,isWu)=>`<span class="idx ${isWu?"wu":""}">${isWu?t("wuShort"):i+1}</span>
+      <input id="${pre}w-${id}-${i}" class="${isWu?"wuin":""} ${r.done?"set-done":""}" type="number" inputmode="decimal" step="0.5" min="0" data-ex="${id}" data-i="${i}" data-f="w" data-wu="${isWu?1:""}" value="${r.w!==undefined?(r.w??""):(isWu||sg.w==null?"":sg.w)}" placeholder="${isWu?"":(last&&last.sets[i]?last.sets[i].w:t("kg"))}" aria-label="${t("hWeight")} ${i+1}">
+      <input id="${pre}r-${id}-${i}" class="${isWu?"wuin":""} ${r.done?"set-done":""}" type="number" inputmode="numeric" step="1" min="0" data-ex="${id}" data-i="${i}" data-f="r" data-wu="${isWu?1:""}" value="${r.r??""}" placeholder="${isWu?"":(last&&last.sets[i]?last.sets[i].r:it.lo+"–"+it.hi)}" aria-label="${t("hReps")} ${i+1}">
+      ${rpe?(isWu?"<span></span>":`<select id="${pre}p-${id}-${i}" data-ex="${id}" data-i="${i}" data-f="rpe" data-wu="" aria-label="RPE ${i+1}">${rpeOpts(r.rpe)}</select>`):""}
+      <button type="button" class="tick ${r.done?"done":""}" data-tick="${id}" data-i="${i}" data-wu="${isWu?1:""}" aria-label="✓ ${i+1}">✓</button>`;
+    h+=`<section class="card"><div class="ex-head"><div style="min-width:0"><h3>${ei+1}. ${esc(exName(id))}</h3><div class="sub">${esc(other(ex.name))}</div></div>
+      <div class="target"><span class="num">${it.s} × ${it.lo}–${it.hi}</span><br>${t("rest")} <span class="num">${mmss(it.rest)}</span></div></div>
+      <button type="button" class="link small" data-info="${id}">ⓘ ${t("howTo")}</button>${openInfo.has(id)?infoPanel(id):""}
+      ${last?`<div class="small muted" style="margin-top:6px">${t("lastTime",{d:shortD(last.date)})} <span class="num">${last.sets.map(s=>s.w+"×"+s.r+(s.rpe?"@"+s.rpe:"")).join("  ")}</span></div>`:""}
+      <div class="hint ${sg.kind==="up"?"up":""}">${sg.kind==="up"?`<span class="tag up">${t("tagUp")}</span> `:sg.kind==="down"?`<span class="tag">${t("tagDown")}</span> `:""}${esc(sg.text)}</div>
+      ${plan&&plan.length?`<div class="small muted" style="margin-top:6px">${t("wuPlan")} <span class="num">${plan.map(p=>p.w+"×"+p.r).join(" · ")}</span></div>`:""}
+      <div class="sets ${rpe?"rpe":""}"><span class="h">#</span><span class="h">${t("hWeight")}</span><span class="h">${t("hReps")}</span>${rpe?`<span class="h">${t("hRpe")}</span>`:""}<span class="h"></span>
+      ${wus.map((r,i)=>cell("w",i,r,true)).join("")}${Array.from({length:n},(_,i)=>cell("",i,rows[i]||{},false)).join("")}</div>
+      <div class="row" style="margin-top:8px"><button type="button" class="ghost small" data-addset="${id}">${t("addSet")}</button><button type="button" class="ghost small" data-addwu="${id}">${t("addWu")}</button></div></section>`;
   });
-  h+=`</div><div class="stack" style="margin-top:16px">
-   <button type="button" class="primary block" id="finish">إنهاء التمرين وحفظه</button>
-   ${S.draft?`<button type="button" class="ghost block" id="discard">إلغاء التمرين الجاري</button>`:""}
-   <p class="muted small" style="margin:0">التمرين يُحفظ كمسودة أثناء الكتابة، فلا مشكلة إذا أغلقت الصفحة. تُحفظ فقط الجولات التي فيها وزن وتكرارات.</p></div>`;
+  h+=`</div><div class="stack" style="margin-top:16px"><button type="button" class="primary block" id="finish">${t("finish")}</button>
+   ${S.draft?`<button type="button" class="ghost block" id="discard">${t("discard")}</button>`:""}<p class="muted small" style="margin:0">${t("draftNote")}</p></div>`;
   return h;
-}
-function ensureDraft(dayId){if(!S.draft){S.draft={day:dayId,date:today(),startedAt:Date.now(),ex:{}}}return S.draft}
-function day0(){return S.draft?S.draft.day:(selDay||nextDayId().id)}
-function curDay(){return S.draft?S.draft.day:(selDay||nextDayId().id)}
-bind.today=function(){
-  const v=$("#view");
-  v.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{if(S.draft){toast("أنهِ التمرين الجاري أو ألغِه أولًا");render();return}selDay=b.dataset.day;render()});
-  v.querySelectorAll("input[data-ex]").forEach(inp=>inp.addEventListener("input",()=>{
-    const d=ensureDraft(curDay());const a=(d.ex[inp.dataset.ex]=d.ex[inp.dataset.ex]||[]);const i=+inp.dataset.i;
-    a[i]=a[i]||{};a[i][inp.dataset.f]=inp.value===""?null:num(inp.value);save();
-  }));
-  v.querySelectorAll("[data-tick]").forEach(b=>b.onclick=()=>{
-    const exId=b.dataset.tick,i=+b.dataset.i;const d=ensureDraft(curDay());
-    const a=(d.ex[exId]=d.ex[exId]||[]);a[i]=a[i]||{};
-    const wv=num($(`#w-${exId}-${i}`).value),rv=num($(`#r-${exId}-${i}`).value);
-    if(!a[i].done&&(wv==null||rv==null)){toast("اكتب الوزن والتكرارات أولًا");return}
-    a[i].w=wv;a[i].r=rv;a[i].done=!a[i].done;save();
-    if(a[i].done&&EX[exId])startTimer(EX[exId].rest,EX[exId].ar);
-    const y=window.scrollY;render();window.scrollTo(0,y);
-  });
-  v.querySelectorAll("[data-addset]").forEach(b=>b.onclick=()=>{
-    const exId=b.dataset.addset;const d=ensureDraft(curDay());const a=(d.ex[exId]=d.ex[exId]||[]);
-    const n=Math.max(EX[exId].s,a.length);while(a.length<n)a.push({});a.push({});save();const y=window.scrollY;render();window.scrollTo(0,y);
-  });
-  $("#goEdit").onclick=()=>{editDay=DAYS.length?day0():null;tab="edit";render();window.scrollTo(0,0)};
+};
+const curDay=()=>S.draft?S.draft.day:(selDay||nextDayId().id);
+function ensureDraft(){if(!S.draft)S.draft={day:curDay(),date:today(),startedAt:Date.now(),ex:{},wu:{}};S.draft.wu=S.draft.wu||{};return S.draft}
+const rowsOf=(d,id,wu)=>{const bag=wu?d.wu:d.ex;return bag[id]=bag[id]||[]};
+BIND.today=function(){
+  $("#goEdit").onclick=()=>{editDay=DAYS.length?curDay():null;go("edit")};
   if(!DAYS.length)return;
-  $("#finish").onclick=finish;
-  const ds=$("#discard");if(ds)ds.onclick=()=>{if(!armed(ds))return;S.draft=null;save();stopTimer();render();toast("تم إلغاء التمرين")};
+  $$("[data-day]").forEach(b=>b.onclick=()=>{selDay=b.dataset.day;render()});
+  $$("[data-info]").forEach(b=>b.onclick=()=>{const id=b.dataset.info;openInfo.has(id)?openInfo.delete(id):openInfo.add(id);keepScroll(render)});
+  $$("[data-f]").forEach(inp=>inp.addEventListener(inp.tagName==="SELECT"?"change":"input",()=>{
+    const d=ensureDraft();const a=rowsOf(d,inp.dataset.ex,!!inp.dataset.wu);const i=+inp.dataset.i;a[i]=a[i]||{};
+    a[i][inp.dataset.f]=inp.value===""?null:num(inp.value);save()}));
+  $$("[data-tick]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.tick,i=+b.dataset.i,wu=!!b.dataset.wu,pre=wu?"w":"";const d=ensureDraft();const a=rowsOf(d,id,wu);a[i]=a[i]||{};
+    const wv=num($(`#${pre}w-${id}-${i}`).value),rv=num($(`#${pre}r-${id}-${i}`).value);
+    if(!a[i].done&&(wv==null||rv==null)){toast(t("needWR"));return}
+    a[i].w=wv;a[i].r=rv;a[i].done=!a[i].done;save();
+    if(a[i].done&&!wu){const it=DAYS.find(x=>x.id===d.day).items.find(x=>x.ex===id);startTimer(it?it.rest:90,exName(id))}
+    keepScroll(render)});
+  $$("[data-addset]").forEach(b=>b.onclick=()=>{const id=b.dataset.addset;const d=ensureDraft();const a=rowsOf(d,id,false);
+    const it=DAYS.find(x=>x.id===d.day).items.find(x=>x.ex===id);while(a.length<(it?it.s:0))a.push({});a.push({});save();keepScroll(render)});
+  $$("[data-addwu]").forEach(b=>b.onclick=()=>{const id=b.dataset.addwu;const d=ensureDraft();const a=rowsOf(d,id,true);
+    const it=DAYS.find(x=>x.id===d.day).items.find(x=>x.ex===id);const plan=exInfo(id).c&&it?warmPlan(suggest(it).w):null;const p=plan&&plan[a.length];
+    a.push(p?{w:p.w,r:p.r}:{});save();keepScroll(render)});
+  $("#finish").onclick=finishWorkout;
+  const ds=$("#discard");if(ds)ds.onclick=()=>{if(!armed(ds))return;S.draft=null;save();stopTimer();render();toast(t("discarded"))};
 };
-function finish(){
-  const dayId=curDay();const day=DAYS.find(d=>d.id===dayId);
-  // read straight from inputs so prefilled values count
-  const ex=[];let newPR=[];
-  for(const e of day.ex){const sets=[];const n=document.querySelectorAll(`input[data-ex="${e.id}"][data-f="w"]`).length;
-    for(let i=0;i<n;i++){const w=num($(`#w-${e.id}-${i}`).value),r=num($(`#r-${e.id}-${i}`).value);if(w!=null&&r!=null&&r>0)sets.push({w,r})}
-    if(sets.length){const before=prs(e.id);const b=bestOf(sets);const topW=Math.max(...sets.map(s=>s.w));
-      if(before.maxE&&(b.e>before.maxE.e+1e-9||topW>before.maxW.w))newPR.push(e.ar);
-      ex.push({id:e.id,sets})}}
-  if(!ex.length){toast("لا توجد جولات مكتملة للحفظ");return}
+function finishWorkout(){
+  const day=DAYS.find(d=>d.id===curDay());const ex=[];const newPR=[];
+  for(const it of day.items){const id=it.ex;const sets=[];
+    const nWu=$$(`input[data-ex="${id}"][data-f="w"][data-wu="1"]`).length;
+    for(let i=0;i<nWu;i++){const w=num($(`#ww-${id}-${i}`).value),r=num($(`#wr-${id}-${i}`).value);if(w!=null&&r)sets.push({w,r,wu:true})}
+    const n=$$(`input[data-ex="${id}"][data-f="w"][data-wu=""]`).length;
+    for(let i=0;i<n;i++){const w=num($(`#w-${id}-${i}`).value),r=num($(`#r-${id}-${i}`).value);const pe=$(`#p-${id}-${i}`);const rp=pe?num(pe.value):null;
+      if(w!=null&&r)sets.push(rp?{w,r,rpe:rp}:{w,r})}
+    const ws=work(sets);
+    if(ws.length){const before=prs(id);const b=bestOf(ws);const topW=Math.max(...ws.map(s=>s.w));
+      if(before.maxE&&(b.e>before.maxE.e+1e-9||topW>before.maxW.w))newPR.push(exName(id));ex.push({id,sets})}}
+  if(!ex.length){toast(t("noSets"));return}
   const dur=S.draft?Math.round((Date.now()-S.draft.startedAt)/60000):null;
-  S.sessions.push({id:uid(),date:S.draft?S.draft.date:today(),day:dayId,ex,min:dur});
-  S.draft=null;selDay=null;save();stopTimer();
-  tab="progress";render();window.scrollTo(0,0);
-  toast(newPR.length?`رقم قياسي جديد في: ${newPR.join("، ")}`:"تم حفظ التمرين");
+  S.sessions.push({id:uid(),date:S.draft?S.draft.date:today(),day:day.id,dayName:dayName(day),ex,min:dur});
+  S.draft=null;selDay=null;save();stopTimer();progEx=ex[0].id;go("progress");
+  toast(newPR.length?t("newPR",{x:newPR.join(LANG==="ar"?"، ":", ")}):t("workoutSaved"));
 }
 
-/* Progress */
-function vProgress(){
-  const now=new Date();const sow=new Date(now);sow.setDate(now.getDate()-((now.getDay()+1)%7));sow.setHours(0,0,0,0); // week starts Saturday
-  const thisWeek=S.sessions.filter(s=>parseD(s.date)>=sow).length;
-  const sorted=[...S.sessions].sort((a,b)=>a.date<b.date?1:-1);
-  const vol=s=>s.ex.reduce((t,e)=>t+e.sets.reduce((u,x)=>u+x.w*x.r,0),0);
-  let h=`<h2>التقدّم</h2><div class="grid3">
-   <div class="card stat"><b>${thisWeek}<span class="muted" style="font-size:14px"> / ${DAYS.length}</span></b><span>تمارين هذا الأسبوع</span></div>
-   <div class="card stat"><b>${S.sessions.length}</b><span>إجمالي التمارين</span></div>
-   <div class="card stat"><b>${sorted[0]?Math.round(vol(sorted[0])).toLocaleString("en"):"—"}</b><span>حجم آخر تمرين (كجم)</span></div></div>`;
-  if(!EX[progEx]){const f=Object.values(EX)[0];progEx=f?f.id:""}
-  const opt=e=>`<option value="${e.id}" ${e.id===progEx?"selected":""}>${esc(e.ar)}</option>`;
-  const ret=Object.values(EX).filter(e=>e.retired);
-  const opts=DAYS.map(d=>`<optgroup label="${esc(d.ar)}">${d.ex.filter(e=>!(e.id==="legpress2"&&EX.legpress)).map(opt).join("")}</optgroup>`).join("")+(ret.length?`<optgroup label="تمارين حذفتها">${ret.map(opt).join("")}</optgroup>`:"");
-  const hx=history(progEx);
-  const M={top:["أثقل وزن",x=>Math.max(...x.sets.map(s=>s.w)),"أثقل وزن رفعته في التمرين بكل مرة."],
-    vol:["حجم التمرين",x=>x.sets.reduce((t,s)=>t+s.w*s.r,0),"مجموع (الوزن × التكرارات) لكل الجولات. ارتفاعه يعني أنك تشتغل أكثر."],
-    e1rm:["1RM تقديري",x=>bestOf(x.sets).e,"القوة القصوى التقديرية لتكرار واحد (معادلة Epley) من أفضل جولة. رقم تقريبي للمقارنة فقط."]};
-  const m=M[progMetric]||M.top;const pts=hx.map(x=>({x:x.date,y:r1(m[1](x))}));
-  const p=prs(progEx);
-  h+=`<h2>منحنى التمرين</h2><div class="card stack">
-   <label class="f">اختر التمرين<select id="progEx">${opts}</select></label>
-   <div class="chips">${Object.entries(M).map(([k,v])=>`<button type="button" class="chip ${k===progMetric?"on":""}" data-metric="${k}">${v[0]}</button>`).join("")}</div>
-   <div class="small muted">${m[2]}</div>
-   <div class="chart">${lineChart(pts,"كجم")}</div>
-   ${p.maxW?`<div class="row small"><span class="tag pr">أثقل وزن</span><span class="num">${p.maxW.w} كجم × ${p.maxW.r}</span><span class="muted">${shortD(p.maxW.date)}</span>
-     <span class="tag pr">أفضل تقدير</span><span class="num">${r1(p.maxE.e)} كجم</span></div>`:""}
-  </div>`;
-  const maxSets=Math.max(0,...hx.map(x=>x.sets.length));
-  h+=`<h2>كل الجولات</h2>`+(hx.length?`<div class="card tbl-wrap"><table><thead><tr><th>التاريخ</th>${Array.from({length:maxSets},(_,i)=>`<th>جولة ${i+1}</th>`).join("")}<th>الحجم</th></tr></thead><tbody>
-   ${[...hx].reverse().map((x,ri,arr)=>{const prev=arr[ri+1];const top=Math.max(...x.sets.map(s=>s.w));const ptop=prev?Math.max(...prev.sets.map(s=>s.w)):null;
-     return`<tr><td><button type="button" class="ghost small" style="padding:4px 6px;min-height:32px;color:var(--accent)" data-editsess="${x.sid}" aria-label="تعديل جولات ${shortD(x.date)}">${shortD(x.date)} ✎</button>${ptop!=null&&top>ptop?'<span class="tag up">↑</span>':""}</td>${Array.from({length:maxSets},(_,i)=>{const st=x.sets[i];return`<td class="num">${st?st.w+"×"+st.r:'<span class="muted">—</span>'}</td>`}).join("")}
-     <td class="num">${Math.round(x.sets.reduce((t,s)=>t+s.w*s.r,0)).toLocaleString("en")}</td></tr>`}).join("")}
-   </tbody></table></div><p class="small muted" style="margin:6px 0 0">اضغط على التاريخ ✎ لتعديل جولات ذلك اليوم. كل خانة = الوزن (كجم) × التكرارات. السهم ↑ يعني أن أثقل وزن زاد عن المرة السابقة.</p>`
-   :`<div class="empty">لم تسجّل هذا التمرين بعد.</div>`);
-  const rowsPR=Object.values(EX).filter(e=>!(e.id==="legpress2"&&EX.legpress)).map(e=>({e,p:prs(e.id)})).filter(x=>x.p.maxW);
-  h+=`<h2>الأرقام القياسية</h2>`+(rowsPR.length?`<div class="card tbl-wrap"><table><thead><tr><th>التمرين</th><th>أثقل جولة</th><th>1RM تقديري</th><th>التاريخ</th></tr></thead><tbody>
-   ${rowsPR.map(x=>`<tr><td>${esc(x.e.ar)}</td><td class="num">${x.p.maxW.w}×${x.p.maxW.r}</td><td class="num">${r1(x.p.maxE.e)}</td><td class="num">${shortD(x.p.maxE.date)}</td></tr>`).join("")}
-   </tbody></table></div>`:`<div class="empty">بعد أول تمرين تحفظه تظهر هنا أفضل أرقامك لكل تمرين.</div>`);
-  h+=`<h2>سجل التمارين</h2>`+(sorted.length?`<div class="card"><ul class="clean list">${sorted.map(s=>{const d=DAYS.find(x=>x.id===s.day)||{ar:"يوم محذوف"};const n=s.ex.reduce((t,e)=>t+e.sets.length,0);
-     return`<li><div style="min-width:0"><b>${d?esc(d.ar):""}</b> <span class="muted small">${fmtD(s.date)}</span><div class="small muted">${n} جولة · حجم <span class="num">${Math.round(vol(s)).toLocaleString("en")}</span> كجم${s.min?` · ${s.min} د`:""}</div></div>
-     <div class="row" style="gap:2px;flex-wrap:nowrap"><button type="button" class="ghost small" data-editsess="${s.id}">تعديل</button><button type="button" class="ghost small" data-delsess="${s.id}">حذف</button></div></li>`}).join("")}</ul></div>`
-     :`<div class="empty">لم تحفظ أي تمرين بعد. ابدأ من تبويب «التمرين».</div>`);
+/* ---------- progress ---------- */
+const volOf=sets=>work(sets).reduce((u,x)=>u+x.w*x.r,0);
+function exOptions(sel,ids,includeLogged){
+  const inProg=new Set();DAYS.forEach(d=>d.items.forEach(i=>inProg.add(i.ex)));
+  const opt=id=>`<option value="${esc(id)}" ${id===sel?"selected":""}>${esc(exName(id))}</option>`;
+  let h=DAYS.map(d=>`<optgroup label="${esc(dayName(d))}">${[...new Set(d.items.map(i=>i.ex))].filter(id=>ids.has(id)).map(opt).join("")}</optgroup>`).join("");
+  const rest=[...ids].filter(id=>!inProg.has(id));if(includeLogged&&rest.length)h+=`<optgroup label="${t("removedEx")}">${rest.map(opt).join("")}</optgroup>`;
   return h;
 }
-bind.progress=function(){
+VIEWS.progress=function(){
+  const now=new Date();const sow=new Date(now);sow.setDate(now.getDate()-((now.getDay()+1)%7));sow.setHours(0,0,0,0); // week starts Saturday
+  const wk=S.sessions.filter(s=>parseD(s.date)>=sow).length;const sorted=[...S.sessions].sort((a,b)=>a.date<b.date?1:-1);
+  const vol=s=>s.ex.reduce((t2,e)=>t2+volOf(e.sets),0);
+  let h=`<h2>${t("progress")}</h2><div class="grid3">
+   <div class="card stat"><b class="num">${wk} / ${DAYS.length}</b><span class="l">${t("thisWeek")}</span></div>
+   <div class="card stat"><b class="num">${S.sessions.length}</b><span class="l">${t("total")}</span></div>
+   <div class="card stat"><b class="num">${sorted[0]?fmtN(vol(sorted[0])):"—"}</b><span class="l">${t("lastVol")}</span></div></div>`;
+  const ids=new Set(knownEx());
+  if(!progEx||!ids.has(progEx))progEx=[...ids][0]||null;
+  const hx=progEx?history(progEx):[];
+  const M={top:["mTop",x=>Math.max(...x.sets.map(s=>s.w)),"mTopD"],vol:["mVol",x=>volOf(x.sets),"mVolD"],e1rm:["mE1",x=>bestOf(x.sets).e,"mE1D"]};
+  const m=M[progMetric]||M.top;const pts=hx.map(x=>({x:x.date,y:r1(m[1](x))}));const p=progEx?prs(progEx):{};
+  h+=`<h2>${t("exChart")}</h2><div class="card stack"><label class="f">${t("pickEx")}<select id="progEx">${exOptions(progEx,ids,true)}</select></label>
+   <div class="chips">${Object.entries(M).map(([k,v])=>`<button type="button" class="chip ${k===progMetric?"on":""}" data-metric="${k}">${t(v[0])}</button>`).join("")}</div>
+   <div class="small muted">${t(m[2])}</div><div class="chart">${lineChart(pts,t("kg"))}</div>
+   ${p.maxW?`<div class="row small"><span class="tag pr">${t("heaviest")}</span><span class="num">${p.maxW.w} ${t("kg")} × ${p.maxW.r}</span><span class="muted">${shortD(p.maxW.date)}</span>
+     <span class="tag pr">${t("bestEst")}</span><span class="num">${r1(p.maxE.e)} ${t("kg")}</span></div>`:""}</div>`;
+  const maxSets=Math.max(0,...hx.map(x=>x.sets.length));
+  h+=`<h2>${t("allSets")}</h2>`+(hx.length?`<div class="card tbl-wrap"><table><thead><tr><th>${t("date")}</th>${Array.from({length:maxSets},(_,i)=>`<th>${t("setN",{n:i+1})}</th>`).join("")}<th>${t("volume")}</th></tr></thead><tbody>
+   ${[...hx].reverse().map((x,ri,arr)=>{const pv=arr[ri+1];const top=Math.max(...x.sets.map(s=>s.w));const ptop=pv?Math.max(...pv.sets.map(s=>s.w)):null;
+     return`<tr><td><button type="button" class="link small" data-editsess="${x.sid}">${shortD(x.date)} ✎</button>${ptop!=null&&top>ptop?'<span class="tag up">↑</span>':""}</td>${Array.from({length:maxSets},(_,i)=>{const st=x.sets[i];return`<td class="num">${st?st.w+"×"+st.r+(st.rpe?" @"+st.rpe:""):'<span class="muted">—</span>'}</td>`}).join("")}<td class="num">${fmtN(volOf(x.sets))}</td></tr>`}).join("")}
+   </tbody></table></div><p class="small muted" style="margin:6px 0 0">${t("allSetsNote")}</p>`:`<div class="empty">${t("notLogged")}</div>`);
+  const rowsPR=[...ids].map(id=>({id,p:prs(id)})).filter(x=>x.p.maxW);
+  h+=`<h2>${t("records")}</h2>`+(rowsPR.length?`<div class="card tbl-wrap"><table><thead><tr><th>${t("exercise")}</th><th>${t("bestSet")}</th><th>${t("mE1")}</th><th>${t("date")}</th></tr></thead><tbody>
+   ${rowsPR.map(x=>`<tr><td>${esc(exName(x.id))}</td><td class="num">${x.p.maxW.w}×${x.p.maxW.r}</td><td class="num">${r1(x.p.maxE.e)}</td><td class="num">${shortD(x.p.maxE.date)}</td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">${t("noRecords")}</div>`);
+  h+=`<h2>${t("history")}</h2>`+(sorted.length?`<div class="card"><ul class="clean list">${sorted.map(s=>{const d=DAYS.find(x=>x.id===s.day);const n=s.ex.reduce((a,e)=>a+work(e.sets).length,0);
+     return`<li><div style="min-width:0"><b>${esc(d?dayName(d):(s.dayName||t("deletedDay")))}</b> <span class="muted small">${fmtD(s.date)}</span><div class="small muted">${t("setsN",{n})} · ${t("volKg",{v:`<span class="num">${fmtN(vol(s))}</span>`})}${s.min?" · "+t("minN",{n:s.min}):""}</div></div>
+     <div class="row" style="gap:2px;flex-wrap:nowrap"><button type="button" class="ghost small" data-editsess="${s.id}">${t("edit")}</button><button type="button" class="ghost small" data-delsess="${s.id}">${t("del")}</button></div></li>`}).join("")}</ul></div>`
+    :`<div class="empty">${t("noHistory")}</div>`);
+  return h;
+};
+BIND.progress=function(){
   $("#progEx").onchange=e=>{progEx=e.target.value;render()};
-  document.querySelectorAll("[data-metric]").forEach(b=>b.onclick=()=>{progMetric=b.dataset.metric;const y=window.scrollY;render();window.scrollTo(0,y)});
-  document.querySelectorAll("[data-editsess]").forEach(b=>b.onclick=()=>{const s0=S.sessions.find(x=>x.id===b.dataset.editsess);if(!s0)return;
-    sessEdit=clone(s0);tab="sess";render();window.scrollTo(0,0)});
-  document.querySelectorAll("[data-delsess]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد الحذف"))return;S.sessions=S.sessions.filter(s=>s.id!==b.dataset.delsess);save();render()});
+  $$("[data-metric]").forEach(b=>b.onclick=()=>{progMetric=b.dataset.metric;keepScroll(render)});
+  $$("[data-editsess]").forEach(b=>b.onclick=()=>{const s0=S.sessions.find(x=>x.id===b.dataset.editsess);if(s0){sessEdit=clone(s0);go("sess")}});
+  $$("[data-delsess]").forEach(b=>b.onclick=()=>{if(!armed(b,t("confirmDel")))return;S.sessions=S.sessions.filter(s=>s.id!==b.dataset.delsess);save();keepScroll(render)});
 };
 
-/* Body */
-function vBody(){
-  const bw=[...S.bodyw].sort((a,b)=>a.date<b.date?-1:1);
-  let trend="";
+/* ---------- edit a saved session ---------- */
+VIEWS.sess=function(){
+  const se=sessEdit;if(!se)return`<div class="empty">—</div>`;const d=DAYS.find(x=>x.id===se.day);
+  const rpe=S.settings.rpe||se.ex.some(e=>e.sets.some(s=>s.rpe));
+  let h=`<h2>${t("editSess")}</h2><p class="muted small" style="margin:0 0 10px">${esc(d?dayName(d):(se.dayName||t("deletedDay")))}. ${t("editSessLead")}</p>
+  <div class="card"><label class="f">${t("date")}<input id="seDate" type="date" value="${se.date}"></label></div><div class="stack" style="margin-top:12px">`;
+  se.ex.forEach((e,ei)=>{let wn=0,sn=0;
+    h+=`<section class="card"><div class="ex-head"><h3 style="min-width:0">${esc(exName(e.id))}</h3><button type="button" class="ghost small" data-sedelex="${ei}" style="color:var(--warn)">${t("delEx")}</button></div>
+     <div class="sets ${rpe?"rpe":""}"><span class="h">#</span><span class="h">${t("hWeight")}</span><span class="h">${t("hReps")}</span>${rpe?`<span class="h">RPE</span>`:""}<span class="h"></span>
+     ${e.sets.map((st,i)=>`<span class="idx ${st.wu?"wu":""}">${st.wu?t("wuShort"):(++sn)}</span>
+      <input id="se-w-${ei}-${i}" class="${st.wu?"wuin":""}" type="number" inputmode="decimal" step="0.5" min="0" data-sei="${ei}" data-si="${i}" data-sf="w" value="${st.w??""}" aria-label="${t("hWeight")}">
+      <input id="se-r-${ei}-${i}" class="${st.wu?"wuin":""}" type="number" inputmode="numeric" step="1" min="0" data-sei="${ei}" data-si="${i}" data-sf="r" value="${st.r??""}" aria-label="${t("hReps")}">
+      ${rpe?(st.wu?"<span></span>":`<select id="se-p-${ei}-${i}" data-sei="${ei}" data-si="${i}" data-sf="rpe" aria-label="RPE">${rpeOpts(st.rpe)}</select>`):""}
+      <button type="button" class="tick" data-sedel="${ei}" data-si="${i}" aria-label="${t("delSet",{n:i+1})}" style="color:var(--warn)">×</button>`).join("")}</div>
+     <button type="button" class="ghost small" data-seadd="${ei}" style="margin-top:8px">${t("addSet")}</button></section>`});
+  const ids=new Set(knownEx());se.ex.forEach(e=>ids.delete(e.id));
+  if(ids.size)h+=`<div class="card row"><label class="f" style="flex:1">${t("addExDay")}<select id="seNew">${exOptions(null,ids,true)}</select></label><button type="button" id="seAddEx" style="align-self:flex-end">${t("add")}</button></div>`;
+  h+=`</div><div class="stack" style="margin-top:12px"><button type="button" class="primary block" id="seSave">${t("saveEdits")}</button><button type="button" class="block" id="seCancel">${t("cancel")}</button>
+   <p class="muted small" style="margin:0">${t("emptySetsNote")}</p></div>`;
+  return h;
+};
+BIND.sess=function(){
+  const se=sessEdit;if(!se)return;const back=()=>{sessEdit=null;go("progress")};
+  $("#seDate").onchange=e=>{if(e.target.value)se.date=e.target.value};
+  $$("[data-sf]").forEach(inp=>inp.addEventListener(inp.tagName==="SELECT"?"change":"input",()=>{const st=se.ex[+inp.dataset.sei].sets[+inp.dataset.si];const v=inp.value===""?null:num(inp.value);
+    if(inp.dataset.sf==="rpe"){if(v)st.rpe=v;else delete st.rpe}else st[inp.dataset.sf]=v}));
+  $$("[data-sedel]").forEach(b=>b.onclick=()=>{se.ex[+b.dataset.sedel].sets.splice(+b.dataset.si,1);keepScroll(render)});
+  $$("[data-seadd]").forEach(b=>b.onclick=()=>{const a=se.ex[+b.dataset.seadd].sets;const w=work(a);const l=w[w.length-1];a.push({w:l?l.w:null,r:null});keepScroll(render)});
+  $$("[data-sedelex]").forEach(b=>b.onclick=()=>{if(!armed(b,t("confirmShort")))return;se.ex.splice(+b.dataset.sedelex,1);keepScroll(render)});
+  $("#seAddEx")&&($("#seAddEx").onclick=()=>{se.ex.push({id:$("#seNew").value,sets:[{w:null,r:null}]});keepScroll(render)});
+  $("#seCancel").onclick=back;
+  $("#seSave").onclick=()=>{se.ex.forEach(e=>{e.sets=e.sets.filter(st=>st.w!=null&&st.r)});se.ex=se.ex.filter(e=>work(e.sets).length);
+    if(!se.ex.length){toast(t("noSetsLeft"));return}
+    const i=S.sessions.findIndex(x=>x.id===se.id);if(i>=0)S.sessions[i]=se;save();back();toast(t("editsSaved"))};
+};
+
+/* ---------- program editor ---------- */
+const RESTS=[45,60,75,90,120,150,180,240];
+function libOptions(sel,exclude){
+  const opt=id=>`<option value="${esc(id)}" ${id===sel?"selected":""} ${exclude.has(id)&&id!==sel?"disabled":""}>${esc(exName(id))}</option>`;
+  let h=GROUPS.map(([g,ar,en])=>`<optgroup label="${LANG==="en"?en:ar}">${Object.values(LIB).filter(e=>e.g===g).map(e=>opt(e.id)).join("")}</optgroup>`).join("");
+  const cu=Object.keys(S.custom);if(cu.length)h+=`<optgroup label="${t("customGroup")}">${cu.map(opt).join("")}</optgroup>`;
+  return h;
+}
+const editable=()=>{if(S.program.key)S.program.key="custom";return S.program.days};
+VIEWS.edit=function(){
+  if(!editDay||!DAYS.some(x=>x.id===editDay))editDay=DAYS[0]?DAYS[0].id:null;const d=DAYS.find(x=>x.id===editDay);
+  let h=`<h2>${t("editProgT")}</h2><p class="muted small" style="margin:0 0 10px">${t("editProgLead")}</p>
+  <div class="chips">${DAYS.map(x=>`<button type="button" class="chip ${x.id===editDay?"on":""}" data-eday="${x.id}">${esc(dayName(x))} · ${wdLabel(x)}</button>`).join("")}<button type="button" class="chip" id="addDay">${t("addDay")}</button></div>`;
+  if(!d)return h+`<div class="empty" style="margin-top:12px">${t("noDays")}</div><div class="stack" style="margin-top:12px"><button type="button" class="block" id="goProgs">${t("pickReady")}</button></div>`;
+  const inDay=new Set(d.items.map(i=>i.ex));
+  h+=`<div class="card stack" style="margin-top:12px"><div class="grid2"><label class="f">${t("dayName")}<input id="dName" data-dk="name" value="${esc(dayName(d))}"></label>
+   <label class="f">${t("weekday")}<select id="dWd" data-dk="wd"><option value="-1" ${d.wd<0?"selected":""}>${t("flexDay")}</option>${[6,0,1,2,3,4,5].map(w=>`<option value="${w}" ${d.wd===w?"selected":""}>${WD[LANG][w]}</option>`).join("")}</select></label></div>
+   <label class="f">${t("focus")}<input id="dFocus" data-dk="focus" value="${esc(L(d.focus))}"></label></div><div class="stack" style="margin-top:12px">`;
+  d.items.forEach((it,i)=>{const q=`data-ei="${i}"`;const ex=exInfo(it.ex);
+    h+=`<section class="card stack" style="gap:8px"><div class="ex-head"><b class="num">${i+1}</b><div class="row" style="gap:4px">
+      <button type="button" class="ghost" data-mv="-1" ${q} aria-label="${t("up")}" ${i===0?"disabled":""}>↑</button><button type="button" class="ghost" data-mv="1" ${q} aria-label="${t("down")}" ${i===d.items.length-1?"disabled":""}>↓</button>
+      <button type="button" class="ghost" data-delit ${q} style="color:var(--warn)">${t("del")}</button></div></div>
+     <label class="f">${t("exercise")}<select id="it-ex-${i}" data-ik="ex" ${q}>${libOptions(it.ex,inDay)}</select></label>
+     <button type="button" class="link small" style="align-self:flex-start" data-info="${esc(it.ex)}">ⓘ ${t("howTo")}</button>${openInfo.has(it.ex)?infoPanel(it.ex):""}
+     <div class="grid3"><label class="f">${t("sets")}<input id="it-s-${i}" type="number" inputmode="numeric" min="1" max="10" data-ik="s" ${q} value="${it.s}"></label>
+      <label class="f">${t("lo")}<input id="it-lo-${i}" type="number" inputmode="numeric" min="1" data-ik="lo" ${q} value="${it.lo}"></label>
+      <label class="f">${t("hi")}<input id="it-hi-${i}" type="number" inputmode="numeric" min="1" data-ik="hi" ${q} value="${it.hi}"></label>
+      <label class="f">${t("restL")}<select id="it-rest-${i}" data-ik="rest" ${q}>${(RESTS.includes(it.rest)?RESTS:[...RESTS,it.rest].sort((a,b)=>a-b)).map(r=>`<option value="${r}" ${r===it.rest?"selected":""}>${mmss(r)}</option>`).join("")}</select></label>
+      <div class="f" style="grid-column:span 2;justify-content:flex-end"><span class="small muted">${t("incType")}: ${ex.k==="l"?t("incL",{n:S.settings.incL}):t("incU",{n:S.settings.incU})}</span></div></div></section>`});
+  if(!d.items.length)h+=`<div class="empty">${t("noEx")}</div>`;
+  h+=`</div><div class="card stack" style="margin-top:12px"><h3>${t("addEx")}</h3>
+   <div class="row" style="flex-wrap:nowrap"><select id="newEx" style="flex:1">${libOptions(null,inDay)}</select><button type="button" class="primary" id="addEx">${t("add")}</button></div>
+   <details><summary class="small" style="cursor:pointer;color:var(--accent)">${t("customT")}</summary><div class="stack" style="margin-top:8px">
+    <label class="f">${t("customName")}<input id="cuName" type="text"></label>
+    <label class="f">${t("incType")}<select id="cuK"><option value="u">${t("incU",{n:S.settings.incU})}</option><option value="l">${t("incL",{n:S.settings.incL})}</option></select></label>
+    <button type="button" id="cuAdd">${t("createAdd")}</button></div></details></div>
+  <div class="stack" style="margin-top:12px"><button type="button" class="block" id="doneEdit">${t("doneEdit")}</button>
+   <div class="row" style="justify-content:space-between"><button type="button" class="danger" id="delDay">${t("delDay")}</button><button type="button" class="ghost" id="goProgs">${t("pickReady")}</button></div>
+   <p class="muted small" style="margin:0">${t("removedNote")}</p></div>`;
+  return h;
+};
+BIND.edit=function(){
+  const D=()=>editable().find(x=>x.id===editDay);const commit=()=>{save();keepScroll(render)};
+  $$("[data-eday]").forEach(b=>b.onclick=()=>{editDay=b.dataset.eday;render()});
+  $("#addDay").onclick=()=>{const P=editable();const used=new Set(P.map(x=>x.wd));const wd=[6,0,1,2,3,4,5].find(w=>!used.has(w))??-1;
+    const nd={id:"d"+uid(),name:t("dayN",{n:P.length+1}),wd,focus:"",items:[]};P.push(nd);editDay=nd.id;save();render()};
+  $("#goProgs").onclick=()=>go("programs");
+  if(!$("#dName"))return;
+  $$("[data-dk]").forEach(inp=>inp.addEventListener("change",()=>{const d=D();const k=inp.dataset.dk;
+    if(k==="wd")d.wd=Number(inp.value);else d[k]=inp.value.trim()||(k==="name"?t("noName"):"");commit()}));
+  $$("[data-info]").forEach(b=>b.onclick=()=>{const id=b.dataset.info;openInfo.has(id)?openInfo.delete(id):openInfo.add(id);keepScroll(render)});
+  $$("[data-ik]").forEach(inp=>inp.addEventListener("change",()=>{const d=D();const it=d.items[+inp.dataset.ei];const k=inp.dataset.ik;
+    if(k==="ex"){if(d.items.some(x=>x.ex===inp.value)){toast(t("dupEx"));render();return}const b=exInfo(inp.value);Object.assign(it,{ex:inp.value,lo:b.lo,hi:b.hi,rest:b.rest})}
+    else if(k==="rest")it.rest=Number(inp.value);
+    else{let n=Math.round(num(inp.value)||0);n=k==="s"?Math.min(10,Math.max(1,n)):Math.max(1,n);it[k]=n;if(it.lo>it.hi){if(k==="lo")it.hi=it.lo;else it.lo=it.hi}}
+    commit();toast(t("saved"))}));
+  $$("[data-mv]").forEach(b=>b.onclick=()=>{const d=D();const i=+b.dataset.ei,j=i+Number(b.dataset.mv);if(j<0||j>=d.items.length)return;[d.items[i],d.items[j]]=[d.items[j],d.items[i]];commit()});
+  $$("[data-delit]").forEach(b=>b.onclick=()=>{if(!armed(b,t("confirmShort")))return;const it=D().items.splice(+b.dataset.ei,1)[0];commit();toast(t("exRemoved",{x:exName(it.ex)}))});
+  const addItem=id=>{const d=D();if(d.items.some(x=>x.ex===id)){toast(t("dupEx"));return}const b=exInfo(id);d.items.push({ex:id,s:3,lo:b.lo,hi:b.hi,rest:b.rest});commit();toast(t("exAdded",{x:exName(id)}))};
+  $("#addEx").onclick=()=>addItem($("#newEx").value);
+  $("#cuAdd").onclick=()=>{const name=$("#cuName").value.trim();if(!name){toast(t("needName"));return}const id="c"+uid();S.custom[id]={name,k:$("#cuK").value};addItem(id)};
+  $("#doneEdit").onclick=()=>{selDay=S.draft?null:editDay;go("today")};
+  $("#delDay").onclick=()=>{const b=$("#delDay");if(S.draft&&S.draft.day===editDay){toast(t("finishFirst"));return}if(!armed(b,t("delDayC")))return;
+    S.program.days=editable().filter(x=>x.id!==editDay);loadProgram();editDay=null;save();render();toast(t("dayDeleted"))};
+};
+
+/* ---------- ready programs ---------- */
+const lvName=l=>t(l==="beginner"?"lvBegS":l==="intermediate"?"lvIntS":"lvAdvS");
+VIEWS.programs=function(){
+  return`<h2>${t("programs")}</h2><p class="muted small" style="margin:0 0 10px">${t("programsLead")}</p><div class="stack">
+  ${Object.entries(PROGRAMS).map(([k,P])=>{const cur=S.program.key===k;return`<section class="card stack prog ${cur?"cur":""}" style="gap:8px">
+   <div class="ex-head"><h3>${L(P.name)}</h3>${cur?`<span class="tag acc">${t("current")}</span>`:""}</div>
+   <div class="row small"><span class="tag">${t("perWeek",{n:P.days.length})}</span><span class="tag">${lvName(P.level)}</span><span class="tag">${P.equip==="home"?t("eqHome"):t("eqGym")}</span></div>
+   <div class="small muted">${L(P.desc)}</div>
+   <details class="small"><summary style="cursor:pointer;color:var(--accent)">${P.days.map(d=>esc(L(d.name))).join(" · ")}</summary>
+    ${P.days.map(d=>`<div style="margin-top:6px"><b>${esc(L(d.name))}</b> · ${WD[LANG][d.wd]}<br><span class="muted">${d.items.map(i=>esc(L(LIB[i[0]].name))).join(LANG==="ar"?"، ":", ")}</span></div>`).join("")}</details>
+   <button type="button" class="${cur?"":"primary"}" data-useprog="${k}">${t("useProg")}</button></section>`}).join("")}</div>
+  <div class="stack" style="margin-top:12px"><button type="button" class="ghost block" id="redoQ">${t("redoQ")}</button></div>`;
+};
+BIND.programs=function(){
+  $$("[data-useprog]").forEach(b=>b.onclick=()=>{if(!armed(b,t("useProgC")))return;S.program=buildProgram(b.dataset.useprog,S.prefs.goal);loadProgram();
+    if(S.draft&&!DAYS.some(d=>d.id===S.draft.day))S.draft=null;selDay=null;save();go("today");toast(t("progSwitched",{x:progName()}))});
+  $("#redoQ").onclick=()=>{OB=clone(S.prefs);go("welcome")};
+};
+
+/* ---------- body ---------- */
+const MEAS=[["chest","mChest"],["shoulders","mShoulders"],["arm","mArm"],["waist","mWaist"],["hips","mHips"],["thigh","mThigh"]];
+VIEWS.body=function(){
+  const bw=[...S.bodyw].sort((a,b)=>a.date<b.date?-1:1);let trend="";
   if(bw.length>=2){const a=bw[0],b=bw[bw.length-1];const days=(parseD(b.date)-parseD(a.date))/864e5;
     if(days>=7){const perWk=(b.kg-a.kg)/days*7;const pct=perWk/a.kg*100;
-      trend=`<div class="hint ${pct>=0.2&&pct<=0.6?"up":""}">المعدّل منذ أول تسجيل: <span class="num">${perWk>=0?"+":""}${r1(perWk)}</span> كجم أسبوعيًا (<span class="num">${r1(pct)}%</span>).
-      ${pct<0.2?"أبطأ من المعتاد للتضخيم. جرّب زيادة ١٠٠–٢٠٠ سعرة يوميًا.":pct>0.6?"أسرع من المعتاد، وقد يزيد الدهون. جرّب إنقاص ١٠٠–٢٠٠ سعرة.":"ضمن النطاق الشائع للتضخيم (حوالي ٠٫٢٥–٠٫٥٪ أسبوعيًا)."}</div>`}}
-  let h=`<h2>وزن الجسم</h2><div class="card stack">
-   <div class="grid2"><label class="f">التاريخ<input id="bwDate" type="date" value="${today()}"></label>
-   <label class="f">الوزن (كجم)<input id="bwKg" type="number" inputmode="decimal" step="0.1" placeholder="مثلًا 72.4"></label></div>
-   <button type="button" class="primary" id="bwAdd">تسجيل الوزن</button>
-   <div class="small muted">للمقارنة العادلة: وزّن نفسك صباحًا بعد دورة المياه وقبل الأكل، ٢–٣ مرات أسبوعيًا.</div>
-   <div class="chart">${lineChart(bw.map(x=>({x:x.date,y:x.kg})),"كجم")}</div>${trend}
-   ${bw.length?`<ul class="clean list small">${[...bw].reverse().slice(0,8).map(x=>`<li><span>${fmtD(x.date)}</span><span class="num">${x.kg} كجم</span><button type="button" class="ghost small" data-delbw="${x.date}">حذف</button></li>`).join("")}</ul>`:""}
-  </div>`;
-  const ms=[...S.meas].sort((a,b)=>a.date<b.date?-1:1);const first=ms[0],last=ms[ms.length-1];
-  h+=`<h2>قياسات الجسم</h2><div class="card stack">
-   <div class="grid3">${MEAS.map(([k,l])=>`<label class="f">${l} (سم)<input id="m-${k}" type="number" inputmode="decimal" step="0.1"></label>`).join("")}</div>
-   <label class="f">التاريخ<input id="mDate" type="date" value="${today()}"></label>
-   <button type="button" class="primary" id="mAdd">حفظ القياسات</button>
-   <div class="small muted">قِس بشريط القياس على نفس النقطة كل مرة، مرة كل ٢–٤ أسابيع. يكفي أن تملأ ما تريده من الخانات.</div>
-   ${ms.length?`<div class="tbl-wrap"><table><thead><tr><th>القياس</th><th>البداية ${shortD(first.date)}</th><th>الأحدث ${shortD(last.date)}</th><th>التغيّر</th></tr></thead><tbody>
-    ${MEAS.map(([k,l])=>{const a=ms.find(m=>m[k]!=null),b=[...ms].reverse().find(m=>m[k]!=null);if(!a)return"";const d=r1(b[k]-a[k]);
-     return`<tr><td>${l}</td><td class="num">${a[k]}</td><td class="num">${b[k]}</td><td class="num" style="color:${d>0?"var(--good)":d<0?"var(--warn)":"var(--muted)"}">${d>0?"+":""}${d}</td></tr>`}).join("")}
-   </tbody></table></div>
-   <ul class="clean list small">${[...ms].reverse().map(m=>`<li><span>${fmtD(m.date)}</span><span class="muted">${MEAS.filter(([k])=>m[k]!=null).length} قياسات</span><button type="button" class="ghost small" data-delm="${m.date}">حذف</button></li>`).join("")}</ul>`
-   :`<div class="empty">سجّل قياساتك الأولى اليوم لتقارن بها لاحقًا.</div>`}
-  </div>`;
+      trend=`<div class="hint ${pct>=0.2&&pct<=0.6?"up":""}">${t("rate")} <span class="num">${perWk>=0?"+":""}${r1(perWk)}</span> ${t("perWeekKg")} (<span class="num">${r1(pct)}%</span>). ${S.prefs.goal==="muscle"?(pct<0.2?t("rateSlow"):pct>0.6?t("rateFast"):t("rateOk")):""}</div>`}}
+  let h=`<h2>${t("bodyW")}</h2><div class="card stack"><div class="grid2"><label class="f">${t("date")}<input id="bwDate" type="date" value="${today()}"></label>
+   <label class="f">${t("weightKg")}<input id="bwKg" type="number" inputmode="decimal" step="0.1" placeholder="${t("eg",{x:"72.4"})}"></label></div>
+   <button type="button" class="primary" id="bwAdd">${t("logW")}</button><div class="small muted">${t("weighTip")}</div>
+   <div class="chart">${lineChart(bw.map(x=>({x:x.date,y:x.kg})),t("kg"))}</div>${trend}
+   ${bw.length?`<ul class="clean list small">${[...bw].reverse().slice(0,8).map(x=>`<li><span>${fmtD(x.date)}</span><span class="num">${x.kg} ${t("kg")}</span><button type="button" class="ghost small" data-delbw="${x.date}">${t("del")}</button></li>`).join("")}</ul>`:""}</div>`;
+  const ms=[...S.meas].sort((a,b)=>a.date<b.date?-1:1);const f=ms[0],l=ms[ms.length-1];
+  h+=`<h2>${t("meas")}</h2><div class="card stack"><div class="grid3">${MEAS.map(([k,lb])=>`<label class="f">${t(lb)} (${t("cm")})<input id="m-${k}" type="number" inputmode="decimal" step="0.1"></label>`).join("")}</div>
+   <label class="f">${t("date")}<input id="mDate" type="date" value="${today()}"></label><button type="button" class="primary" id="mAdd">${t("saveMeas")}</button><div class="small muted">${t("measTip")}</div>
+   ${ms.length?`<div class="tbl-wrap"><table><thead><tr><th>${t("measure")}</th><th>${t("start")} ${shortD(f.date)}</th><th>${t("latest")} ${shortD(l.date)}</th><th>${t("change")}</th></tr></thead><tbody>
+    ${MEAS.map(([k,lb])=>{const a=ms.find(m=>m[k]!=null),b=[...ms].reverse().find(m=>m[k]!=null);if(!a)return"";const dlt=r1(b[k]-a[k]);
+     return`<tr><td>${t(lb)}</td><td class="num">${a[k]}</td><td class="num">${b[k]}</td><td class="num" style="color:${dlt>0?"var(--good)":dlt<0?"var(--warn)":"var(--muted)"}">${dlt>0?"+":""}${dlt}</td></tr>`}).join("")}</tbody></table></div>
+   <ul class="clean list small">${[...ms].reverse().map(m=>`<li><span>${fmtD(m.date)}</span><span class="muted">${t("nMeas",{n:MEAS.filter(([k])=>m[k]!=null).length})}</span><button type="button" class="ghost small" data-delm="${m.date}">${t("del")}</button></li>`).join("")}</ul>`
+   :`<div class="empty">${t("firstMeas")}</div>`}</div>`;
   return h;
-}
-bind.body=function(){
-  $("#bwAdd").onclick=()=>{const kg=num($("#bwKg").value),d=$("#bwDate").value||today();if(!kg){toast("اكتب الوزن");return}
-    S.bodyw=S.bodyw.filter(x=>x.date!==d);S.bodyw.push({date:d,kg});S.profile.weight=String(latestWeight());save();render();toast("تم تسجيل الوزن")};
-  $("#mAdd").onclick=()=>{const d=$("#mDate").value||today();const m={date:d};let any=false;
-    MEAS.forEach(([k])=>{const v=num($("#m-"+k).value);if(v!=null){m[k]=v;any=true}});
-    if(!any){toast("املأ قياسًا واحدًا على الأقل");return}
-    const old=S.meas.find(x=>x.date===d);S.meas=S.meas.filter(x=>x.date!==d);S.meas.push(Object.assign(old||{},m));save();render();toast("تم حفظ القياسات")};
-  document.querySelectorAll("[data-delbw]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد"))return;S.bodyw=S.bodyw.filter(x=>x.date!==b.dataset.delbw);save();render()});
-  document.querySelectorAll("[data-delm]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد"))return;S.meas=S.meas.filter(x=>x.date!==b.dataset.delm);save();render()});
+};
+BIND.body=function(){
+  $("#bwAdd").onclick=()=>{const kg=num($("#bwKg").value),d=$("#bwDate").value||today();if(!kg){toast(t("enterW"));return}
+    S.bodyw=S.bodyw.filter(x=>x.date!==d);S.bodyw.push({date:d,kg});S.profile.weight=String(latestWeight());save();render();toast(t("wLogged"))};
+  $("#mAdd").onclick=()=>{const d=$("#mDate").value||today();const m={date:d};let any=false;MEAS.forEach(([k])=>{const v=num($("#m-"+k).value);if(v!=null){m[k]=v;any=true}});
+    if(!any){toast(t("fillOne"));return}const old=S.meas.find(x=>x.date===d);S.meas=S.meas.filter(x=>x.date!==d);S.meas.push(Object.assign(old||{},m));save();render();toast(t("measSaved"))};
+  $$("[data-delbw]").forEach(b=>b.onclick=()=>{if(!armed(b,t("confirmShort")))return;S.bodyw=S.bodyw.filter(x=>x.date!==b.dataset.delbw);save();keepScroll(render)});
+  $$("[data-delm]").forEach(b=>b.onclick=()=>{if(!armed(b,t("confirmShort")))return;S.meas=S.meas.filter(x=>x.date!==b.dataset.delm);save();keepScroll(render)});
 };
 
-/* Food */
+/* ---------- food ---------- */
 let foodDate=null;
-function vFood(){
-  const d=foodDate||today();const T=targets();
-  const items=S.food.filter(f=>f.date===d);
-  const kc=items.reduce((t,f)=>t+(f.kcal||0),0),pr=items.reduce((t,f)=>t+(f.protein||0),0);
-  const pct=(v,t)=>t?Math.min(100,v/t*100):0;
-  let h=`<h2>التغذية</h2>`;
-  if(!T.kcal)h+=`<div class="banner" style="margin-top:0">أكمل العمر والطول والوزن في تبويب «ملفي» لحساب هدف السعرات والبروتين تلقائيًا.</div>`;
-  h+=`<div class="row" style="margin-top:10px"><label class="f" style="flex:1">اليوم<input id="fDate" type="date" value="${d}"></label></div>
-  <div class="grid2" style="margin-top:10px">
-   <div class="card"><div class="small muted">السعرات</div><div class="num" style="font-size:22px;font-weight:600;text-align:right">${Math.round(kc)}<span class="muted" style="font-size:14px"> / ${T.kcal??"—"}</span></div>
-     <div class="bar ${T.kcal&&kc>=T.kcal?"over":""}"><i style="width:${pct(kc,T.kcal)}%"></i></div>
-     <div class="small muted" style="margin-top:4px">${T.kcal?(kc<T.kcal?`باقي ${Math.round(T.kcal-kc)}`:"وصلت للهدف"):""}</div></div>
-   <div class="card"><div class="small muted">البروتين (جم)</div><div class="num" style="font-size:22px;font-weight:600;text-align:right">${Math.round(pr)}<span class="muted" style="font-size:14px"> / ${T.prot??"—"}</span></div>
-     <div class="bar ${T.prot&&pr>=T.prot?"over":""}"><i style="width:${pct(pr,T.prot)}%"></i></div>
-     <div class="small muted" style="margin-top:4px">${T.prot?(pr<T.prot?`باقي ${Math.round(T.prot-pr)}`:"وصلت للهدف"):""}</div></div></div>`;
-  const recent=[];const seen=new Set();for(const f of [...S.food].reverse()){const k=f.name.trim();if(k&&!seen.has(k)){seen.add(k);recent.push(f)}if(recent.length>=8)break}
-  h+=`<div class="card stack" style="margin-top:12px"><h3>إضافة وجبة</h3>
-   <label class="f">الاسم<input id="fName" type="text" placeholder="مثلًا: صدر دجاج ٢٠٠ جم + أرز"></label>
-   <div class="grid2"><label class="f">السعرات<input id="fKcal" type="number" inputmode="numeric" min="0"></label>
-   <label class="f">البروتين (جم)<input id="fProt" type="number" inputmode="decimal" min="0" step="0.5"></label></div>
-   <button type="button" class="primary" id="fAdd">إضافة</button>
-   ${recent.length?`<div class="small muted">إضافة سريعة من وجباتك السابقة:</div><div class="chips" style="flex-wrap:wrap">${recent.map((f,i)=>`<button type="button" class="chip" data-quick="${i}">${esc(f.name)} · <span class="num">${f.kcal||0}</span></button>`).join("")}</div>`:""}
-   <div class="small muted">القيم الغذائية تقريبية؛ خذها من ملصق المنتج أو من تطبيق قاعدة بيانات أطعمة موثوق.</div></div>`;
-  h+=`<h2>وجبات ${fmtD(d)}</h2>`+(items.length?`<div class="card"><ul class="clean list">${items.map(f=>`<li><div style="min-width:0">${esc(f.name)||"بدون اسم"}<div class="small muted"><span class="num">${f.kcal||0}</span> سعرة · <span class="num">${f.protein||0}</span> جم بروتين</div></div><button type="button" class="ghost small" data-delf="${f.id}">حذف</button></li>`).join("")}</ul></div>`
-    :`<div class="empty">لم تسجّل أكلًا لهذا اليوم بعد.</div>`);
-  const days=[];for(let i=6;i>=0;i--){const x=new Date();x.setDate(x.getDate()-i);const s=x.getFullYear()+"-"+pad(x.getMonth()+1)+"-"+pad(x.getDate());const it=S.food.filter(f=>f.date===s);days.push({s,k:it.reduce((t,f)=>t+(f.kcal||0),0),p:it.reduce((t,f)=>t+(f.protein||0),0),n:it.length})}
-  h+=`<h2>آخر ٧ أيام</h2><div class="card tbl-wrap"><table><thead><tr><th>اليوم</th><th>السعرات</th><th>البروتين</th><th></th></tr></thead><tbody>
-   ${days.map(x=>`<tr><td>${fmtD(x.s)}</td><td class="num">${x.n?Math.round(x.k):"—"}</td><td class="num">${x.n?Math.round(x.p):"—"}</td><td>${x.n&&T.prot?(x.p>=T.prot?'<span class="tag up">بروتين ✓</span>':'<span class="tag hold">أقل</span>'):""}</td></tr>`).join("")}
-  </tbody></table></div>`;
-  if(T.tdee)h+=`<p class="small muted">الهدف محسوب بمعادلة Mifflin-St Jeor: الحرق اليومي التقديري <span class="num">${Math.round(T.tdee)}</span> سعرة + فائض <span class="num">${S.profile.surplus}</span>. هذه تقديرات تقريبية؛ راقب وزنك أسبوعيًا وعدّل.</p>`;
+function recentFoods(){const out=[],seen=new Set();for(const f of [...S.food].reverse()){const k=(f.name||"").trim();if(k&&!seen.has(k)){seen.add(k);out.push(f)}if(out.length>=8)break}return out}
+VIEWS.food=function(){
+  const d=foodDate||today();const T=targets();const items=S.food.filter(f=>f.date===d);
+  const kc=items.reduce((a,f)=>a+(f.kcal||0),0),pr=items.reduce((a,f)=>a+(f.protein||0),0);const pct=(v,x)=>x?Math.min(100,v/x*100):0;
+  const tile=(lbl,v,x)=>`<div class="card"><div class="small muted">${lbl}</div><div style="font-size:22px;font-weight:600"><span class="num">${Math.round(v)} / ${x??"—"}</span></div>
+    <div class="bar ${x&&v>=x?"over":""}"><i style="width:${pct(v,x)}%"></i></div><div class="small muted" style="margin-top:4px">${x?(v<x?t("left",{n:Math.round(x-v)}):t("reached")):""}</div></div>`;
+  let h=`<h2>${t("food")}</h2>${T.kcal?"":`<div class="banner" style="margin-top:0">${t("needProfile")}</div>`}
+  <label class="f" style="margin-top:10px">${t("day")}<input id="fDate" type="date" value="${d}"></label>
+  <div class="grid2" style="margin-top:10px">${tile(t("kcal"),kc,T.kcal)}${tile(t("protein"),pr,T.prot)}</div>`;
+  const rec=recentFoods();
+  h+=`<div class="card stack" style="margin-top:12px"><h3>${t("addMeal")}</h3><label class="f">${t("mealName")}<input id="fName" type="text" placeholder="${t("mealPh")}"></label>
+   <div class="grid2"><label class="f">${t("kcal")}<input id="fKcal" type="number" inputmode="numeric" min="0"></label><label class="f">${t("protein")}<input id="fProt" type="number" inputmode="decimal" min="0" step="0.5"></label></div>
+   <button type="button" class="primary" id="fAdd">${t("add")}</button>
+   ${rec.length?`<div class="small muted">${t("quickAdd")}</div><div class="chips wrap">${rec.map((f,i)=>`<button type="button" class="chip" data-quick="${i}">${esc(f.name)} · <span class="num">${f.kcal||0}</span></button>`).join("")}</div>`:""}
+   <div class="small muted">${t("foodTip")}</div></div>`;
+  h+=`<h2>${t("mealsOf",{d:fmtD(d)})}</h2>`+(items.length?`<div class="card"><ul class="clean list">${items.map(f=>`<li><div style="min-width:0">${esc(f.name)||t("untitled")}<div class="small muted">${t("kcalN",{n:`<span class="num">${f.kcal||0}</span>`})} · ${t("protN",{n:`<span class="num">${f.protein||0}</span>`})}</div></div><button type="button" class="ghost small" data-delf="${f.id}">${t("del")}</button></li>`).join("")}</ul></div>`:`<div class="empty">${t("noMeals")}</div>`);
+  const days=[];for(let i=6;i>=0;i--){const x=new Date();x.setDate(x.getDate()-i);const s=ymd(x);const it=S.food.filter(f=>f.date===s);days.push({s,k:it.reduce((a,f)=>a+(f.kcal||0),0),p:it.reduce((a,f)=>a+(f.protein||0),0),n:it.length})}
+  h+=`<h2>${t("last7")}</h2><div class="card tbl-wrap"><table><thead><tr><th>${t("day")}</th><th>${t("kcal")}</th><th>${t("protein")}</th><th></th></tr></thead><tbody>
+   ${days.map(x=>`<tr><td>${fmtD(x.s)}</td><td class="num">${x.n?Math.round(x.k):"—"}</td><td class="num">${x.n?Math.round(x.p):"—"}</td><td>${x.n&&T.prot?(x.p>=T.prot?`<span class="tag up">${t("protOk")}</span>`:`<span class="tag">${t("protLow")}</span>`):""}</td></tr>`).join("")}</tbody></table></div>`;
+  if(T.tdee)h+=`<p class="small muted">${t("tdeeNote",{t:fmtN(T.tdee),s:S.profile.surplus})}</p>`;
   return h;
-}
-bind.food=function(){
+};
+BIND.food=function(){
   $("#fDate").onchange=e=>{foodDate=e.target.value||null;render()};
   $("#fAdd").onclick=()=>{const name=$("#fName").value.trim(),kcal=num($("#fKcal").value),protein=num($("#fProt").value);
-    if(!name&&kcal==null&&protein==null){toast("اكتب الوجبة أو قيمها");return}
-    S.food.push({id:uid(),date:foodDate||today(),name,kcal:kcal||0,protein:protein||0});save();render();toast("تمت الإضافة")};
-  const recent=[];const seen=new Set();for(const f of [...S.food].reverse()){const k=f.name.trim();if(k&&!seen.has(k)){seen.add(k);recent.push(f)}if(recent.length>=8)break}
-  document.querySelectorAll("[data-quick]").forEach(b=>b.onclick=()=>{const f=recent[+b.dataset.quick];S.food.push({id:uid(),date:foodDate||today(),name:f.name,kcal:f.kcal,protein:f.protein});save();render();toast("تمت إضافة "+f.name)});
-  document.querySelectorAll("[data-delf]").forEach(b=>b.onclick=()=>{S.food=S.food.filter(f=>f.id!==b.dataset.delf);save();render()});
+    if(!name&&kcal==null&&protein==null){toast(t("enterMeal"));return}S.food.push({id:uid(),date:foodDate||today(),name,kcal:kcal||0,protein:protein||0});save();render();toast(t("added"))};
+  const rec=recentFoods();
+  $$("[data-quick]").forEach(b=>b.onclick=()=>{const f=rec[+b.dataset.quick];S.food.push({id:uid(),date:foodDate||today(),name:f.name,kcal:f.kcal,protein:f.protein});save();keepScroll(render);toast(t("added"))});
+  $$("[data-delf]").forEach(b=>b.onclick=()=>{S.food=S.food.filter(f=>f.id!==b.dataset.delf);save();keepScroll(render)});
 };
 
-/* Edit a saved session */
-function vSess(){
-  const se=sessEdit;if(!se)return`<div class="empty">لا يوجد تمرين للتعديل.</div>`;
-  const d=DAYS.find(x=>x.id===se.day);
-  let h=`<h2>تعديل تمرين محفوظ</h2><p class="muted small" style="margin:0 0 10px">${d?esc(d.ar):"يوم محذوف"}. عدّل أي جولة ثم اضغط حفظ.</p>
-  <div class="card"><label class="f">التاريخ<input id="seDate" type="date" value="${se.date}"></label></div><div class="stack" style="margin-top:12px">`;
-  se.ex.forEach((e,ei)=>{const x=EX[e.id]||{ar:"تمرين محذوف",en:""};
-    h+=`<section class="card"><div class="ex-head"><div style="min-width:0"><h3>${esc(x.ar)}</h3><div class="en">${esc(x.en||"")}</div></div>
-     <button type="button" class="ghost small" data-sedelex="${ei}" style="color:var(--warn)">حذف التمرين</button></div>
-     <div class="sets"><span class="h">#</span><span class="h">الوزن (كجم)</span><span class="h">التكرارات</span><span class="h"></span>
-     ${e.sets.map((st,i)=>`<span class="idx">${i+1}</span>
-      <input id="se-w-${ei}-${i}" type="number" inputmode="decimal" step="0.5" min="0" data-sei="${ei}" data-si="${i}" data-sf="w" value="${st.w??""}" aria-label="الوزن للجولة ${i+1}">
-      <input id="se-r-${ei}-${i}" type="number" inputmode="numeric" step="1" min="0" data-sei="${ei}" data-si="${i}" data-sf="r" value="${st.r??""}" aria-label="التكرارات للجولة ${i+1}">
-      <button type="button" class="tick" data-sedel="${ei}" data-si="${i}" aria-label="حذف الجولة ${i+1}" style="color:var(--warn)">×</button>`).join("")}</div>
-     <button type="button" class="ghost small" data-seadd="${ei}" style="margin-top:8px">+ جولة</button></section>`});
-  const missing=Object.values(EX).filter(e=>!e.retired&&!se.ex.some(x=>x.id===e.id));
-  if(missing.length)h+=`<div class="card row"><label class="f" style="flex:1">إضافة تمرين لهذا اليوم<select id="seNew">${missing.map(e=>`<option value="${e.id}">${esc(e.ar)}</option>`).join("")}</select></label><button type="button" id="seAddEx" style="align-self:flex-end">إضافة</button></div>`;
-  h+=`</div><div class="stack" style="margin-top:12px"><button type="button" class="primary block" id="seSave">حفظ التعديلات</button><button type="button" class="block" id="seCancel">إلغاء</button>
-   <p class="muted small" style="margin:0">الجولات الفارغة (بدون وزن أو تكرارات) تُحذف عند الحفظ.</p></div>`;
-  return h;
-}
-bind.sess=function(){
-  const se=sessEdit;const keep=()=>{const y=window.scrollY;render();window.scrollTo(0,y)};
-  const back=()=>{sessEdit=null;tab="progress";render();window.scrollTo(0,0)};
-  if(!se)return;
-  $("#seDate").onchange=e=>{if(e.target.value)se.date=e.target.value};
-  document.querySelectorAll("[data-sf]").forEach(inp=>inp.addEventListener("input",()=>{se.ex[+inp.dataset.sei].sets[+inp.dataset.si][inp.dataset.sf]=inp.value===""?null:num(inp.value)}));
-  document.querySelectorAll("[data-sedel]").forEach(b=>b.onclick=()=>{se.ex[+b.dataset.sedel].sets.splice(+b.dataset.si,1);keep()});
-  document.querySelectorAll("[data-seadd]").forEach(b=>b.onclick=()=>{const a=se.ex[+b.dataset.seadd].sets;const l=a[a.length-1];a.push({w:l?l.w:null,r:null});keep()});
-  document.querySelectorAll("[data-sedelex]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد"))return;se.ex.splice(+b.dataset.sedelex,1);keep()});
-  $("#seAddEx")&&($("#seAddEx").onclick=()=>{se.ex.push({id:$("#seNew").value,sets:[{w:null,r:null}]});keep()});
-  $("#seCancel").onclick=back;
-  $("#seSave").onclick=()=>{
-    se.ex.forEach(e=>{e.sets=e.sets.filter(st=>st.w!=null&&st.r!=null&&st.r>0)});se.ex=se.ex.filter(e=>e.sets.length);
-    const i=S.sessions.findIndex(x=>x.id===se.id);
-    if(!se.ex.length){toast("لا توجد جولات. لحذف التمرين كله استخدم زر «حذف» في السجل");return}
-    if(i>=0)S.sessions[i]=se;save();back();toast("تم حفظ التعديلات")};
-};
-
-/* Program editor */
-const RESTS=[45,60,75,90,120,150,180,240];
-const LIB=[["ضغط صدر بالبار","Barbell Bench Press","u",6,10,150],["ضغط صدر بالدمبل","Dumbbell Bench Press","u",8,12,120],["ضغط صدر مائل بالبار","Incline Barbell Press","u",6,10,150],["ضغط صدر مائل بالدمبل","Incline DB Press","u",8,12,120],["جهاز ضغط صدر","Machine Chest Press","u",8,12,90],["تفتيح صدر بالكيبل","Cable Fly","u",10,15,75],["جهاز فراشة (Pec Deck)","Pec Deck","u",10,15,75],["متوازي (Dips)","Dips","u",6,12,120],["عقلة (Pull-up)","Pull-up","u",5,10,150],["سحب عالي (Lat Pulldown)","Lat Pulldown","u",8,12,120],["تجديف بالبار منحني","Barbell Bent-Over Row","u",6,10,150],["تجديف بالدمبل يد واحدة","One-Arm DB Row","u",8,12,90],["سحب أرضي بالكيبل جالس","Seated Cable Row","u",8,12,90],["جهاز تجديف (T-Bar)","T-Bar Row","u",8,12,120],["ضغط أكتاف بالبار واقف","Overhead Press","u",6,10,150],["ضغط أكتاف بالدمبل جالس","Seated DB Shoulder Press","u",8,12,120],["رفرفة جانبي بالدمبل","DB Lateral Raise","u",12,15,60],["رفرفة جانبي بالكيبل","Cable Lateral Raise","u",12,15,60],["خلفي كتف (Reverse Fly)","Reverse Pec Deck","u",12,15,60],["فيس بول (Face Pull)","Face Pull","u",12,15,60],["باي بالبار","Barbell Curl","u",8,12,75],["باي بالدمبل","Dumbbell Biceps Curl","u",10,15,75],["باي مطرقة (Hammer)","Hammer Curl","u",10,15,75],["باي ارتكاز (Preacher)","Preacher Curl","u",10,15,75],["تراي بالكيبل (Pushdown)","Cable Triceps Pushdown","u",10,15,75],["تراي خلف الرأس بالكيبل","Overhead Cable Triceps Ext.","u",10,15,75],["تراي بالبار نائم (Skull Crusher)","Skull Crusher","u",8,12,90],["بطن بالكيبل","Cable Crunch","u",10,15,60],["رفع أرجل معلّق","Hanging Leg Raise","u",8,15,60],["سكوات بالبار","Barbell Back Squat","l",6,10,180],["هاك سكوات","Hack Squat","l",8,12,150],["دفع أرجل (Leg Press)","Leg Press","l",8,12,150],["ديدلفت","Deadlift","l",5,8,180],["ديدلفت روماني","Romanian Deadlift","l",8,12,150],["هيب ثرست بالبار","Barbell Hip Thrust","l",8,12,120],["سكوات بلغاري بالدمبل (لكل رجل)","DB Bulgarian Split Squat","l",8,12,90],["طعنات مشي بالدمبل","DB Walking Lunge","l",10,12,90],["رفرفة أمامي (Leg Extension)","Leg Extension","l",10,15,75],["رفرفة خلفي نائم","Lying Leg Curl","l",10,15,90],["رفرفة خلفي جالس","Seated Leg Curl","l",10,15,75],["سمانة واقف","Standing Calf Raise","l",10,15,60],["سمانة جالس","Seated Calf Raise","l",12,15,60]];
-function vEdit(){
-  const P=DAYS;if(!editDay||!P.some(d=>d.id===editDay))editDay=P[0]?P[0].id:null;
-  const d=P.find(x=>x.id===editDay);
-  let h=`<h2>تعديل البرنامج</h2>
-  <p class="muted small" style="margin:0 0 10px">اختر اليوم ثم عدّل تمارينه. التغييرات تُحفظ تلقائيًا. سجلّك القديم يبقى كما هو.</p>
-  <div class="chips">${P.map(x=>`<button type="button" class="chip ${x.id===editDay?"on":""}" data-eday="${x.id}">${esc(x.ar)} · ${esc(x.wdName)}</button>`).join("")}<button type="button" class="chip" id="addDay">+ يوم</button></div>
-  <datalist id="exLib">${LIB.map(l=>`<option value="${esc(l[0])}"></option>`).join("")}</datalist>`;
-  if(!d)return h+`<div class="empty" style="margin-top:12px">لا توجد أيام في البرنامج. أضف يومًا.</div>`;
-  h+=`<div class="card stack" style="margin-top:12px">
-   <div class="grid2"><label class="f">اسم اليوم<input id="dAr" data-dk="ar" value="${esc(d.ar)}"></label>
-   <label class="f">يوم الأسبوع<select id="dWd" data-dk="wd"><option value="-1" ${d.wd<0?"selected":""}>بدون يوم ثابت</option>${[6,0,1,2,3,4,5].map(w=>`<option value="${w}" ${d.wd===w?"selected":""}>${WDN[w]}</option>`).join("")}</select></label></div>
-   <label class="f">العضلات المستهدفة (اختياري)<input id="dFocus" data-dk="focus" value="${esc(d.focus||"")}"></label>
-  </div><div class="stack" style="margin-top:12px">`;
-  d.ex.forEach((e,i)=>{const q=`data-ei="${i}"`;
-    h+=`<section class="card stack" style="gap:8px">
-     <div class="ex-head"><b class="num">${i+1}</b><div class="row" style="gap:4px">
-      <button type="button" class="ghost" data-mv="-1" ${q} aria-label="تحريك لأعلى" ${i===0?"disabled":""}>↑</button>
-      <button type="button" class="ghost" data-mv="1" ${q} aria-label="تحريك لأسفل" ${i===d.ex.length-1?"disabled":""}>↓</button>
-      <button type="button" class="ghost" data-delex ${q} style="color:var(--warn)">حذف</button></div></div>
-     <label class="f">اسم التمرين<input id="e-ar-${e.id}" list="exLib" data-ek="ar" ${q} value="${esc(e.ar)}" placeholder="اكتب أو اختر من القائمة"></label>
-     <label class="f">الاسم بالإنجليزي (اختياري)<input id="e-en-${e.id}" data-ek="en" ${q} value="${esc(e.en||"")}" style="direction:ltr;text-align:right"></label>
-     <div class="grid3">
-      <label class="f">الجولات<input id="e-s-${e.id}" type="number" inputmode="numeric" min="1" max="10" data-ek="s" ${q} value="${e.s}"></label>
-      <label class="f">أقل تكرار<input id="e-lo-${e.id}" type="number" inputmode="numeric" min="1" data-ek="lo" ${q} value="${e.lo}"></label>
-      <label class="f">أعلى تكرار<input id="e-hi-${e.id}" type="number" inputmode="numeric" min="1" data-ek="hi" ${q} value="${e.hi}"></label>
-      <label class="f">الراحة<select id="e-rest-${e.id}" data-ek="rest" ${q}>${(RESTS.includes(e.rest)?RESTS:[...RESTS,e.rest].sort((a,b)=>a-b)).map(r=>`<option value="${r}" ${r===e.rest?"selected":""}>${mmss(r)}</option>`).join("")}</select></label>
-      <label class="f" style="grid-column:span 2">زيادة الوزن<select id="e-k-${e.id}" data-ek="k" ${q}><option value="u" ${e.k!=="l"?"selected":""}>علوي (+${S.settings.incU} كجم)</option><option value="l" ${e.k==="l"?"selected":""}>أرجل (+${S.settings.incL} كجم)</option></select></label>
-     </div></section>`});
-  if(!d.ex.length)h+=`<div class="empty">لا توجد تمارين في هذا اليوم بعد.</div>`;
-  h+=`</div><div class="stack" style="margin-top:12px">
-   <button type="button" class="primary block" id="addEx">+ إضافة تمرين</button>
-   <button type="button" class="block" id="doneEdit">تم، ارجع للتمرين</button>
-   <div class="row" style="justify-content:space-between"><button type="button" class="danger" id="delDay">حذف هذا اليوم</button><button type="button" class="ghost" id="resetProg">استرجاع البرنامج الأصلي</button></div>
-   <p class="muted small" style="margin:0">ملاحظة: إذا حذفت تمرينًا يبقى سجله وأرقامه القياسية في تبويب «التقدّم».</p></div>`;
-  return h;
-}
-bind.edit=function(){
-  const v=$("#view");const keep=()=>{const y=window.scrollY;render();window.scrollTo(0,y)};
-  const D=()=>editable().find(x=>x.id===editDay);
-  v.querySelectorAll("[data-eday]").forEach(b=>b.onclick=()=>{editDay=b.dataset.eday;render()});
-  $("#addDay").onclick=()=>{const P=editable();const used=new Set(P.map(x=>x.wd));const wd=[6,0,1,2,3,4,5].find(w=>!used.has(w))??-1;
-    const nd={id:"d"+uid(),ar:"يوم "+(P.length+1),en:"",wd,focus:"",ex:[]};P.push(nd);editDay=nd.id;loadProgram();save();render()};
-  v.querySelectorAll("[data-dk]").forEach(inp=>inp.addEventListener("change",()=>{const d=D();const k=inp.dataset.dk;
-    d[k]=k==="wd"?Number(inp.value):inp.value.trim();if(k==="ar"){d.en="";if(!d.ar)d.ar="بدون اسم"}loadProgram();save();keep()}));
-  v.querySelectorAll("[data-ek]").forEach(inp=>inp.addEventListener("change",()=>{const d=D();const e=d.ex[+inp.dataset.ei];const k=inp.dataset.ek;
-    if(k==="ar"){e.ar=inp.value.trim()||"تمرين";const l=LIB.find(x=>x[0]===e.ar);if(l&&!e.en){e.en=l[1];e.k=l[2];e.lo=l[3];e.hi=l[4];e.rest=l[5]}}
-    else if(k==="en")e.en=inp.value.trim();
-    else if(k==="k")e.k=inp.value;
-    else{let n=Math.round(num(inp.value)||0);if(k==="s")n=Math.min(10,Math.max(1,n));if(k==="lo"||k==="hi")n=Math.max(1,n);if(k==="rest")n=Number(inp.value);e[k]=n;
-      if(e.lo>e.hi){if(k==="lo")e.hi=e.lo;else e.lo=e.hi}}
-    loadProgram();save();keep();toast("تم الحفظ")}));
-  v.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{const d=D();const i=+b.dataset.ei,j=i+Number(b.dataset.mv);if(j<0||j>=d.ex.length)return;
-    [d.ex[i],d.ex[j]]=[d.ex[j],d.ex[i]];loadProgram();save();keep()});
-  v.querySelectorAll("[data-delex]").forEach(b=>b.onclick=()=>{if(!armed(b,"تأكيد"))return;const d=D();const e=d.ex.splice(+b.dataset.ei,1)[0];
-    if(history(e.id).length&&!S.retired.some(x=>x.id===e.id))S.retired.push({id:e.id,ar:e.ar,en:e.en,s:e.s,lo:e.lo,hi:e.hi,rest:e.rest,k:e.k});
-    loadProgram();save();keep();toast("تم حذف "+e.ar)});
-  $("#addEx")&&($("#addEx").onclick=()=>{const d=D();const e={id:"x"+uid(),ar:"",en:"",s:3,lo:8,hi:12,rest:90,k:"u"};d.ex.push(e);loadProgram();save();keep();
-    const i=$("#e-ar-"+e.id);if(i){i.scrollIntoView({block:"center"});i.focus()}});
-  $("#doneEdit")&&($("#doneEdit").onclick=()=>{const d=D();if(d)d.ex.forEach(e=>{if(!e.ar)e.ar="تمرين"});loadProgram();save();selDay=editDay;tab="today";render();window.scrollTo(0,0)});
-  $("#delDay")&&($("#delDay").onclick=()=>{const b=$("#delDay");if(S.draft&&S.draft.day===editDay){toast("أنهِ تمرين هذا اليوم الجاري أو ألغِه أولًا");return}
-    if(!armed(b,"اضغط مرة أخرى لحذف اليوم"))return;const P=editable();const d=P.find(x=>x.id===editDay);
-    for(const e of d.ex)if(history(e.id).length&&!S.retired.some(x=>x.id===e.id))S.retired.push(Object.assign({},e));
-    S.program=P.filter(x=>x.id!==editDay);editDay=null;loadProgram();save();render();toast("تم حذف اليوم")});
-  $("#resetProg").onclick=()=>{const b=$("#resetProg");if(!armed(b,"اضغط مرة أخرى للاسترجاع"))return;
-    for(const d of DAYS)for(const e of d.ex)if(!DEFAULT_DAYS.some(x=>x.ex.some(y=>y.id===e.id))&&history(e.id).length&&!S.retired.some(x=>x.id===e.id))S.retired.push(Object.assign({},e));
-    S.program=null;if(S.draft&&!DEFAULT_DAYS.some(x=>x.id===S.draft.day))S.draft=null;editDay=null;loadProgram();save();render();toast("رجع البرنامج الأصلي")};
-};
-
-/* Settings */
-function vSettings(){
+/* ---------- settings ---------- */
+let installEvt=null;
+const isStandalone=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
+const pwaCapable=()=>!!document.querySelector('link[rel="manifest"]');
+VIEWS.settings=function(){
   const p=S.profile,T=targets();
-  return`<h2>بياناتي</h2><div class="card stack">
-   <div class="grid2">
-    <label class="f">الجنس<select id="pSex"><option value="male" ${p.sex==="male"?"selected":""}>ذكر</option><option value="female" ${p.sex==="female"?"selected":""}>أنثى</option></select></label>
-    <label class="f">العمر<input id="pAge" type="number" inputmode="numeric" value="${esc(p.age)}"></label>
-    <label class="f">الطول (سم)<input id="pH" type="number" inputmode="decimal" value="${esc(p.height)}"></label>
-    <label class="f">الوزن (كجم)<input id="pW" type="number" inputmode="decimal" step="0.1" value="${esc(p.weight)}"></label></div>
-   <label class="f">النشاط اليومي خارج الجم<select id="pAct">
-    ${[[1.2,"قليل جدًا (جلوس معظم اليوم)"],[1.375,"خفيف (عمل مكتبي + ٣–٤ تمارين)"],[1.55,"متوسط (حركة يومية أكثر)"],[1.725,"عالٍ (عمل بدني)"]].map(([v,l])=>`<option value="${v}" ${Number(p.activity)===v?"selected":""}>${l}</option>`).join("")}</select></label>
-   <div class="grid2">
-    <label class="f">الفائض للتضخيم (سعرة)<input id="pSur" type="number" inputmode="numeric" step="50" value="${esc(p.surplus)}"></label>
-    <label class="f">البروتين (جم لكل كجم)<input id="pPk" type="number" inputmode="decimal" step="0.1" value="${esc(p.protPerKg)}"></label>
-    <label class="f">هدف سعرات يدوي (اختياري)<input id="pKo" type="number" inputmode="numeric" value="${esc(p.kcalOverride)}"></label>
-    <label class="f">هدف بروتين يدوي (اختياري)<input id="pPo" type="number" inputmode="numeric" value="${esc(p.protOverride)}"></label></div>
-   <button type="button" class="primary" id="pSave">حفظ</button>
-   ${T.kcal?`<div class="hint">هدفك الحالي: <span class="num">${T.kcal}</span> سعرة و<span class="num">${T.prot}</span> جم بروتين يوميًا (تقديري).</div>`:""}
-   <div class="small muted">الإعداد المقترح لمبتدئ في تضخيم: فائض ٢٠٠–٤٠٠ سعرة تقريبًا، وبروتين ١٫٦–٢٫٢ جم لكل كجم. هذه نطاقات شائعة وليست قاعدة ثابتة.</div>
-  </div>
-  <h2>برنامجي</h2><div class="card"><button type="button" class="block" id="goEdit2">تعديل الأيام والتمارين</button></div>
-  <h2>زيادة الوزن المقترحة</h2><div class="card grid2">
-   <label class="f">تمارين الجزء العلوي (كجم)<input id="sIncU" type="number" inputmode="decimal" step="0.5" value="${S.settings.incU}"></label>
-   <label class="f">تمارين الأرجل (كجم)<input id="sIncL" type="number" inputmode="decimal" step="0.5" value="${S.settings.incL}"></label>
-   <button type="button" id="sSave" style="grid-column:1/-1">حفظ</button></div>
-  <h2>النسخة الاحتياطية</h2><div class="card stack">
-   <div class="small muted">بياناتك محفوظة في هذا المتصفح على هذا الجهاز فقط. خذ نسخة احتياطية كل فترة واحفظها في الملاحظات أو أرسلها لنفسك، وإلا قد تضيع إذا مُسحت بيانات المتصفح.</div>
-   <div class="row"><button type="button" class="primary" id="bCopy">نسخ النسخة الاحتياطية</button><button type="button" id="bDl">تنزيل ملف</button></div>
-   <textarea id="bText" readonly aria-label="نص النسخة الاحتياطية"></textarea>
-   <h3 style="margin-top:6px">استعادة</h3>
-   <label class="f">الصق نص النسخة الاحتياطية هنا<textarea id="bIn"></textarea></label>
-   <label class="f">أو اختر ملف النسخة<input id="bFile" type="file" accept=".json,application/json,text/plain"></label>
-   <button type="button" id="bImp">استعادة (تستبدل البيانات الحالية)</button>
-  </div>
-  <h2>منطقة الخطر</h2><div class="card"><button type="button" class="danger block" id="bReset">حذف كل البيانات</button></div>
-  <p class="small muted" style="margin-top:16px">سجل: <span class="num">${S.sessions.length}</span> تمرين · <span class="num">${S.bodyw.length}</span> وزن · <span class="num">${S.meas.length}</span> قياس · <span class="num">${S.food.length}</span> وجبة</p>`;
-}
-bind.settings=function(){
-  const dump=()=>JSON.stringify(Object.assign({app:"ironlog",v:1,exported:new Date().toISOString()},S));
-  $("#bText").value=dump();
-  $("#goEdit2").onclick=()=>{editDay=null;tab="edit";render();window.scrollTo(0,0)};
+  return`<h2>${t("myProg")}</h2><div class="card stack"><div><b>${esc(progName())}</b> <span class="muted small">· ${t("perWeek",{n:DAYS.length})}</span></div>
+   <div class="grid2"><button type="button" id="goProgs">${t("changeProg")}</button><button type="button" id="goEdit">${t("editDaysEx")}</button></div>
+   <button type="button" class="ghost" id="redoQ">${t("redoQ")}</button></div>
+  <h2>${t("prefs")}</h2><div class="card stack">
+   <div class="q"><span>${t("qLang")}</span><div class="chips"><button type="button" class="chip ${LANG==="ar"?"on":""}" data-lang="ar">العربية</button><button type="button" class="chip ${LANG==="en"?"on":""}" data-lang="en">English</button></div></div>
+   <label class="row" style="flex-wrap:nowrap;cursor:pointer"><input id="sRpe" type="checkbox" style="width:22px;min-height:22px" ${S.settings.rpe?"checked":""}><span>${t("showRpe")}</span></label>
+   <div class="grid2"><label class="f">${t("incUpper")}<input id="sIncU" type="number" inputmode="decimal" step="0.5" value="${S.settings.incU}"></label>
+   <label class="f">${t("incLower")}<input id="sIncL" type="number" inputmode="decimal" step="0.5" value="${S.settings.incL}"></label></div>
+   <button type="button" id="sSave">${t("save")}</button></div>
+  ${pwaCapable()?`<h2>${t("install")}</h2><div class="card stack small">${isStandalone()?`<div>${t("installed")}</div>`:`
+   <button type="button" class="primary" id="instBtn" ${installEvt?"":"hidden"}>${t("installBtn")}</button><div class="muted">${t("installIos")}</div><div class="muted">${t("installAndroid")}</div>`}</div>`:""}
+  <h2>${t("me")}</h2><div class="card stack"><div class="grid2">
+    <label class="f">${t("sex")}<select id="pSex"><option value="male" ${p.sex==="male"?"selected":""}>${t("male")}</option><option value="female" ${p.sex==="female"?"selected":""}>${t("female")}</option></select></label>
+    <label class="f">${t("age")}<input id="pAge" type="number" inputmode="numeric" value="${esc(p.age)}"></label>
+    <label class="f">${t("height")}<input id="pH" type="number" inputmode="decimal" value="${esc(p.height)}"></label>
+    <label class="f">${t("weightKg")}<input id="pW" type="number" inputmode="decimal" step="0.1" value="${esc(p.weight)}"></label></div>
+   <label class="f">${t("activity")}<select id="pAct">${[[1.2,"act1"],[1.375,"act2"],[1.55,"act3"],[1.725,"act4"]].map(([v,l])=>`<option value="${v}" ${Number(p.activity)===v?"selected":""}>${t(l)}</option>`).join("")}</select></label>
+   <div class="grid2"><label class="f">${t("surplus")}<input id="pSur" type="number" inputmode="numeric" step="50" value="${esc(p.surplus)}"></label>
+    <label class="f">${t("protKg")}<input id="pPk" type="number" inputmode="decimal" step="0.1" value="${esc(p.protPerKg)}"></label>
+    <label class="f">${t("kcalMan")}<input id="pKo" type="number" inputmode="numeric" value="${esc(p.kcalOverride)}"></label>
+    <label class="f">${t("protMan")}<input id="pPo" type="number" inputmode="numeric" value="${esc(p.protOverride)}"></label></div>
+   <button type="button" class="primary" id="pSave">${t("save")}</button>
+   ${T.kcal?`<div class="hint">${t("curTarget",{k:`<span class="num">${T.kcal}</span>`,p:`<span class="num">${T.prot}</span>`})}</div>`:""}<div class="small muted">${t("targetTip")}</div></div>
+  <h2>${t("backup")}</h2><div class="card stack"><div class="small muted">${t("backupTip")}</div>
+   <div class="row"><button type="button" class="primary" id="bCopy">${t("copyBackup")}</button><button type="button" id="bDl">${t("dlFile")}</button></div>
+   <textarea id="bText" readonly aria-label="${t("backupText")}"></textarea>
+   <h3 style="margin-top:6px">${t("restore")}</h3><label class="f">${t("pasteHere")}<textarea id="bIn"></textarea></label>
+   <label class="f">${t("orFile")}<input id="bFile" type="file" accept=".json,application/json,text/plain"></label><button type="button" id="bImp">${t("restoreBtn")}</button></div>
+  <h2>${t("danger")}</h2><div class="card"><button type="button" class="danger block" id="bReset">${t("wipe")}</button></div>
+  <p class="small muted" style="margin-top:16px">${t("counts",{a:S.sessions.length,b:S.bodyw.length,c:S.meas.length,d:S.food.length})}</p>`;
+};
+BIND.settings=function(){
+  const dump=()=>JSON.stringify(Object.assign({app:"ironlog",exported:new Date().toISOString()},S));$("#bText").value=dump();
+  $("#goProgs").onclick=()=>go("programs");$("#goEdit").onclick=()=>{editDay=null;go("edit")};$("#redoQ").onclick=()=>{OB=clone(S.prefs);go("welcome")};
+  $$("[data-lang]").forEach(b=>b.onclick=()=>{LANG=S.lang=b.dataset.lang;save();applyLang();keepScroll(render)});
+  $("#sRpe").onchange=e=>{S.settings.rpe=e.target.checked;save();toast(t("saved"))};
+  $("#sSave").onclick=()=>{S.settings.incU=num($("#sIncU").value)??2.5;S.settings.incL=num($("#sIncL").value)??5;save();toast(t("saved"))};
+  const ib=$("#instBtn");if(ib)ib.onclick=async()=>{if(!installEvt)return;installEvt.prompt();try{await installEvt.userChoice}catch(e){}installEvt=null;keepScroll(render)};
   $("#pSave").onclick=()=>{Object.assign(S.profile,{sex:$("#pSex").value,age:$("#pAge").value,height:$("#pH").value,weight:$("#pW").value,activity:Number($("#pAct").value),surplus:num($("#pSur").value)??300,protPerKg:num($("#pPk").value)??2,kcalOverride:$("#pKo").value,protOverride:$("#pPo").value});
-    const w=num(S.profile.weight);if(w&&!S.bodyw.some(x=>x.date===today())){S.bodyw.push({date:today(),kg:w})}save();render();toast("تم الحفظ")};
-  $("#sSave").onclick=()=>{S.settings.incU=num($("#sIncU").value)??2.5;S.settings.incL=num($("#sIncL").value)??5;save();toast("تم الحفظ")};
-  $("#bCopy").onclick=()=>{const t=$("#bText");const txt=t.value;
-    try{navigator.clipboard.writeText(txt).then(()=>toast("تم النسخ"),()=>{t.focus();t.select();toast("حدّد النص وانسخه يدويًا")})}catch(e){t.focus();t.select();toast("حدّد النص وانسخه يدويًا")}};
-  $("#bDl").onclick=()=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([dump()],{type:"application/json"}));a.download="ironlog-"+today()+".json";document.body.appendChild(a);a.click();a.remove();toast("إن لم يبدأ التنزيل فاستخدم زر النسخ")}catch(e){toast("التنزيل غير متاح هنا، استخدم زر النسخ")}};
-  $("#bFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{$("#bIn").value=rd.result;toast("تم تحميل الملف، اضغط استعادة")};rd.readAsText(f)};
-  $("#bImp").onclick=()=>{const b=$("#bImp");let o;try{o=JSON.parse($("#bIn").value)}catch(e){toast("النص ليس نسخة احتياطية صالحة");return}
-    if(!o||o.app!=="ironlog"||!Array.isArray(o.sessions)){toast("هذه ليست نسخة احتياطية من دفتر الحديد");return}
-    if(!armed(b,"اضغط مرة أخرى لتأكيد الاستبدال"))return;
-    delete o.app;delete o.v;delete o.exported;S=merge(DEF(),o);loadProgram();save();render();toast("تمت الاستعادة")};
-  $("#bReset").onclick=()=>{const b=$("#bReset");if(!armed(b,"اضغط مرة أخرى لحذف كل شيء نهائيًا"))return;S=DEF();loadProgram();save();render();toast("تم حذف البيانات")};
+    const w=num(S.profile.weight);if(w&&!S.bodyw.some(x=>x.date===today()))S.bodyw.push({date:today(),kg:w});save();keepScroll(render);toast(t("saved"))};
+  $("#bCopy").onclick=()=>{const ta=$("#bText");const sel=()=>{ta.focus();ta.select();toast(t("selectCopy"))};try{navigator.clipboard.writeText(ta.value).then(()=>toast(t("copied")),sel)}catch(e){sel()}};
+  $("#bDl").onclick=()=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([dump()],{type:"application/json"}));a.download="ironlog-"+today()+".json";document.body.appendChild(a);a.click();a.remove();toast(t("dlMaybe"))}catch(e){toast(t("dlNo"))}};
+  $("#bFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{$("#bIn").value=rd.result;toast(t("fileLoaded"))};rd.readAsText(f)};
+  $("#bImp").onclick=()=>{const b=$("#bImp");let o;try{o=JSON.parse($("#bIn").value)}catch(e){toast(t("badBackup"));return}
+    if(!o||o.app!=="ironlog"||!Array.isArray(o.sessions)){toast(t("notOurs"));return}if(!armed(b,t("restoreC")))return;
+    delete o.app;delete o.exported;S=migrate(o);LANG=S.lang||"ar";loadProgram();save();applyLang();render();toast(t("restored"))};
+  $("#bReset").onclick=()=>{const b=$("#bReset");if(!armed(b,t("wipeC")))return;const lang=S.lang;S=DEF();S.lang=lang;loadProgram();save();OB=null;render();toast(t("wiped"))};
 };
 
 /* ---------- rest timer ---------- */
 let tEnd=0,tInt=null,actx=null;
-function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();[0,0.25,0.5].forEach(t=>{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;g.gain.setValueAtTime(0.2,actx.currentTime+t);g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+t+0.2);o.connect(g);g.connect(actx.destination);o.start(actx.currentTime+t);o.stop(actx.currentTime+t+0.2)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}}
-function startTimer(sec,label){tEnd=Date.now()+sec*1000;$("#tLabel").textContent="راحة بعد: "+label;$("#timer").hidden=false;$("#timer").classList.remove("ding");
-  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume()}catch(e){}
-  clearInterval(tInt);tInt=setInterval(tick,250);tick()}
-function tick(){const left=Math.ceil((tEnd-Date.now())/1000);
-  if(left<=0){$("#tClock").textContent="0:00";if(!$("#timer").classList.contains("ding")){$("#timer").classList.add("ding");$("#tLabel").textContent="ابدأ الجولة التالية";beep();setTimeout(()=>{if($("#timer").classList.contains("ding"))stopTimer()},6000)}return}
+function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();[0,0.25,0.5].forEach(o=>{const os=actx.createOscillator(),g=actx.createGain();os.frequency.value=880;g.gain.setValueAtTime(0.2,actx.currentTime+o);g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+o+0.2);os.connect(g);g.connect(actx.destination);os.start(actx.currentTime+o);os.stop(actx.currentTime+o+0.2)})}catch(e){}try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}}
+function startTimer(sec,label){tEnd=Date.now()+sec*1000;$("#tLabel").textContent=t("restAfter",{x:label});$("#timer").hidden=false;$("#timer").classList.remove("ding");
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume()}catch(e){}clearInterval(tInt);tInt=setInterval(tick,250);tick()}
+function tick(){const left=Math.ceil((tEnd-Date.now())/1000);const tm=$("#timer");
+  if(left<=0){$("#tClock").textContent="0:00";if(!tm.classList.contains("ding")){tm.classList.add("ding");$("#tLabel").textContent=t("nextSet");beep();setTimeout(()=>{if(tm.classList.contains("ding"))stopTimer()},6000)}return}
   $("#tClock").textContent=mmss(left)}
 function stopTimer(){clearInterval(tInt);$("#timer").hidden=true;$("#timer").classList.remove("ding")}
 $("#tPlus").onclick=()=>{tEnd=Math.max(tEnd,Date.now())+30000;$("#timer").classList.remove("ding");tick()};
 $("#tStop").onclick=stopTimer;
 
 /* ---------- boot ---------- */
-document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();window.scrollTo(0,0)});
+LANG=S.lang==="en"?"en":"ar";loadProgram();applyLang();
 if(!storeOK)$("#storeWarn").hidden=false;
-if(location.hash&&["today","progress","body","food","settings"].includes(location.hash.slice(1)))tab=location.hash.slice(1);
+// Installable app: only when the page is served with its manifest (the hosted copy, not the artifact).
+if(pwaCapable()){
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;if(tab==="settings")keepScroll(render)});
+  if("serviceWorker" in navigator&&window.isSecureContext)navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+const h0=location.hash.slice(1);if(S.onboarded&&VIEWS[h0]&&!["sess","edit"].includes(h0))tab=h0;
 render();
 })();
 </script>
+
 </body></html>
