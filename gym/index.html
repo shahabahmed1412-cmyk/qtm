@@ -480,7 +480,19 @@ const TX={
  counts:["سجل: {a} تمرين · {b} وزن · {c} قياس · {d} وجبة","Log: {a} workouts · {b} weights · {c} measurements · {d} meals"],
  copied:["تم النسخ","Copied"],selectCopy:["حدّد النص وانسخه يدويًا","Select the text and copy it manually"],dlMaybe:["إن لم يبدأ التنزيل فاستخدم زر النسخ","If the download doesn't start, use Copy"],dlNo:["التنزيل غير متاح هنا، استخدم زر النسخ","Download isn't available here; use Copy"],
  fileLoaded:["تم تحميل الملف، اضغط استعادة","File loaded, tap Restore"],badBackup:["النص ليس نسخة احتياطية صالحة","That isn't a valid backup"],notOurs:["هذه ليست نسخة احتياطية من دفتر الحديد","That isn't an Iron Log backup"],
- restored:["تمت الاستعادة","Restored"],wiped:["تم حذف البيانات","Data deleted"]
+ restored:["تمت الاستعادة","Restored"],
+ // licensing
+ trialBanner:["نسخة تجريبية · الأيام المتبقية: {n}","Free trial: {n} days left"],trialLast:["نسخة تجريبية: هذا آخر يوم","Free trial: last day"],enterCode:["إدخال رمز التفعيل","Enter activation code"],
+ act:["التفعيل","Activation"],actOk:["التطبيق مفعّل ✓ شكرًا لشرائك.","The app is activated ✓ Thanks for your purchase."],
+ actTrial:["أنت تستخدم النسخة التجريبية (الأيام المتبقية: {n})، وبعدها تحتاج رمز تفعيل. بياناتك تبقى محفوظة.","You're on the free trial with {n} days left, then you'll need an activation code. Your data stays saved."],
+ codeLbl:["رمز التفعيل","Activation code"],activate:["تفعيل","Activate"],
+ codeFormat:["الرمز يتكوّن من ١٢ حرفًا ورقمًا، مثل IRON-AB12-CD34-EF56","The code has 12 letters and digits, like IRON-AB12-CD34-EF56"],
+ codeBad:["الرمز غير صحيح. تأكد منه وحاول مرة أخرى.","That code isn't valid. Check it and try again."],
+ codeOk:["تم التفعيل. استمتع بالتطبيق!","Activated. Enjoy the app!"],
+ lockedT:["انتهت الفترة التجريبية","Your free trial has ended"],
+ lockedLead:["أدخل رمز التفعيل لمتابعة استخدام التطبيق. كل بياناتك وتمارينك محفوظة كما هي.","Enter your activation code to keep using the app. All your data and workouts are saved."],
+ buy:["للحصول على رمز تفعيل تواصل مع البائع.","To get an activation code, contact the seller."],
+ lockedBackup:["تقدر تنسخ بياناتك الآن كنسخة احتياطية:","You can copy your data now as a backup:"],wiped:["تم حذف البيانات","Data deleted"]
 };
 const WD={ar:["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
 /* ---------- language ---------- */
@@ -624,6 +636,93 @@ function lineChart(pts,unit){
    <text x="${X(xs[li])}" y="${H-8}" text-anchor="end" font-size="12" fill="var(--fg)" font-weight="700">${r1(pts[li].y)} ${unit} · ${shortD(pts[li].x)}</text></svg>`;
 }
 
+/* ---------- licensing ----------
+   Codes are random (60 bits); the app only stores truncated SHA-256 hashes of valid codes,
+   so the list of codes can't be read back from the published file. Added by gym/tools/make_codes.py. */
+const TRIAL_DAYS=7,LIC_KEY="ironlog.lic";
+const BUY_INFO={ar:"",en:""}; // seller contact shown on the lock screen, e.g. a WhatsApp number
+const LIC_HASHES=new Set([
+/*LICENSES-START*/
+"87fb5819271c0fd439b4ff8e","9ed7fb8f0e9ff6d0d758cf0d","22ea64903ff146fc6b4fe78a","c85e1425d7ef0ac46ef41000","d51b0897971eaae395372027","bc2bbf1d5f6ee87ee25534fa",
+"cd490b3c1d8ae85036388680","1e2948dc72ec5ab0afa7e990","eaf23d38b7e0f1fa07b8459c","c6985e98a1be038eb8c8b5b7","cbe1f760a3b140d535607ca2","be8cab1b2c812a35c3f9103d",
+"41d8fbf2d6b91cac3b7c2572","5eabf47e1ad1ee724712df10","a6369cf7c2332e45c1e4e826","da17decadedc4f9c8bdedf63","e5bb6e1d358b78d1a1e5aace","34d6512427fec8164872f539",
+"7c2935cefec55047353f41bc","98ac5d74761db3454d92952c","3276dcb76290d9c716f74554","6746f52bbbbeffbaa5533486","f3e79065eae24db0d58e9ddb","74d947cc313470f7cd7b52e3",
+"56fe756baf5403ead608ee58","ccebbd347133147f5113b515","68c62c6a2d3b6a219a452044","49d794276754db216162aaf7","41f63845a75bc96d0de4e2f7","33ba8298908883559fa24c30",
+"46ada968963e206b8c2a06a7","32e26fe69ab0c4c43d94c35a","2f36c37944055abad68d6e75","9fa5d5267811dd61e6352af1","ce89a147ec21a11a93044821","f41a4b2319a320016242ac10",
+"acefb0aee2c54f00eefff86c","90a77783478d378b657b3b37","756353ff3b5e36f568a0d9a5","4487b3d8e6a7e5c43e0f72d8","47c77aca4aa5b577bcec93b6","26744f397551c086bd8d954e",
+"4748a55836dc5938d4a83581","c5979e5b5e13f700f073e236","b639f59a716dac46bf774239","df0cabe859c92b52e0677cfb","9fc7e1063ca9b9e97ff961ca","8c5ecf40384c0b9d71156d57",
+"29080c75b530016eae8fbac3","2c46242628c66b9dffc82e68","b3da7d1051769883bc457e18","437eb813f589a68c8dfacec3","86a4ab70f956795008445ad8","17b0d4688b1b09d6fc1b99f2",
+"e08c4adea30f3d89006897a7","6abcd68cd6a30322463a0a58","c56cb51bd69838b72f3c2eda","62ebdb9e6b76d5f69ea8538f","8b2dae31c4dc69d0b172b0ac","76516534d5e5f49accd9cf2d",
+"23d80aa8f24b874357d3f1d2","c51b83654f402a72592dfff5","d69580de6ad7a28db26f1310","fd562e115b07ca681f656831","7e3861b010ebfdf51d19e28c","d9cfe65565ff972fe2b54d84",
+"67f733ec4db79ee5649b7f8d","a87c6ff724b2a7d513fa5bfc","0ca6c8daeaf52f01d397c2e6","430d1d6059d1104a089f88cb","2e5e5635ff572f3bab555888","b721eef5e82424bca8c261cf",
+"1cfbac8bdcb7706c238540ce","cc062bad2125242df515eafa","bc0c4a56a30ac574791dbcfb","79836f929ff8134565364b7e","63108a6757a0dbc58460a742","f202233ceadaf099b9c1f682",
+"ceb848130da19306583db336","33b98232d432cd629460708d","7de7e1cff9b7882b081e62a4","c5dbfc9292cbab6b4d2c1e5f","923ca5daf126cc4b93e092bb","cb74335df9bbe5fb4f6966d2",
+"106b49748da06d184c6ece38","14f7063de10a2f148b2b3fe1","5607bc27abc0b2487d960428","ea70ee98fcaa92e3512e8bb6","80bc4630793a90b8033d7b3d","b63220c663b8a8b921175fd0",
+"33c158c3f6aca5e5cf2ae441","dff71f414e7646cce429aeb4","bc19594be602d7839c12661f","0d12cdb209516f7ee5c23626","4ef092a46055b0f0f0b086c1","1340bdeb032e798c6f00bdd5",
+"01c76709ca83bff9a24cd6a3","253e84c4bf96bbc948324920","0fef7f02d3863367d291f883","1a4c76d78e82c3b62bafe924","6483f74fce2eafef77a704c4","e4e8faf7fecdebef4161187a",
+"e4a0a49789913350957cb65d","ce9bc3463fc20b68e7d6b486","37741bf68c68efe9d9b13259","e2037a57e640924823d1d7f5","748073d6e1c082a199729dd9","76e1a057131c64e8dc1ffcef",
+"90e789a3307aacf751c79bc5","095ecc5b5412aba5c6b9c158","a3afd2a710ac0dfedfbfd568","b31e2c88a187fc44f3df1993","a3d663fc033463771aeb258d","7769f962c6f1c820ae0e4d08",
+"b9505a3026e67df5e08ff4d8","1ef877848214505c25ee722b","3763ba67b9a6cd7d981a3105","0b41d191485d3c57073ed9fc","6bf89d0e52c4afb903ad997f","25a2534a8c24ff3e6145294b",
+"bd47633f2a5a012bd9e37517","ddb90c4992f482c9485a3e7a","ca18f2cc403625734dd1da63","1a7b1e09fa70552429acc622","3365483ed878a4b606275b2d","be1f19f1dcd9280280534e64",
+"4499af18365ea6b71026d42d","b2d78ec70ad7844d1aa33dbc","538856f2d33ed9f44b78a566","527e5ed30ba4bac0ba5dad94","b5d99d24918b2e39662674c5","3b7061f94ba41144ab27252d",
+"935f41ab7656ee71c4676676","01bc558d7ae391b572a4dddc","2ef09ec26eb781114c46a616","d2fefe2416e005bb7d5ca13e","a8a6883addce369f630a9b44","8e3bbbfee2c6f89fc1204035",
+"b22d257a069743c737d522ec","b1cbdf0f7361ad1a5431768e","a2d6d504579e6f3b6f83b068","a4b597592ab248d065de3265","25cacfb53c4d0ab4d3215ccd","131d45f78a498983d12a718f",
+"3c8461a3e34fdd9f47d067f5","c4fae6c3285982165c2860ad","dd10fef5c5b7446a1aa8870a","a2b10f1b46ea859e40dc6060","67008419ace5e4ad896e171d","742fc99b24f1cff7eb81c458",
+"238978934964caf3316fcf14","bf5f7da7e75326db081e1126","d2fe338a4d45606674da5ccc","19849e173ddc101b2ab57166","f2e652136e3e1b3f40991240","263d52efd70e38820a843941",
+"2381916687e21412452080d5","42f6546af374e9c263528e55","c454682f3d3c6b2e0000a1f2","52b8fea9208ebfe6dc9bd4aa","8785c99ade40331ff9699cbc","2606c81e480c2ba047177f54",
+"0de6152e19f38963b89c7652","9aba8ce8d87e8c76ccf883f1","97b1ac73bdcc2f4684e8ec83","bb9b30ba3ab434d4758b3772","90433c4d00449a99eccad057","94f7366f8e270ca6e163a115",
+"6094546f0750a3cfcae4a8a2","4476215de95465b680c3db42","3b11a05afb048369f092a0b5","c3b4496ca4ef3ea03229106f","4e9a42de11b888922b788bc6","be022732481e3b98d199427b",
+"dd6eb7aa9ebee9a716695a30","ae33170936405fd1de62f039","ce4531058183d7d53a75df8f","b5428ed1e33a0345885eeaeb","521d96b5d83a7bcee100cdd7","40a307bd2acbfd5e94e4a370",
+"7aa225ebfefec56de260fc8c","dc67f0f630696354153226da","44ddb78b22e14b438fd7534a","b4e5c235398cf41a125b1ced","a93c2002ebb4e621bc2299ff","6ff35575b4bd1ecf42bddbe9",
+"4f427637045a60e5084fe388","31059d2938f36b05bad34d57","1d0ca0d48040cfc969025eb4","a8b0ee90d784ac01abfabc95","6ef1e64bf6064a2c451aa089","49e4f2fb0975fc5e25746b52",
+"a4635306bac605dfbb47bfcd","5c2db9b6a5ab7c485d43031c","96652e4cf6f649d5ea6c7291","4e196219b9197bbb24febfce","87ec669a0565406dd78cbad9","1fd39256225a1cb707a8b578",
+"434c3faf13769d438f92e936","0dfb73e9505ab375f069ec50","852537da16ddecec70fb1795","e8f032a35f89f80b9c2897d8","1965489505877be2a0bec0be","41a09181d1801b6b022e7cda",
+"c965fba31f33f93404769fa1","5d2e32f4da7bc3dec499c59d","eca37b94b7e49862979eadb8","3fd946bc19c0a3162d52c33b","ca7642c3fe1d2cc1e16ad431","febfbd8c0aa5c7054fc36dcf",
+"7b47215aa7de00310a7d517e","920394a35d63fd78417cc1d0","fd8e1b05fb459ac16ca4adc2","5eb5fe7c7c0c25355d8f1d50","a63987fda88768a052901f1f","3cba17d53308bf830dd7c6ab",
+"ece5a50e0250f326082a1863","49cf9d068331684997a2e00d","9a28d19e554b813b2d37862f","7669f1b095713738fdbe9a17","46478d5af19637d525e9be65","62f20e885b7058a0f0307595",
+"f56986c9253605b368e9141e","ebc773ded27d499fd8d602eb","4455a290e88c7aaf0dccbb8b","51989cc551aaa14e08fea449","c02662ef4e9c916f1a9dc94f","64839e926f4b9ce89d1a1c2b",
+"ffcf327a06c0a18f267b7365","b9fba017b0fc54893b0f60d6","3d35bca1d92b43d97c6bef38","e4d3ea2ddf1b706ad0a8285d","c3b2a33c88ad5f864bd7db06","8e5b0c573332feb05abfcf78",
+"0d247e80799bf967b1eb6dc5","87bf461e015a299106cfe01b","fccb49efc944bc198b91301e","d8906796a6b04aa00f0fcdd3","1976f27b0e41754a30c07d33","788403ea7bc3c7c9e7c867ff",
+"29abc83c128ce2ba62954f68","61138bbc59fa8af4234f4839","0806ef9bc03d4c27dfbd4f4d","dbf81591c3f91fb410c1f201","933e5fcb54160ce1acd07b9f","659fd87ab7a49c1da5c8a331",
+"5a4ede2cbec11b1e40a80404","a28988a9a850af4920069248","970afaae40df79c53a62f39a","6ff598573794aa1858de1626","3537f301c2b976b47b16281d","81cfffe83fc516a29934604e",
+"c68489ad68bab20e14a52c9a","45adc01eaa024ad877bcf4d1","cf0fd33f3e3b7de7849ec942","2fb93d2511d4e65a4dece99a","d477b963e76fef53340bb97d","8d5d796326d5cb751db7c501",
+"08f6a73213706c42453610db","af3463028eed4dfa2473c629","3ea772026e247eb8c58292cd","33ab4daf673f0a2a256f0d16","46ba33192c8b0da9fdf0a9be","9d86b4d554c4b4e96e691c00",
+"082eb79d8ec29f1bcd5a182b","140f60f0e03141074a40850c","9f8aabc2823d92c9d4465db7","6788975db1bac0d063431646","2824b95e58f03e902b0e2b9d","d6c2e6b89e07433f7a2632e5",
+"7dff2df0907b4720027ef009","5fe4dd36b3412cc18a2b9717","0e36ba6596fa75473e365bea","6c6785d70c20eef96f0cad50","6e08d665df6a1cf6559fda2e","eb1c5f4b129a0d1b536f5051",
+"da37aeb049f4cb8f28cdb167","dd9f563cc65b9c13435f535c","9fe493ba9caee062fa41f068","b4276f8bc2e3e3a3e3e9a372","d3131928b3442abd8128c195","2eb26f456f4ab2a95fd158f7",
+"06d391c819f59f2369c7be88","94291fb1e0b4db74bec65824","a9a038e1572df2ffc3c325ac","19a2dd581170080763550d06","5117c14d959a92221c03ca3f","1e102602cde34d89fcdaaf9a",
+"9dbbd9f1d64ac05ded26b299","f3e24ad05d35354b2eed95c0","2f77f18661f9f24f2971d57f","bd4fc907e891544963b20552","2311fc49d523adcacaf0ca6d","d14896fb99ce8168db42afe1",
+"520f89f3490803626101e304","961d4de920e2a09ad9c95594","74d5c6a8b3cfc2dd3345b3c4","fb5a3960bd81fa86b471f0cf","0c81622d76344beb1af17393","ab2fa8d1845b44fdbde70dd3",
+/*LICENSES-END*/
+]);
+const ror=(x,n)=>(x>>>n)|(x<<(32-n));
+const SHA_K=(()=>{const k=[];let n=2;while(k.length<64){let p=true;for(let d=2;d*d<=n;d++)if(n%d===0){p=false;break}if(p)k.push((Math.cbrt(n)%1)*4294967296|0);n++}return k})();
+function sha256hex(str){
+  const b=new TextEncoder().encode(str),l=b.length,n=((l+9+63)>>6)<<6,m=new Uint8Array(n);m.set(b);m[l]=0x80;
+  const dv=new DataView(m.buffer);dv.setUint32(n-4,l*8);
+  const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19],w=new Int32Array(64);
+  for(let i=0;i<n;i+=64){
+    for(let j=0;j<16;j++)w[j]=dv.getUint32(i+j*4);
+    for(let j=16;j<64;j++){const x=w[j-15],y=w[j-2];w[j]=w[j-16]+(ror(x,7)^ror(x,18)^(x>>>3))+w[j-7]+(ror(y,17)^ror(y,19)^(y>>>10))|0}
+    let[a,b2,c,d,e,f,g,h]=H;
+    for(let j=0;j<64;j++){const t1=h+(ror(e,6)^ror(e,11)^ror(e,25))+((e&f)^(~e&g))+SHA_K[j]+w[j]|0,t2=(ror(a,2)^ror(a,13)^ror(a,22))+((a&b2)^(a&c)^(b2&c))|0;
+      h=g;g=f;f=e;e=d+t1|0;d=c;c=b2;b2=a;a=t1+t2|0}
+    [a,b2,c,d,e,f,g,h].forEach((v,k)=>H[k]=H[k]+v|0)}
+  return H.map(x=>(x>>>0).toString(16).padStart(8,"0")).join("");
+}
+const normCode=s=>String(s||"").toUpperCase().replace(/[^0-9A-Z]/g,"").replace(/^IRON/,"").replace(/O/g,"0").replace(/[IL]/g,"1");
+const codeHash=c=>sha256hex("ironlog:"+c).slice(0,24);
+let LIC={};try{LIC=JSON.parse(localStorage.getItem(LIC_KEY)||"{}")||{}}catch(e){}
+const saveLic=()=>{try{localStorage.setItem(LIC_KEY,JSON.stringify(LIC))}catch(e){}};
+if(!LIC.trialStart){LIC.trialStart=Date.now();saveLic()}
+const activated=()=>!!LIC.code&&LIC_HASHES.has(codeHash(LIC.code));
+const trialLeft=()=>Math.max(0,Math.ceil((LIC.trialStart+TRIAL_DAYS*864e5-Date.now())/864e5));
+const isLocked=()=>!activated()&&trialLeft()<=0;
+function tryActivate(raw){const c=normCode(raw);if(c.length!==12){toast(t("codeFormat"));return false}
+  if(!LIC_HASHES.has(codeHash(c))){toast(t("codeBad"));return false}LIC.code=c;LIC.at=Date.now();saveLic();toast(t("codeOk"));return true}
+const buyText=()=>L(BUY_INFO)?esc(L(BUY_INFO)):t("buy");
+const codeForm=id=>`<label class="f">${t("codeLbl")}<input id="${id}" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="IRON-XXXX-XXXX-XXXX" style="direction:ltr;font-family:var(--f-num);text-align:center;letter-spacing:1px"></label>`;
+
 /* ---------- shell ---------- */
 const TABS=[["today","tToday",'<path d="M2 12h3M19 12h3M5 8v8M19 8v8M8 6v12M16 6v12M8 12h8"/>'],["progress","tProg",'<path d="M3 20h18M5 16l4-5 4 3 6-8"/>'],
  ["body","tBody",'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9l3 4 3-4"/>'],["food","tFood",'<path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8M7 7h4M17 3c-2 2-2 6 0 9v9"/>'],
@@ -639,15 +738,31 @@ function applyLang(){
   $$("#tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();window.scrollTo(0,0)});
 }
 function render(){
-  if(!S.onboarded&&tab!=="welcome")tab="welcome";
+  if(isLocked())tab="locked";else if(tab==="locked")tab="today";
+  if(!S.onboarded&&tab!=="welcome"&&tab!=="locked")tab="welcome";
   $("#subtitle").textContent=S.onboarded?progName():"";
   $$("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(PARENT[tab]||tab)));
-  $("#tabs").hidden=tab==="welcome"&&!S.onboarded;
+  $("#tabs").hidden=tab==="locked"||(tab==="welcome"&&!S.onboarded);
   $("#view").innerHTML=VIEWS[tab]();
   BIND[tab]&&BIND[tab]();
 }
 const VIEWS={},BIND={};
 const go=(k)=>{tab=k;render();window.scrollTo(0,0)};
+
+/* ---------- lock screen (trial over) ---------- */
+VIEWS.locked=function(){
+  return`<h2>${t("lockedT")}</h2><p class="muted" style="margin:0 0 14px">${t("lockedLead")}</p>
+  <div class="card stack">${codeForm("lkCode")}<button type="button" class="primary block" id="lkGo">${t("activate")}</button><div class="small muted">${buyText()}</div></div>
+  <div class="card stack" style="margin-top:12px"><div class="chips"><button type="button" class="chip ${LANG==="ar"?"on":""}" data-lang="ar">العربية</button><button type="button" class="chip ${LANG==="en"?"on":""}" data-lang="en">English</button></div>
+   <div class="small muted">${t("lockedBackup")}</div><button type="button" id="lkCopy">${t("copyBackup")}</button><textarea id="lkText" readonly aria-label="${t("backupText")}"></textarea></div>`;
+};
+BIND.locked=function(){
+  $("#lkText").value=JSON.stringify(Object.assign({app:"ironlog",exported:new Date().toISOString()},S));
+  $("#lkGo").onclick=()=>{if(tryActivate($("#lkCode").value)){tab=S.onboarded?"today":"welcome";render();window.scrollTo(0,0)}};
+  $("#lkCode").addEventListener("keydown",e=>{if(e.key==="Enter")$("#lkGo").click()});
+  $$("[data-lang]").forEach(b=>b.onclick=()=>{LANG=S.lang=b.dataset.lang;save();applyLang();render()});
+  $("#lkCopy").onclick=()=>{const ta=$("#lkText");const sel=()=>{ta.focus();ta.select();toast(t("selectCopy"))};try{navigator.clipboard.writeText(ta.value).then(()=>toast(t("copied")),sel)}catch(e){sel()}};
+};
 
 /* ---------- onboarding ---------- */
 let OB=null;
@@ -693,7 +808,9 @@ VIEWS.today=function(){
   const ndName=dayName(DAYS.find(d=>d.id===nd.id));const wdT=WD[LANG][new Date().getDay()];
   const lead=S.draft?t("running",{x:new Date(S.draft.startedAt).toLocaleTimeString(LANG,{hour:"numeric",minute:"2-digit"})}):nd.why==="sched"?t("todaySched",{d:wdT,x:esc(ndName)}):t("todayRest",{d:wdT,x:esc(ndName)});
   const dr=S.draft&&S.draft.day===day.id?S.draft:null;const rpe=S.settings.rpe;
-  let h=`<h2>${esc(dayName(day))} <span class="muted small" style="font-family:var(--f-body)">${esc(other(day.name))}${other(day.name)?" · ":""}${wdLabel(day)}</span></h2>
+  const tl=trialLeft();
+  let h=activated()?"":`<div class="hint row" style="justify-content:space-between;margin-top:12px"><span>${tl<=1?t("trialLast"):t("trialBanner",{n:tl})}</span><button type="button" class="link small" id="goAct">${t("enterCode")}</button></div>`;
+  h+=`<h2>${esc(dayName(day))} <span class="muted small" style="font-family:var(--f-body)">${esc(other(day.name))}${other(day.name)?" · ":""}${wdLabel(day)}</span></h2>
   <p class="muted small" style="margin:0 0 10px">${lead}${day.focus?"<br>"+esc(L(day.focus)):""}</p>`;
   if(!S.draft)h+=`<div class="chips">${DAYS.map(d=>`<button type="button" class="chip ${d.id===day.id?"on":""}" data-day="${d.id}">${esc(dayName(d))} · ${wdLabel(d)}${d.id===nd.id?`<span class="dot" title="${t("suggested")}"></span>`:""}</button>`).join("")}</div>`;
   h+=`<div class="row" style="margin-top:8px"><button type="button" id="goEdit">${t("editProg")}</button></div>
@@ -749,6 +866,7 @@ BIND.today=function(){
     const it=DAYS.find(x=>x.id===d.day).items.find(x=>x.ex===id);const plan=exInfo(id).c&&it?warmPlan(suggest(it).w):null;const p=plan&&plan[a.length];
     a.push(p?{w:p.w,r:p.r}:{});save();keepScroll(render)});
   $("#finish").onclick=finishWorkout;
+  const ga=$("#goAct");if(ga)ga.onclick=()=>{go("settings");const el=$("#actCard");if(el)el.scrollIntoView({block:"start"})};
   const ds=$("#discard");if(ds)ds.onclick=()=>{if(!armed(ds))return;S.draft=null;save();stopTimer();render();toast(t("discarded"))};
 };
 function finishWorkout(){
@@ -1008,7 +1126,9 @@ const isStandalone=()=>{try{return matchMedia("(display-mode: standalone)").matc
 const pwaCapable=()=>!!document.querySelector('link[rel="manifest"]');
 VIEWS.settings=function(){
   const p=S.profile,T=targets();
-  return`<h2>${t("myProg")}</h2><div class="card stack"><div><b>${esc(progName())}</b> <span class="muted small">· ${t("perWeek",{n:DAYS.length})}</span></div>
+  return`<h2 id="actCard">${t("act")}</h2><div class="card stack">${activated()?`<div class="hint up" style="margin:0">${t("actOk")}</div>`:
+   `<div class="small">${t("actTrial",{n:trialLeft()})}</div>${codeForm("actCode")}<button type="button" class="primary" id="actGo">${t("activate")}</button><div class="small muted">${buyText()}</div>`}</div>
+  <h2>${t("myProg")}</h2><div class="card stack"><div><b>${esc(progName())}</b> <span class="muted small">· ${t("perWeek",{n:DAYS.length})}</span></div>
    <div class="grid2"><button type="button" id="goProgs">${t("changeProg")}</button><button type="button" id="goEdit">${t("editDaysEx")}</button></div>
    <button type="button" class="ghost" id="redoQ">${t("redoQ")}</button></div>
   <h2>${t("prefs")}</h2><div class="card stack">
@@ -1040,6 +1160,7 @@ VIEWS.settings=function(){
   <p class="small muted" style="margin-top:16px">${t("counts",{a:S.sessions.length,b:S.bodyw.length,c:S.meas.length,d:S.food.length})}</p>`;
 };
 BIND.settings=function(){
+  const ag=$("#actGo");if(ag)ag.onclick=()=>{if(tryActivate($("#actCode").value))keepScroll(render)};
   const dump=()=>JSON.stringify(Object.assign({app:"ironlog",exported:new Date().toISOString()},S));$("#bText").value=dump();
   $("#goProgs").onclick=()=>go("programs");$("#goEdit").onclick=()=>{editDay=null;go("edit")};$("#redoQ").onclick=()=>{OB=clone(S.prefs);go("welcome")};
   $$("[data-lang]").forEach(b=>b.onclick=()=>{LANG=S.lang=b.dataset.lang;save();applyLang();keepScroll(render)});
@@ -1077,7 +1198,7 @@ if(pwaCapable()){
   window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;if(tab==="settings")keepScroll(render)});
   if("serviceWorker" in navigator&&window.isSecureContext)navigator.serviceWorker.register("sw.js").catch(()=>{});
 }
-const h0=location.hash.slice(1);if(S.onboarded&&VIEWS[h0]&&!["sess","edit"].includes(h0))tab=h0;
+const h0=location.hash.slice(1);if(S.onboarded&&VIEWS[h0]&&!["sess","edit","locked"].includes(h0))tab=h0;
 render();
 })();
 </script>
