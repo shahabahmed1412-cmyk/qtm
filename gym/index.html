@@ -482,17 +482,15 @@ const TX={
  fileLoaded:["تم تحميل الملف، اضغط استعادة","File loaded, tap Restore"],badBackup:["النص ليس نسخة احتياطية صالحة","That isn't a valid backup"],notOurs:["هذه ليست نسخة احتياطية من دفتر الحديد","That isn't an Iron Log backup"],
  restored:["تمت الاستعادة","Restored"],
  // licensing
- trialBanner:["نسخة تجريبية · الأيام المتبقية: {n}","Free trial: {n} days left"],trialLast:["نسخة تجريبية: هذا آخر يوم","Free trial: last day"],enterCode:["إدخال رمز التفعيل","Enter activation code"],
  act:["التفعيل","Activation"],actOk:["التطبيق مفعّل ✓ شكرًا لشرائك.","The app is activated ✓ Thanks for your purchase."],
- actTrial:["أنت تستخدم النسخة التجريبية (الأيام المتبقية: {n})، وبعدها تحتاج رمز تفعيل. بياناتك تبقى محفوظة.","You're on the free trial with {n} days left, then you'll need an activation code. Your data stays saved."],
  codeLbl:["رمز التفعيل","Activation code"],activate:["تفعيل","Activate"],
  codeFormat:["الرمز يتكوّن من ١٢ حرفًا ورقمًا، مثل IRON-AB12-CD34-EF56","The code has 12 letters and digits, like IRON-AB12-CD34-EF56"],
  codeBad:["الرمز غير صحيح. تأكد منه وحاول مرة أخرى.","That code isn't valid. Check it and try again."],
  codeOk:["تم التفعيل. استمتع بالتطبيق!","Activated. Enjoy the app!"],
- lockedT:["انتهت الفترة التجريبية","Your free trial has ended"],
- lockedLead:["أدخل رمز التفعيل لمتابعة استخدام التطبيق. كل بياناتك وتمارينك محفوظة كما هي.","Enter your activation code to keep using the app. All your data and workouts are saved."],
+ lockedT:["فعّل التطبيق","Activate the app"],
+ lockedLead:["أدخل رمز التفعيل الذي حصلت عليه عند الشراء لبدء استخدام التطبيق.","Enter the activation code you received with your purchase to start using the app."],
  buy:["للحصول على رمز تفعيل تواصل مع البائع.","To get an activation code, contact the seller."],
- lockedBackup:["تقدر تنسخ بياناتك الآن كنسخة احتياطية:","You can copy your data now as a backup:"],wiped:["تم حذف البيانات","Data deleted"]
+ lockedBackup:["بياناتك السابقة على هذا الجهاز محفوظة، وتقدر تنسخها كنسخة احتياطية:","Your earlier data on this device is saved, and you can copy it as a backup:"],wiped:["تم حذف البيانات","Data deleted"]
 };
 const WD={ar:["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
 /* ---------- language ---------- */
@@ -639,7 +637,7 @@ function lineChart(pts,unit){
 /* ---------- licensing ----------
    Codes are random (60 bits); the app only stores truncated SHA-256 hashes of valid codes,
    so the list of codes can't be read back from the published file. Added by gym/tools/make_codes.py. */
-const TRIAL_DAYS=7,LIC_KEY="ironlog.lic";
+const LIC_KEY="ironlog.lic";
 const BUY_INFO={ar:"",en:""}; // seller contact shown on the lock screen, e.g. a WhatsApp number
 const LIC_HASHES=new Set([
 /*LICENSES-START*/
@@ -714,10 +712,8 @@ const normCode=s=>String(s||"").toUpperCase().replace(/[^0-9A-Z]/g,"").replace(/
 const codeHash=c=>sha256hex("ironlog:"+c).slice(0,24);
 let LIC={};try{LIC=JSON.parse(localStorage.getItem(LIC_KEY)||"{}")||{}}catch(e){}
 const saveLic=()=>{try{localStorage.setItem(LIC_KEY,JSON.stringify(LIC))}catch(e){}};
-if(!LIC.trialStart){LIC.trialStart=Date.now();saveLic()}
 const activated=()=>!!LIC.code&&LIC_HASHES.has(codeHash(LIC.code));
-const trialLeft=()=>Math.max(0,Math.ceil((LIC.trialStart+TRIAL_DAYS*864e5-Date.now())/864e5));
-const isLocked=()=>!activated()&&trialLeft()<=0;
+const isLocked=()=>!activated(); // the app opens only after activation
 function tryActivate(raw){const c=normCode(raw);if(c.length!==12){toast(t("codeFormat"));return false}
   if(!LIC_HASHES.has(codeHash(c))){toast(t("codeBad"));return false}LIC.code=c;LIC.at=Date.now();saveLic();toast(t("codeOk"));return true}
 const buyText=()=>L(BUY_INFO)?esc(L(BUY_INFO)):t("buy");
@@ -749,19 +745,20 @@ function render(){
 const VIEWS={},BIND={};
 const go=(k)=>{tab=k;render();window.scrollTo(0,0)};
 
-/* ---------- lock screen (trial over) ---------- */
+/* ---------- activation screen ---------- */
+const hasData=()=>S.sessions.length+S.bodyw.length+S.meas.length+S.food.length>0;
 VIEWS.locked=function(){
   return`<h2>${t("lockedT")}</h2><p class="muted" style="margin:0 0 14px">${t("lockedLead")}</p>
   <div class="card stack">${codeForm("lkCode")}<button type="button" class="primary block" id="lkGo">${t("activate")}</button><div class="small muted">${buyText()}</div></div>
   <div class="card stack" style="margin-top:12px"><div class="chips"><button type="button" class="chip ${LANG==="ar"?"on":""}" data-lang="ar">العربية</button><button type="button" class="chip ${LANG==="en"?"on":""}" data-lang="en">English</button></div>
-   <div class="small muted">${t("lockedBackup")}</div><button type="button" id="lkCopy">${t("copyBackup")}</button><textarea id="lkText" readonly aria-label="${t("backupText")}"></textarea></div>`;
+   ${hasData()?`<div class="small muted">${t("lockedBackup")}</div><button type="button" id="lkCopy">${t("copyBackup")}</button><textarea id="lkText" readonly aria-label="${t("backupText")}"></textarea>`:""}</div>`;
 };
 BIND.locked=function(){
-  $("#lkText").value=JSON.stringify(Object.assign({app:"ironlog",exported:new Date().toISOString()},S));
+  if($("#lkText"))$("#lkText").value=JSON.stringify(Object.assign({app:"ironlog",exported:new Date().toISOString()},S));
   $("#lkGo").onclick=()=>{if(tryActivate($("#lkCode").value)){tab=S.onboarded?"today":"welcome";render();window.scrollTo(0,0)}};
   $("#lkCode").addEventListener("keydown",e=>{if(e.key==="Enter")$("#lkGo").click()});
   $$("[data-lang]").forEach(b=>b.onclick=()=>{LANG=S.lang=b.dataset.lang;save();applyLang();render()});
-  $("#lkCopy").onclick=()=>{const ta=$("#lkText");const sel=()=>{ta.focus();ta.select();toast(t("selectCopy"))};try{navigator.clipboard.writeText(ta.value).then(()=>toast(t("copied")),sel)}catch(e){sel()}};
+  if($("#lkCopy"))$("#lkCopy").onclick=()=>{const ta=$("#lkText");const sel=()=>{ta.focus();ta.select();toast(t("selectCopy"))};try{navigator.clipboard.writeText(ta.value).then(()=>toast(t("copied")),sel)}catch(e){sel()}};
 };
 
 /* ---------- onboarding ---------- */
@@ -808,9 +805,7 @@ VIEWS.today=function(){
   const ndName=dayName(DAYS.find(d=>d.id===nd.id));const wdT=WD[LANG][new Date().getDay()];
   const lead=S.draft?t("running",{x:new Date(S.draft.startedAt).toLocaleTimeString(LANG,{hour:"numeric",minute:"2-digit"})}):nd.why==="sched"?t("todaySched",{d:wdT,x:esc(ndName)}):t("todayRest",{d:wdT,x:esc(ndName)});
   const dr=S.draft&&S.draft.day===day.id?S.draft:null;const rpe=S.settings.rpe;
-  const tl=trialLeft();
-  let h=activated()?"":`<div class="hint row" style="justify-content:space-between;margin-top:12px"><span>${tl<=1?t("trialLast"):t("trialBanner",{n:tl})}</span><button type="button" class="link small" id="goAct">${t("enterCode")}</button></div>`;
-  h+=`<h2>${esc(dayName(day))} <span class="muted small" style="font-family:var(--f-body)">${esc(other(day.name))}${other(day.name)?" · ":""}${wdLabel(day)}</span></h2>
+  let h=`<h2>${esc(dayName(day))} <span class="muted small" style="font-family:var(--f-body)">${esc(other(day.name))}${other(day.name)?" · ":""}${wdLabel(day)}</span></h2>
   <p class="muted small" style="margin:0 0 10px">${lead}${day.focus?"<br>"+esc(L(day.focus)):""}</p>`;
   if(!S.draft)h+=`<div class="chips">${DAYS.map(d=>`<button type="button" class="chip ${d.id===day.id?"on":""}" data-day="${d.id}">${esc(dayName(d))} · ${wdLabel(d)}${d.id===nd.id?`<span class="dot" title="${t("suggested")}"></span>`:""}</button>`).join("")}</div>`;
   h+=`<div class="row" style="margin-top:8px"><button type="button" id="goEdit">${t("editProg")}</button></div>
@@ -866,7 +861,6 @@ BIND.today=function(){
     const it=DAYS.find(x=>x.id===d.day).items.find(x=>x.ex===id);const plan=exInfo(id).c&&it?warmPlan(suggest(it).w):null;const p=plan&&plan[a.length];
     a.push(p?{w:p.w,r:p.r}:{});save();keepScroll(render)});
   $("#finish").onclick=finishWorkout;
-  const ga=$("#goAct");if(ga)ga.onclick=()=>{go("settings");const el=$("#actCard");if(el)el.scrollIntoView({block:"start"})};
   const ds=$("#discard");if(ds)ds.onclick=()=>{if(!armed(ds))return;S.draft=null;save();stopTimer();render();toast(t("discarded"))};
 };
 function finishWorkout(){
@@ -1126,8 +1120,7 @@ const isStandalone=()=>{try{return matchMedia("(display-mode: standalone)").matc
 const pwaCapable=()=>!!document.querySelector('link[rel="manifest"]');
 VIEWS.settings=function(){
   const p=S.profile,T=targets();
-  return`<h2 id="actCard">${t("act")}</h2><div class="card stack">${activated()?`<div class="hint up" style="margin:0">${t("actOk")}</div>`:
-   `<div class="small">${t("actTrial",{n:trialLeft()})}</div>${codeForm("actCode")}<button type="button" class="primary" id="actGo">${t("activate")}</button><div class="small muted">${buyText()}</div>`}</div>
+  return`<h2>${t("act")}</h2><div class="card"><div class="hint up" style="margin:0">${t("actOk")}</div></div>
   <h2>${t("myProg")}</h2><div class="card stack"><div><b>${esc(progName())}</b> <span class="muted small">· ${t("perWeek",{n:DAYS.length})}</span></div>
    <div class="grid2"><button type="button" id="goProgs">${t("changeProg")}</button><button type="button" id="goEdit">${t("editDaysEx")}</button></div>
    <button type="button" class="ghost" id="redoQ">${t("redoQ")}</button></div>
@@ -1160,7 +1153,6 @@ VIEWS.settings=function(){
   <p class="small muted" style="margin-top:16px">${t("counts",{a:S.sessions.length,b:S.bodyw.length,c:S.meas.length,d:S.food.length})}</p>`;
 };
 BIND.settings=function(){
-  const ag=$("#actGo");if(ag)ag.onclick=()=>{if(tryActivate($("#actCode").value))keepScroll(render)};
   const dump=()=>JSON.stringify(Object.assign({app:"ironlog",exported:new Date().toISOString()},S));$("#bText").value=dump();
   $("#goProgs").onclick=()=>go("programs");$("#goEdit").onclick=()=>{editDay=null;go("edit")};$("#redoQ").onclick=()=>{OB=clone(S.prefs);go("welcome")};
   $$("[data-lang]").forEach(b=>b.onclick=()=>{LANG=S.lang=b.dataset.lang;save();applyLang();keepScroll(render)});
