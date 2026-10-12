@@ -57,6 +57,9 @@ button.ghost{background:transparent;border-color:transparent;color:var(--muted)}
 button.danger{color:var(--warn);border-color:var(--warn)}
 button.block{width:100%}
 button.link{background:none;border:0;padding:4px 6px;min-height:32px;color:var(--accent)}
+a.wa{display:flex;align-items:center;justify-content:center;gap:10px;min-height:48px;border-radius:10px;background:var(--good);color:var(--surface);font-weight:700;text-decoration:none;padding:8px 14px}
+a.wa:hover{filter:brightness(1.08)}a.wa:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a.wa svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 input,select,textarea{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:40px;width:100%;min-width:0}
 textarea{min-height:110px;font-family:var(--f-num);font-size:12px;direction:ltr}
@@ -489,7 +492,9 @@ const TX={
  codeOk:["تم التفعيل. استمتع بالتطبيق!","Activated. Enjoy the app!"],
  lockedT:["فعّل التطبيق","Activate the app"],
  lockedLead:["أدخل رمز التفعيل الذي حصلت عليه عند الشراء لبدء استخدام التطبيق.","Enter the activation code you received with your purchase to start using the app."],
- buy:["للحصول على رمز تفعيل تواصل مع البائع.","To get an activation code, contact the seller."],
+ buyWa:["ما عندك رمز؟ اطلبه منا على واتساب:","No code yet? Get one from us on WhatsApp:"],
+ waBtn:["اطلب رمز التفعيل عبر واتساب","Get an activation code on WhatsApp"],waOr:["أو راسلنا على الرقم:","Or message us at:"],
+ waMsg:["السلام عليكم، أريد شراء رمز تفعيل دفتر الحديد","Hello, I'd like to buy an Iron Log activation code"],
  lockedBackup:["بياناتك السابقة على هذا الجهاز محفوظة، وتقدر تنسخها كنسخة احتياطية:","Your earlier data on this device is saved, and you can copy it as a backup:"],wiped:["تم حذف البيانات","Data deleted"]
 };
 const WD={ar:["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
@@ -638,7 +643,7 @@ function lineChart(pts,unit){
    Codes are random (60 bits); the app only stores truncated SHA-256 hashes of valid codes,
    so the list of codes can't be read back from the published file. Added by gym/tools/make_codes.py. */
 const LIC_KEY="ironlog.lic";
-const BUY_INFO={ar:"",en:""}; // seller contact shown on the lock screen, e.g. a WhatsApp number
+const SELLER_WA={number:"9647878757391",display:"+964 787 875 7391"}; // seller WhatsApp shown on the activation screen
 const LIC_HASHES=new Set([
 /*LICENSES-START*/
 "87fb5819271c0fd439b4ff8e","9ed7fb8f0e9ff6d0d758cf0d","22ea64903ff146fc6b4fe78a","c85e1425d7ef0ac46ef41000","d51b0897971eaae395372027","bc2bbf1d5f6ee87ee25534fa",
@@ -716,7 +721,10 @@ const activated=()=>!!LIC.code&&LIC_HASHES.has(codeHash(LIC.code));
 const isLocked=()=>!activated(); // the app opens only after activation
 function tryActivate(raw){const c=normCode(raw);if(c.length!==12){toast(t("codeFormat"));return false}
   if(!LIC_HASHES.has(codeHash(c))){toast(t("codeBad"));return false}LIC.code=c;LIC.at=Date.now();saveLic();toast(t("codeOk"));return true}
-const buyText=()=>L(BUY_INFO)?esc(L(BUY_INFO)):t("buy");
+const waLink=()=>"https://wa.me/"+SELLER_WA.number+"?text="+encodeURIComponent(t("waMsg"));
+const buyBlock=()=>`<div class="stack" style="gap:8px;margin-top:4px"><div class="small muted">${t("buyWa")}</div>
+  <a class="wa" href="${waLink()}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.4-4A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1-1 2 1"/></svg>${t("waBtn")}</a>
+  <div class="small muted">${t("waOr")} <span class="num" style="user-select:all;color:var(--fg)">${SELLER_WA.display}</span></div></div>`;
 const codeForm=id=>`<label class="f">${t("codeLbl")}<input id="${id}" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="IRON-XXXX-XXXX-XXXX" style="direction:ltr;font-family:var(--f-num);text-align:center;letter-spacing:1px"></label>`;
 
 /* ---------- shell ---------- */
@@ -749,7 +757,7 @@ const go=(k)=>{tab=k;render();window.scrollTo(0,0)};
 const hasData=()=>S.sessions.length+S.bodyw.length+S.meas.length+S.food.length>0;
 VIEWS.locked=function(){
   return`<h2>${t("lockedT")}</h2><p class="muted" style="margin:0 0 14px">${t("lockedLead")}</p>
-  <div class="card stack">${codeForm("lkCode")}<button type="button" class="primary block" id="lkGo">${t("activate")}</button><div class="small muted">${buyText()}</div></div>
+  <div class="card stack">${codeForm("lkCode")}<button type="button" class="primary block" id="lkGo">${t("activate")}</button>${buyBlock()}</div>
   <div class="card stack" style="margin-top:12px"><div class="chips"><button type="button" class="chip ${LANG==="ar"?"on":""}" data-lang="ar">العربية</button><button type="button" class="chip ${LANG==="en"?"on":""}" data-lang="en">English</button></div>
    ${hasData()?`<div class="small muted">${t("lockedBackup")}</div><button type="button" id="lkCopy">${t("copyBackup")}</button><textarea id="lkText" readonly aria-label="${t("backupText")}"></textarea>`:""}</div>`;
 };
